@@ -2,9 +2,8 @@ package eventSystem
 
 import org.scalatest.flatspec._
 import org.scalatest.matchers._
-import org.scalamock.scalatest.MockFactory
 
-class EventSystemSpec extends AnyFlatSpec with should.Matchers with MockFactory {
+class EventSystemSpec extends AnyFlatSpec with should.Matchers {
   "Listener" should "handle subscribed event" in {
     var count = 1
     val listener = EventSystem.subscribe()
