@@ -9,7 +9,7 @@ class EventSystemSpec extends AnyFlatSpec with should.Matchers with MockFactory 
     var count = 1
     val listener = EventSystem.subscribe()
 
-    listener.on(SimpleEvent.eventId, _ => { count += 1 })
+    listener.on(SimpleEvent.id, _ => { count += 1 })
 
     count should be (1)
 
@@ -28,7 +28,7 @@ class EventSystemSpec extends AnyFlatSpec with should.Matchers with MockFactory 
     var count = 0
     val listener = EventSystem.subscribe()
 
-    listener.on(SimpleEvent.eventId, _ => { count += 1 })
+    listener.on(SimpleEvent.id, _ => { count += 1 })
     listener.unsubscribe()
 
     EventSystem ! SimpleEvent()
@@ -42,7 +42,7 @@ class EventSystemSpec extends AnyFlatSpec with should.Matchers with MockFactory 
     var count = 0
     val listener = EventSystem.subscribe()
 
-    listener.on(SimpleEvent.eventId, {
+    listener.on(SimpleEvent.id, {
       case SimpleEvent(data) => count += data.asInstanceOf[Int]
       case _ => throw new Error("should never be thrown")
     })
@@ -64,8 +64,8 @@ class EventSystemSpec extends AnyFlatSpec with should.Matchers with MockFactory 
     var count2 = 0
     val listener = EventSystem.subscribe()
 
-    listener.on(SimpleEvent.eventId, _ => { count = 3 })
-    listener.on(SimpleEvent.eventId, _ => { count2 = 8 })
+    listener.on(SimpleEvent.id, _ => { count = 3 })
+    listener.on(SimpleEvent.id, _ => { count2 = 8 })
 
     EventSystem ! SimpleEvent()
 
@@ -78,8 +78,8 @@ class EventSystemSpec extends AnyFlatSpec with should.Matchers with MockFactory 
   it should "be chainable" in {
     var count = 0
     EventSystem.subscribe()
-      .on(SimpleEvent.eventId, _ => {})
-      .on(SimpleEvent.eventId, _ => {})
+      .on(SimpleEvent.id, _ => {})
+      .on(SimpleEvent.id, _ => {})
       .unsubscribe()
 
     count should be (0)

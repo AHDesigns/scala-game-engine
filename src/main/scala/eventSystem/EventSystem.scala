@@ -1,7 +1,6 @@
 package eventSystem
 
 object EventSystem {
-  type ID = Int
   private var lastId = 1
   private var listeners = Map.empty[ID, List[(ID, Event => Unit)]]
 
@@ -18,20 +17,11 @@ object EventSystem {
   class EventListener(private val listenerId: ID) {
     private var listening = true
 
-    def on(e: ID, cb: Event => Unit): EventListener = {
+    def on(e: IdWrapper, cb: Event => Unit): EventListener = {
       if (!listening) {
         println(s"Listener is no longer subscribed to events. Attempted to listen to $e")
       } else {
-        listeners += (e -> ((listenerId, cb) :: listeners.getOrElse(e, Nil)))
-      }
-      this
-    }
-
-    def once(e: ID, cb: Event => Unit): EventListener = {
-      if (!listening) {
-        println(s"Listener is no longer subscribed to events. Attempted to listen to $e")
-      } else {
-        listeners += (e -> ((listenerId, cb) :: listeners.getOrElse(e, Nil)))
+        listeners += (e.id -> ((listenerId, cb) :: listeners.getOrElse(e.id, Nil)))
       }
       this
     }
