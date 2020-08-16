@@ -3,7 +3,7 @@ package eventSystem
 object EventSystem {
   type ID = Int
   private var lastId = 1
-  private var listeners = Map.empty[Events.Value, List[(ID, Event => Unit)]]
+  private var listeners = Map.empty[ID, List[(ID, Event => Unit)]]
 
   def subscribe(): EventListener = {
     lastId += 1
@@ -18,7 +18,7 @@ object EventSystem {
   class EventListener(private val listenerId: ID) {
     private var listening = true
 
-    def on(e: Events.Value, cb: Event => Unit): EventListener = {
+    def on(e: ID, cb: Event => Unit): EventListener = {
       if (!listening) {
         println(s"Listener is no longer subscribed to events. Attempted to listen to $e")
       } else {
@@ -27,7 +27,7 @@ object EventSystem {
       this
     }
 
-    def once(e: Events.Value, cb: Event => Unit): EventListener = {
+    def once(e: ID, cb: Event => Unit): EventListener = {
       if (!listening) {
         println(s"Listener is no longer subscribed to events. Attempted to listen to $e")
       } else {
