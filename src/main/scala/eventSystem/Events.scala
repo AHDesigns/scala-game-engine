@@ -1,33 +1,32 @@
 package eventSystem
 
-private object EventID {
-  private var lastId: ID = 0;
-
-  def gen(): IdWrapper = {
-    lastId += 1
-    new IdWrapper(lastId)
-  }
-}
-
-class IdWrapper(val id: ID)
-
-trait WithId {
-  val id: IdWrapper = EventID.gen()
-}
-/** Base Event
- *
- * the eventId allows for matching all listeners of an event enum. to their respective callback
- */
 abstract class Event(val eventId: Int)
 
-object GameLoopStartEvent extends WithId
-final case class GameLoopStartEvent() extends Event(GameLoopStartEvent.id.id)
+object GameLoopStart extends WithId
+final case class GameLoopStart() extends Event(GameLoopStart.id.id)
 
-object WindowResizeEvent extends WithId
-final case class WindowResizeEvent(width: Int, height: Int) extends Event(WindowResizeEvent.id.id)
+object WindowResize extends WithId
+final case class WindowResize(width: Int, height: Int) extends Event(WindowResize.id.id)
 
-object ClickEvent extends WithId
-final case class ClickEvent(x: Int, y: Int, keyCode: Int) extends Event(ClickEvent.id.id)
+object Click extends WithId
+final case class Click(x: Int, y: Int, keyCode: Int) extends Event(Click.id.id)
 
 object SimpleEvent extends WithId
 final case class SimpleEvent(data: AnyVal) extends Event(SimpleEvent.id.id)
+
+// --------------- Helpers -------------------
+private object EventID {
+  private var lastId: ID = 0;
+
+  def gen(): EventIDWrapper = {
+    lastId += 1
+    new EventIDWrapper(lastId)
+  }
+}
+
+class EventIDWrapper(val id: ID)
+
+trait WithId {
+  val id: EventIDWrapper = EventID.gen()
+}
+

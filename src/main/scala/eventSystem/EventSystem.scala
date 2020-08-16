@@ -17,7 +17,7 @@ object EventSystem {
   class EventListener(private val listenerId: ID) {
     private var listening = true
 
-    def on(e: IdWrapper, cb: Event => Unit): EventListener = {
+    def on(e: EventIDWrapper, cb: Event => Unit): EventListener = {
       if (!listening) {
         println(s"Listener is no longer subscribed to events. Attempted to listen to $e")
       } else {

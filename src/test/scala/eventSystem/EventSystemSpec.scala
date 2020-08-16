@@ -52,8 +52,8 @@ class EventSystemSpec extends AnyFlatSpec with should.Matchers {
 
     count should be (5)
 
-    EventSystem ! WindowResizeEvent(1,2)
-    EventSystem ! ClickEvent(1,2,3)
+    EventSystem ! WindowResize(1,2)
+    EventSystem ! Click(1,2,3)
 
     listener.unsubscribe()
   }
@@ -82,5 +82,18 @@ class EventSystemSpec extends AnyFlatSpec with should.Matchers {
       .unsubscribe()
 
     count should be (0)
+  }
+
+  "Events trait" should "subscribe automatically" in {
+    object Foo extends Events
+    var count = 0
+
+    Foo.events.on(SimpleEvent.id, _ => { count = 3 })
+
+    EventSystem ! SimpleEvent()
+
+    count should be (3)
+
+    Foo.events.unsubscribe()
   }
 }
