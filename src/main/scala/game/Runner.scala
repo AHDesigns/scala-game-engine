@@ -1,13 +1,17 @@
 package game
 
+import eventSystem.{EventSystem, Events, GameEnd, GameLoopTick, WindowClose}
 import input.Handler
 import org.lwjgl.Version
-import org.lwjgl.glfw.GLFW.glfwInit
+import org.lwjgl.glfw.GLFW.{glfwInit, glfwSetErrorCallback, glfwTerminate}
 import org.lwjgl.glfw.GLFWErrorCallback
+import org.lwjgl.opengl.GL
+import org.lwjgl.opengl.GL11.glClearColor
 import window.Window
 
-object Runner extends App {
+object Runner extends App with Events {
   println("Using LWJGL " + Version.getVersion + "!")
+  private var gameRunning = true
 
   // Setup an error callback. The default implementation
   // will print the error message in System.err.
@@ -21,8 +25,19 @@ object Runner extends App {
   val window = new Window()
   val inputHandler = new Handler(window)
 
-  new GameLoop(
-    window,
-    List(inputHandler)
-  ).run()
+  events.on(WindowClose.id, _ => { gameRunning = false })
+
+  GL.createCapabilities
+  glClearColor(0.3f, 0.2f, 0.8f, 0.0f)
+
+  while (gameRunning) {
+    EventSystem ! GameLoopTick()
+  }
+
+  EventSystem ! GameEnd()
+
+  events.unsubscribe()
+  // Terminate GLFW and free the error callback
+  glfwTerminate()
+  glfwSetErrorCallback(null).free()
 }
