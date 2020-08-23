@@ -8,8 +8,14 @@ import org.lwjgl.system.MemoryUtil._
 
 class Window extends Events {
   glfwDefaultWindowHints() // optional, the current window hints are already the default
-  glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE) // the window will stay hidden after creation
-  glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE) // the window will be resizable
+  private val n = GLFW_FALSE
+  private val y = GLFW_TRUE
+  glfwWindowHint(GLFW_VISIBLE, n) // the window will stay hidden after creation
+  glfwWindowHint(GLFW_RESIZABLE, y) // the window will be resizable
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3)
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2)
+  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE)
+  glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, y)
 
   // Create the window
   val id: Long = glfwCreateWindow(300, 300, "Hello World!", NULL, NULL)
@@ -23,8 +29,8 @@ class Window extends Events {
   glfwShowWindow(id)
 
   events
-    .on(GameLoopTick.id, _ => { update() })
-    .on(GameEnd.id, _ => { cleanUp() })
+    .on[GameLoopTick](_ => { update() })
+    .on[GameEnd](_ => { cleanUp() })
 
   private def update(): Unit = {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT) // clear the framebuffer

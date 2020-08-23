@@ -1,0 +1,4 @@
+package rendy
+
+class StaticShader {
+}
