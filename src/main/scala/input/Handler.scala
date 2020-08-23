@@ -13,10 +13,10 @@ class Handler(window: Window) extends Events {
   })
   glfwSetWindowCloseCallback(window.id, _ => { EventSystem ! WindowClose() })
 
-  events.on(GameLoopTick.id, _ => {
+  events.on[GameLoopTick](_ => {
       // Poll for window events. The key callback will only be invoked during this call.
       glfwPollEvents()
-  }).on(GameEnd.id, _ => {
+  }).on[GameEnd](_ => {
     // Free the window callbacks and destroy the window
     glfwFreeCallbacks(window.id)
     events.unsubscribe()

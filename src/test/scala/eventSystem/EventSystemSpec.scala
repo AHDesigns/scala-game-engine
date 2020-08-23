@@ -8,7 +8,7 @@ class EventSystemSpec extends AnyFlatSpec with should.Matchers {
     var count = 1
     val listener = EventSystem.subscribe()
 
-    listener.on(SimpleEvent.id, _ => { count += 1 })
+    listener.on[SimpleEvent](_ => { count += 1 })
 
     count should be (1)
 
@@ -27,7 +27,7 @@ class EventSystemSpec extends AnyFlatSpec with should.Matchers {
     var count = 0
     val listener = EventSystem.subscribe()
 
-    listener.on(SimpleEvent.id, _ => { count += 1 })
+    listener.on[SimpleEvent](_ => { count += 1 })
     listener.unsubscribe()
 
     EventSystem ! SimpleEvent()
@@ -41,10 +41,7 @@ class EventSystemSpec extends AnyFlatSpec with should.Matchers {
     var count = 0
     val listener = EventSystem.subscribe()
 
-    listener.on(SimpleEvent.id, {
-      case SimpleEvent(data) => count += data.asInstanceOf[Int]
-      case _ => throw new Error("should never be thrown")
-    })
+    listener.on[SimpleEvent](count += _.data.asInstanceOf[Int])
 
     count should be (0)
 
@@ -63,8 +60,8 @@ class EventSystemSpec extends AnyFlatSpec with should.Matchers {
     var count2 = 0
     val listener = EventSystem.subscribe()
 
-    listener.on(SimpleEvent.id, _ => { count = 3 })
-    listener.on(SimpleEvent.id, _ => { count2 = 8 })
+    listener.on[SimpleEvent](_ => { count = 3 })
+    listener.on[SimpleEvent](_ => { count2 = 8 })
 
     EventSystem ! SimpleEvent()
 
@@ -74,11 +71,25 @@ class EventSystemSpec extends AnyFlatSpec with should.Matchers {
     listener.unsubscribe()
   }
 
-  it should "be chainable" in {
+  it should "be called with all subscribed events in order" in {
     var count = 0
+    val listener = EventSystem.subscribe()
+
+    listener.on[SimpleEvent](_ => { count = 5 })
+    listener.on[SimpleEvent](_ => { count *= 3 })
+
+    EventSystem ! SimpleEvent()
+
+    count should be (15)
+
+    listener.unsubscribe()
+  }
+
+  it should "be chainable" in {
+    val count = 0
     EventSystem.subscribe()
-      .on(SimpleEvent.id, _ => {})
-      .on(SimpleEvent.id, _ => {})
+      .on[SimpleEvent](_ => {})
+      .on[SimpleEvent](_ => {})
       .unsubscribe()
 
     count should be (0)
@@ -88,7 +99,7 @@ class EventSystemSpec extends AnyFlatSpec with should.Matchers {
     object Foo extends Events
     var count = 0
 
-    Foo.events.on(SimpleEvent.id, _ => { count = 3 })
+    Foo.events.on[SimpleEvent](_ => { count = 3 })
 
     EventSystem ! SimpleEvent()
 
