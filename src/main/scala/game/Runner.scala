@@ -31,7 +31,6 @@ object Runner extends App with Events {
   events.on[WindowClose](_ => { gameRunning = false })
 
   GL.createCapabilities
-  glClearColor(0.3f, 0.2f, 0.8f, 0.0f)
 
   val loader = new Loader()
 
@@ -45,14 +44,18 @@ object Runner extends App with Events {
   val shader = new Shader()
 
   while (gameRunning) {
+    window.clean()
     shader.shade()
-    glBindVertexArray(model.vaoID)
 
+    glBindVertexArray(model.vaoID)
     glEnableVertexAttribArray(0)
     glDrawArrays(GL_TRIANGLES, 0, 3)
     glDisableVertexAttribArray(0)
     glBindVertexArray(0)
+
     EventSystem ! GameLoopTick()
+
+    window.draw()
   }
 
   EventSystem ! GameEnd()
