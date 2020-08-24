@@ -2,23 +2,35 @@ package window
 
 import eventSystem.{Events, GameEnd}
 import org.lwjgl.glfw.GLFW._
-import org.lwjgl.opengl.GL11.{GL_COLOR_BUFFER_BIT, GL_DEPTH_BUFFER_BIT, glClear, glClearColor}
+import org.lwjgl.glfw.GLFWErrorCallback
+import org.lwjgl.opengl.GL
+import org.lwjgl.opengl.GL11.{GL_COLOR_BUFFER_BIT, GL_DEPTH_BUFFER_BIT, GL_VERSION, glClear, glClearColor, glGetString}
 import org.lwjgl.system.MemoryStack._
 import org.lwjgl.system.MemoryUtil._
 
 class Window extends Events {
   // Create the window
-  val id: Long = glfwCreateWindow(800, 600, "Hello World!", NULL, NULL)
   private val n = GLFW_FALSE
   private val y = GLFW_TRUE
-  glfwInit()
+
+  // Setup an error callback. The default implementation
+  // will print the error message in System.err.
+  GLFWErrorCallback.createPrint(System.err).set
+
+  if (! glfwInit() ) {
+    println("failed to initialise GLFW")
+    System.exit(1)
+  }
+
   glfwDefaultWindowHints() // optional, the current window hints are already the default
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3)
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3)
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2)
   glfwWindowHint(GLFW_VISIBLE, n) // the window will stay hidden after creation
   glfwWindowHint(GLFW_RESIZABLE, y) // the window will be resizable
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE)
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, y)
+
+  val id: Long = glfwCreateWindow(800, 600, "Hello World!", NULL, NULL)
   if (id == NULL) throw new RuntimeException("Failed to create the GLFW window")
 
   // Make the OpenGL context current
@@ -27,6 +39,9 @@ class Window extends Events {
   glfwSwapInterval(1)
   // Make the window visible
   glfwShowWindow(id)
+  // does all the things
+  GL.createCapabilities
+  println(glGetString(GL_VERSION))
 
   events
     .on[GameEnd](_ => {
