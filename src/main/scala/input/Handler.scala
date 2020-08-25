@@ -1,21 +1,25 @@
 package input
 
-import eventSystem.{EventSystem, Events, GameEnd, GameLoopTick, WindowClose}
+import eventSystem._
+import org.lwjgl.glfw.Callbacks.glfwFreeCallbacks
 import org.lwjgl.glfw.GLFW._
 import window.Window
-import org.lwjgl.glfw.Callbacks.glfwFreeCallbacks
 
 class Handler(window: Window) extends Events {
+  def poll(): Unit = glfwPollEvents()
+
   // Setup a key callback. It will be called every time a key is pressed, repeated or released.
   glfwSetKeyCallback(window.id, (window: Long, key: Int, scancode: Int, action: Int, mods: Int) => {
     log(key, action)
     if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE) EventSystem ! WindowClose()
   })
-  glfwSetWindowCloseCallback(window.id, _ => { EventSystem ! WindowClose() })
+  glfwSetWindowCloseCallback(window.id, _ => {
+    EventSystem ! WindowClose()
+  })
 
   events.on[GameLoopTick](_ => {
-      // Poll for window events. The key callback will only be invoked during this call.
-      glfwPollEvents()
+    // Poll for window events. The key callback will only be invoked during this call.
+    //      glfwPollEvents()
   }).on[GameEnd](_ => {
     // Free the window callbacks and destroy the window
     glfwFreeCallbacks(window.id)

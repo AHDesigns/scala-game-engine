@@ -4,9 +4,10 @@ import eventSystem.{Events, GameEnd}
 import org.lwjgl.glfw.GLFW._
 import org.lwjgl.glfw.GLFWErrorCallback
 import org.lwjgl.opengl.GL
-import org.lwjgl.opengl.GL11.{GL_COLOR_BUFFER_BIT, GL_DEPTH_BUFFER_BIT, GL_VERSION, glClear, glClearColor, glGetString}
+import org.lwjgl.opengl.GL11._
 import org.lwjgl.system.MemoryStack._
 import org.lwjgl.system.MemoryUtil._
+import utils.System.isMacOs
 
 class Window extends Events {
   // Create the window
@@ -28,7 +29,10 @@ class Window extends Events {
   glfwWindowHint(GLFW_VISIBLE, n) // the window will stay hidden after creation
   glfwWindowHint(GLFW_RESIZABLE, y) // the window will be resizable
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE)
-  glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, y)
+
+  if (isMacOs) {
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, y)
+  }
 
   val id: Long = glfwCreateWindow(800, 600, "Hello World!", NULL, NULL)
   if (id == NULL) throw new RuntimeException("Failed to create the GLFW window")

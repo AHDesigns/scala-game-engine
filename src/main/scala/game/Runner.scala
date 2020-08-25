@@ -1,12 +1,9 @@
 package game
 
-import eventSystem.{EventSystem, Events, GameEnd, GameLoopTick, WindowClose}
+import eventSystem._
 import input.Handler
 import org.lwjgl.Version
-import org.lwjgl.opengl.GL11.{GL_TRIANGLES, glDrawArrays}
-import org.lwjgl.opengl.GL20.{glDisableVertexAttribArray, glEnableVertexAttribArray}
-import org.lwjgl.opengl.GL30.glBindVertexArray
-import rendy.{Loader, Shader}
+import rendy.{Loader, Renderer, Shader}
 import window.Window
 
 object Runner extends App with Events {
@@ -21,27 +18,30 @@ object Runner extends App with Events {
   val loader = new Loader()
 
   val vertices = List(
-    -0.5f, -0.5f, 0.0f,
-    0.5f, -0.5f, 0.0f,
-    0.0f,  0.5f, 0.0f
+    0.5f, 0.5f, 0.0f, // top right
+    0.5f, -0.5f, 0.0f, // bottom right
+    -0.5f, -0.5f, 0.0f, // bottom left
+    -0.5f, 0.5f, 0.0f // top left
   )
 
-  val model = loader.loadToVAO(vertices)
+  val indices = List(
+    0, 1, 3,
+    1, 2, 3
+  )
+
+  val model = loader.loadToVAO(vertices, indices)
   val shader = new Shader()
+  val renderer = new Renderer()
 
   while (gameRunning) {
     window.clean()
     shader.shade()
-
-    glBindVertexArray(model.vaoID)
-    glEnableVertexAttribArray(0)
-    glDrawArrays(GL_TRIANGLES, 0, 3)
-    glDisableVertexAttribArray(0)
-    glBindVertexArray(0)
+    renderer.render(model)
 
     EventSystem ! GameLoopTick()
 
     window.draw()
+    inputHandler.poll()
   }
 
   EventSystem ! GameEnd()
