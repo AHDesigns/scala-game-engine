@@ -1,4 +1,4 @@
-package rendy
+package loaders
 
 import java.nio.{FloatBuffer, IntBuffer}
 
@@ -7,6 +7,7 @@ import org.lwjgl.opengl.GL11._
 import org.lwjgl.opengl.GL15._
 import org.lwjgl.opengl.GL20._
 import org.lwjgl.opengl.GL30._
+import rendy.RawModel
 
 import scala.collection.mutable.ListBuffer
 
@@ -47,11 +48,12 @@ class Loader {
    * Create a Vertex Buffer Object
    *
    * Used for storing VAO data at a specific index
+   * size is the number of vertices per position, eg 2D data would be 2, 3D would be 3
    */
   private def storeModelData(data: List[Float], size: Int): Unit = {
     glBindBuffer(GL_ARRAY_BUFFER, createVBO())
     glBufferData(GL_ARRAY_BUFFER, storeDataInBuffer(data), GL_STATIC_DRAW)
-    glVertexAttribPointer(0, size, GL_FLOAT, false, 0, 0)
+    glVertexAttribPointer(0, size, GL_FLOAT, false, floatSize * size, 0)
     glBindBuffer(GL_ARRAY_BUFFER, 0)
   }
 
@@ -74,4 +76,6 @@ object Helpers {
     buffer.flip()
     buffer
   }
+
+  val floatSize = 4
 }

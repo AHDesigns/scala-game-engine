@@ -23,7 +23,7 @@ object EventSystem {
       if (!listening) {
         println(s"Listener is no longer subscribed to events. Attempted to listen to $e")
       } else {
-        listeners += (e.id -> (listeners.getOrElse(e.id, Queue.empty).enqueue(listenerId, cb) ))
+        listeners += (e.id -> listeners.getOrElse(e.id, Queue.empty).enqueue(listenerId, cb))
       }
       this
     }
@@ -54,6 +54,7 @@ object EventsId {
   implicit val windowResize: EventsId[WindowResize] = new EventsId
   implicit val click: EventsId[Click] = new EventsId
   implicit val simpleEvent: EventsId[SimpleEvent] = new EventsId()
+  implicit val debugWireframe: EventsId[DebugWireframe] = new EventsId()
 }
 
 sealed trait Event
@@ -65,6 +66,7 @@ final case class GameEnd() extends Event
 
 // Window Events -----------------------------------------------------
 final case class WindowClose() extends Event
+
 final case class WindowResize(width: Int, height: Int) extends Event
 
 // Inputs ------------------------------------------------------------
@@ -73,10 +75,12 @@ final case class Click(x: Int, y: Int, keyCode: Int) extends Event
 // Debug/Random Events -----------------------------------------------
 final case class SimpleEvent(data: AnyVal) extends Event
 
+final case class DebugWireframe() extends Event
+
 // --------------- Helpers -------------------------------------------
 
 object EventID {
-  private var lastId: ID = 0;
+  private var lastId: ID = 0
 
   def gen(): EventIDWrapper = {
     lastId += 1

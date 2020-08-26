@@ -1,32 +1,12 @@
 package rendy
 
-import org.lwjgl.opengl.{GL11, GL20}
 import org.lwjgl.opengl.GL20._
 
-class Shader {
-  val vertexShaderProgram = """#version 330 core
-      |layout (location = 0) in vec3 aPos;
-      |
-      |void main()
-      |{
-      |    gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);
-      |}
-      |""".stripMargin
-
-  val fragmentShaderProgram =
-    """#version 330 core
-      |out vec4 FragColor;
-      |
-      |void main()
-      |{
-      |    FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);
-      |}
-      |""".stripMargin
-
-  val vertexShader = compileShader(vertexShaderProgram, GL_VERTEX_SHADER)
-  val fragmentShader = compileShader(fragmentShaderProgram, GL_FRAGMENT_SHADER)
-  val shaderProgram = linkShaders(List(vertexShader,fragmentShader))
-
+class Shader(vertex: String, fragment: String) {
+  private val shaderProgram = linkShaders(List(
+    compileShader(vertex, GL_VERTEX_SHADER),
+    compileShader(fragment, GL_FRAGMENT_SHADER)
+  ))
 
   def compileShader(shaderCode: String, shaderType: Int): Int = {
     val shaderId = glCreateShader(shaderType)
