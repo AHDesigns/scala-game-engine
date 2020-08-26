@@ -4,7 +4,8 @@ import eventSystem._
 import input.Handler
 import loaders.Loader
 import org.lwjgl.Version
-import rendy.{Renderer, Shader}
+import rendy.Renderer
+import shaders.Shader
 import window.Window
 
 object Runner extends App with Events {
@@ -39,39 +40,10 @@ object Runner extends App with Events {
   )
 
 
-  val vertexShaderProgram =
-    """#version 330 core
-      |layout (location = 0) in vec3 aPos;
-      |
-      |void main()
-      |{
-      |    gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);
-      |}
-      |""".stripMargin
-
-  val fragmentShaderProgram =
-    """#version 330 core
-      |out vec4 FragColor;
-      |
-      |void main()
-      |{
-      |    FragColor = vec4(0.95f, 0.8f, 0.45f, 1.0f);
-      |}
-      |""".stripMargin
-  val fragmentShaderProgram2 =
-    """#version 330 core
-      |out vec4 FragColor;
-      |
-      |void main()
-      |{
-      |    FragColor = vec4(1.0f, 0.5f, 0.44f, 1.0f);
-      |}
-      |""".stripMargin
-
   val model2 = loader.loadToVAO(vertices2, indices)
   val model = loader.loadToVAO(vertices, indices)
-  val shader = new Shader(vertex = vertexShaderProgram, fragment = fragmentShaderProgram)
-  val shader2 = new Shader(vertex = vertexShaderProgram, fragment = fragmentShaderProgram2)
+  val shader = new Shader(vertex = "vertexShader", fragment = "fragmentShader")
+  val shader2 = new Shader(vertex = "vertexShader", fragment = "fragmentShaderOrange")
   val renderer = new Renderer()
 
   while (gameRunning) {
