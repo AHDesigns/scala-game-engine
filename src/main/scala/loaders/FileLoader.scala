@@ -5,9 +5,9 @@ import utils.Control
 import scala.io.Source
 import scala.util.{Failure, Success, Try}
 
-class FileLoader(private val dir: String, private val stripNewlines: Boolean = false) {
+class FileLoader(dir: String, ext: String = "", stripNewlines: Boolean = false) {
   def load(file: String): Either[String, String] = {
-    val filePath = dir + "/" + file + ".shader"
+    val filePath = "res/" + dir + "/" + file + ext
 
     readText(filePath, stripNewlines) match {
       case Failure(exception) => Left(s"Could not read file at $filePath\n$exception")
@@ -23,5 +23,4 @@ class FileLoader(private val dir: String, private val stripNewlines: Boolean = f
       lines
     }
   }
-
 }

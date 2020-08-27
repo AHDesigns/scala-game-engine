@@ -42,15 +42,13 @@ object Runner extends App with Events {
 
   val model2 = loader.loadToVAO(vertices2, indices)
   val model = loader.loadToVAO(vertices, indices)
-  val shader = new Shader(vertex = "vertexShader", fragment = "fragmentShader")
-  val shader2 = new Shader(vertex = "vertexShader", fragment = "fragmentShaderOrange")
+  val shader = new Shader("basic")
   val renderer = new Renderer()
 
   while (gameRunning) {
     window.clean()
     shader.shade()
     renderer.render(model)
-    shader2.shade()
     renderer.render(model2)
 
     EventSystem ! GameLoopTick()

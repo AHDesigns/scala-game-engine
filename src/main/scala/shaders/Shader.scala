@@ -1,21 +1,22 @@
 package shaders
 
 import loaders.FileLoader
+import org.lwjgl.glfw.GLFW.glfwGetTime
 import org.lwjgl.opengl.GL20._
 
-class Shader(vertex: String, fragment: String) extends FileLoader("src/main/scala/shaders/") {
+class Shader(shaderName: String) extends FileLoader("shaders", ".glsl") {
   private val shaderProgram = (for {
-    vertexCode <- load(vertex)
-    vertexShader <- compileShader(vertexCode, GL_VERTEX_SHADER)
-    fragmentCode <- load(fragment)
-    fragmentShader <- compileShader(fragmentCode, GL_FRAGMENT_SHADER)
+    shaderCode <- load(shaderName)
+    shaderPair <- splitShader(shaderCode)
+    vertexShader <- compileShader(shaderPair.vertex, GL_VERTEX_SHADER)
+    fragmentShader <- compileShader(shaderPair.fragment, GL_FRAGMENT_SHADER)
     result <- linkShaders(List(vertexShader, fragmentShader))
   } yield result) match {
     case Left(err) => println(err); 0
     case Right(value) => value
   }
 
-  def compileShader(shaderCode: String, shaderType: Int): Either[String, Int] = {
+  private def compileShader(shaderCode: String, shaderType: Int): Either[String, Int] = {
     val shaderId = glCreateShader(shaderType)
     glShaderSource(shaderId, shaderCode)
     glCompileShader(shaderId)
@@ -26,7 +27,7 @@ class Shader(vertex: String, fragment: String) extends FileLoader("src/main/scal
     }
   }
 
-  def linkShaders(shaderIds: List[Int]): Either[String, Int] = {
+  private def linkShaders(shaderIds: List[Int]): Either[String, Int] = {
     val shaderProgram = glCreateProgram()
     shaderIds.foreach(glAttachShader(shaderProgram, _))
     glLinkProgram(shaderProgram)
@@ -38,5 +39,23 @@ class Shader(vertex: String, fragment: String) extends FileLoader("src/main/scal
     }
   }
 
-  def shade(): Unit = glUseProgram(shaderProgram)
+  private def splitShader(shaderCode: String): Either[String, ShaderPair] = {
+    val shaders = shaderCode.split("#---")
+    shaders.length match {
+      case 2 => Right(ShaderPair(vertex = shaders(0), fragment = shaders(1)))
+      case _ => Left(
+        s"""shader '$shaderName' did not appear to contain a vertex and fragment section.
+           |Does the file contain a '#---' line to indicate the separation""".stripMargin
+      )
+    }
+  }
+
+  def shade(): Unit = {
+    val time = glfwGetTime()
+    val greenValue = (Math.sin(time).toFloat / 2f) + 0.5f
+    val vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor")
+    glUseProgram(shaderProgram)
+    //    glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f)
+    glUniform4f(vertexColorLocation, greenValue, greenValue, greenValue, 1.0f)
+  }
 }

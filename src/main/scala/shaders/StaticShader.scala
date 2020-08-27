@@ -1,4 +1,4 @@
-package rendy
+package shaders
 
 class StaticShader {
 }
