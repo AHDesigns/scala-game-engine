@@ -21,9 +21,12 @@ class Renderer extends Events {
         glBindVertexArray(vaoID)
 
         glEnableVertexAttribArray(0)
+        glEnableVertexAttribArray(1)
+
         glDrawElements(GL_TRIANGLES, indices, GL_UNSIGNED_INT, 0)
 
         glDisableVertexAttribArray(0)
+        glDisableVertexAttribArray(1)
         glBindVertexArray(0)
     }
   }

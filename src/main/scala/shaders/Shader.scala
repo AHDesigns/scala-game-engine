@@ -1,7 +1,6 @@
 package shaders
 
 import loaders.FileLoader
-import org.lwjgl.glfw.GLFW.glfwGetTime
 import org.lwjgl.opengl.GL20._
 
 class Shader(shaderName: String) extends FileLoader("shaders", ".glsl") {
@@ -51,11 +50,11 @@ class Shader(shaderName: String) extends FileLoader("shaders", ".glsl") {
   }
 
   def shade(): Unit = {
-    val time = glfwGetTime()
-    val greenValue = (Math.sin(time).toFloat / 2f) + 0.5f
-    val vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor")
+    //    val time = glfwGetTime()
+    //    val greenValue = (Math.sin(time).toFloat / 2f) + 0.5f
+    //    val vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor")
     glUseProgram(shaderProgram)
     //    glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f)
-    glUniform4f(vertexColorLocation, greenValue, greenValue, greenValue, 1.0f)
+    //    glUniform4f(vertexColorLocation, greenValue, greenValue, greenValue, 1.0f)
   }
 }

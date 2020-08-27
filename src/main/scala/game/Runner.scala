@@ -21,26 +21,23 @@ object Runner extends App with Events {
 
   val loader = new Loader()
 
+  //  val vertices = List(
+  //    0.5f, 0.5f, 0.0f, // top right
+  //    0.5f, -0.5f, 0.0f, // bottom right
+  //    -0.5f, -0.5f, 0.0f, // bottom left
+  //    -0.5f, 0.5f, 0.0f // top left
+  //  )
   val vertices = List(
-    0.5f, 0.5f, 0.0f, // top right
-    0.5f, -0.5f, 0.0f, // bottom right
-    -0.5f, -0.5f, 0.0f, // bottom left
-    -0.5f, 0.5f, 0.0f // top left
-  )
-  val vertices2 = List(
-    1.0f, 1.0f, 0.0f, // top right
-    1.0f, -1.0f, 0.0f, // bottom right
-    0.6f, -1.0f, 0.0f, // bottom left
-    0.6f, 1.0f, 0.0f // top left
+    // positions         // colors
+    0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, // bottom right
+    -0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, // bottom left
+    0.0f, 0.5f, 0.0f, 0.0f, 0.0f, 1.0f // top
   )
 
   val indices = List(
-    0, 1, 3,
-    1, 2, 3
+    0, 1, 2
   )
 
-
-  val model2 = loader.loadToVAO(vertices2, indices)
   val model = loader.loadToVAO(vertices, indices)
   val shader = new Shader("basic")
   val renderer = new Renderer()
@@ -49,7 +46,6 @@ object Runner extends App with Events {
     window.clean()
     shader.shade()
     renderer.render(model)
-    renderer.render(model2)
 
     EventSystem ! GameLoopTick()
 

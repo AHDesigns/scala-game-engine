@@ -18,23 +18,23 @@ class Loader {
   var vbos = new ListBuffer[Int]()
   var vaos = new ListBuffer[Int]()
 
-  def loadToVAO(vertices: List[Float], indicies: List[Int]): RawModel = {
+  def loadToVAO(vertices: List[Float], indices: List[Int]): RawModel = {
     val vaoID = glGenVertexArrays()
     vaos += vaoID
     glBindVertexArray(vaoID)
 
     storeModelData(vertices, 3)
-    storeEAO(indicies)
+    storeEAO(indices)
 
     glBindVertexArray(0)
 
-    RawModel(vaoID, indicies.size)
+    RawModel(vaoID, indices.size)
   }
 
   /**
    * Create Element Array Object
    *
-   * Used for storing a models indicies
+   * Used for storing a models indices
    * EAO's are automatically bound to the currently bound VAO so call this before unbinding
    * the VAO
    */
@@ -53,7 +53,8 @@ class Loader {
   private def storeModelData(data: List[Float], size: Int): Unit = {
     glBindBuffer(GL_ARRAY_BUFFER, createVBO())
     glBufferData(GL_ARRAY_BUFFER, storeDataInBuffer(data), GL_STATIC_DRAW)
-    glVertexAttribPointer(0, size, GL_FLOAT, false, floatSize * size, 0)
+    glVertexAttribPointer(0, size, GL_FLOAT, false, (floatSize * size) * 2, 0)
+    glVertexAttribPointer(1, size, GL_FLOAT, false, (floatSize * size) * 2, floatSize * size)
     glBindBuffer(GL_ARRAY_BUFFER, 0)
   }
 
