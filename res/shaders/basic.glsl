@@ -2,11 +2,13 @@
 layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec3 aColor;
 
+uniform float horizontal;
+
 out vec3 colour;
 
 void main()
 {
-    gl_Position = vec4(aPos.xyz, 1.0);
+    gl_Position = vec4(aPos.x + horizontal, aPos.y * -1, aPos.z, 1.0);
     colour = aColor;
 }
 

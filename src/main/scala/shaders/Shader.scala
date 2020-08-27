@@ -1,60 +1,22 @@
 package shaders
 
-import loaders.FileLoader
+import loaders.ShaderLoader
 import org.lwjgl.opengl.GL20._
 
-class Shader(shaderName: String) extends FileLoader("shaders", ".glsl") {
-  private val shaderProgram = (for {
-    shaderCode <- load(shaderName)
-    shaderPair <- splitShader(shaderCode)
-    vertexShader <- compileShader(shaderPair.vertex, GL_VERTEX_SHADER)
-    fragmentShader <- compileShader(shaderPair.fragment, GL_FRAGMENT_SHADER)
-    result <- linkShaders(List(vertexShader, fragmentShader))
-  } yield result) match {
+class Shader(shaderName: String, uniforms: Map[String, String] = Map.empty) extends ShaderLoader {
+  private var horizon = 0f
+  private val shaderProgram = load(shaderName) match {
     case Left(err) => println(err); 0
-    case Right(value) => value
-  }
-
-  private def compileShader(shaderCode: String, shaderType: Int): Either[String, Int] = {
-    val shaderId = glCreateShader(shaderType)
-    glShaderSource(shaderId, shaderCode)
-    glCompileShader(shaderId)
-
-    glGetShaderi(shaderId, GL_COMPILE_STATUS) match {
-      case 0 => Left(s"Could not compile shader! ${glGetShaderInfoLog(shaderId, 512)}")
-      case _ => Right(shaderId)
-    }
-  }
-
-  private def linkShaders(shaderIds: List[Int]): Either[String, Int] = {
-    val shaderProgram = glCreateProgram()
-    shaderIds.foreach(glAttachShader(shaderProgram, _))
-    glLinkProgram(shaderProgram)
-    shaderIds.foreach(glDeleteShader)
-
-    glGetProgrami(shaderProgram, GL_LINK_STATUS) match {
-      case 0 => Left(s"Could not link shader!\n${glGetProgramInfoLog(shaderProgram, 512)}")
-      case _ => Right(shaderProgram)
-    }
-  }
-
-  private def splitShader(shaderCode: String): Either[String, ShaderPair] = {
-    val shaders = shaderCode.split("#---")
-    shaders.length match {
-      case 2 => Right(ShaderPair(vertex = shaders(0), fragment = shaders(1)))
-      case _ => Left(
-        s"""shader '$shaderName' did not appear to contain a vertex and fragment section.
-           |Does the file contain a '#---' line to indicate the separation""".stripMargin
-      )
-    }
+    case Right(id) => id
   }
 
   def shade(): Unit = {
     //    val time = glfwGetTime()
     //    val greenValue = (Math.sin(time).toFloat / 2f) + 0.5f
-    //    val vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor")
+    horizon += 0.001f
+    val horizontalLoc = glGetUniformLocation(shaderProgram, "horizontal")
     glUseProgram(shaderProgram)
-    //    glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f)
+    glUniform1f(horizontalLoc, horizon)
     //    glUniform4f(vertexColorLocation, greenValue, greenValue, greenValue, 1.0f)
   }
 }

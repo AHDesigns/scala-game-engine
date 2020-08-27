@@ -5,12 +5,12 @@ import utils.Control
 import scala.io.Source
 import scala.util.{Failure, Success, Try}
 
-class FileLoader(dir: String, ext: String = "", stripNewlines: Boolean = false) {
-  def load(file: String): Either[String, String] = {
-    val filePath = "res/" + dir + "/" + file + ext
+trait FileLoader {
+  protected def load(filePath: String, stripNewlines: Boolean = false): Either[String, String] = {
+    val file = "res/" + filePath
 
-    readText(filePath, stripNewlines) match {
-      case Failure(exception) => Left(s"Could not read file at $filePath\n$exception")
+    readText(file, stripNewlines) match {
+      case Failure(exception) => Left(s"Could not read file at $file\n$exception")
       case Success(value) => Right(value)
     }
   }
