@@ -3,7 +3,9 @@ package loaders
 import org.lwjgl.opengl.GL20._
 
 trait ShaderLoader extends FileLoader {
-  def load(shaderFile: String): Either[String, Int] = {
+  def draw(): Unit
+
+  protected def load(shaderFile: String): Either[String, Int] = {
     val shaderPath = "shaders/" + shaderFile + ".glsl"
     for {
       shaderCode <- super.load(shaderPath)

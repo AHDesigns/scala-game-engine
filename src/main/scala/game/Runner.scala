@@ -2,10 +2,10 @@ package game
 
 import eventSystem._
 import input.Handler
-import loaders.Loader
+import loaders.EntityLoader
 import org.lwjgl.Version
 import rendy.Renderer
-import shaders.Shader
+import shaders.StaticShader
 import window.Window
 
 object Runner extends App with Events {
@@ -19,7 +19,7 @@ object Runner extends App with Events {
     gameRunning = false
   })
 
-  val loader = new Loader()
+  val loader = new EntityLoader()
 
   //  val vertices = List(
   //    0.5f, 0.5f, 0.0f, // top right
@@ -39,12 +39,12 @@ object Runner extends App with Events {
   )
 
   val model = loader.loadToVAO(vertices, indices)
-  val shader = new Shader("basic")
+  val shader = new StaticShader("basic")
   val renderer = new Renderer()
 
   while (gameRunning) {
     window.clean()
-    shader.shade()
+    shader.draw()
     renderer.render(model)
 
     EventSystem ! GameLoopTick()

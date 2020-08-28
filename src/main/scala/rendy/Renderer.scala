@@ -5,6 +5,8 @@ import org.lwjgl.opengl.GL11._
 import org.lwjgl.opengl.GL20.{glDisableVertexAttribArray, glEnableVertexAttribArray}
 import org.lwjgl.opengl.GL30.glBindVertexArray
 
+import scala.annotation.tailrec
+
 class Renderer extends Events {
   private var isWireframe = false
   init()
@@ -15,15 +17,31 @@ class Renderer extends Events {
       .on[GameEnd] { _ => events.unsubscribe() }
   }
 
+  def GL[T](fn: => T): T = {
+    clearErrors
+    val res = fn
+    val err = glGetError()
+    if (err != 0) {
+      new RuntimeException(s"GL error $err").printStackTrace()
+      System.exit(1)
+    }
+    res
+  }
+
+  @tailrec
+  private def clearErrors: Int = if (glGetError() == 0) 0 else clearErrors
+
   def render(model: Model): Unit = {
     model match {
-      case RawModel(vaoID, indices) =>
+      case BasicModel(vaoID, indices) =>
         glBindVertexArray(vaoID)
 
         glEnableVertexAttribArray(0)
         glEnableVertexAttribArray(1)
 
-        glDrawElements(GL_TRIANGLES, indices, GL_UNSIGNED_INT, 0)
+        GL {
+          glDrawElements(GL_TRIANGLES, indices, GL_UNSIGNED_INT, 0)
+        }
 
         glDisableVertexAttribArray(0)
         glDisableVertexAttribArray(1)

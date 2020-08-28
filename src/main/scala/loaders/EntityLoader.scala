@@ -1,22 +1,21 @@
 package loaders
 
-import java.nio.{FloatBuffer, IntBuffer}
-
-import org.lwjgl.BufferUtils
 import org.lwjgl.opengl.GL11._
 import org.lwjgl.opengl.GL15._
 import org.lwjgl.opengl.GL20._
 import org.lwjgl.opengl.GL30._
 import rendy.BasicModel
+import utils.BufferUtils
 
 import scala.collection.mutable.ListBuffer
+import scala.language.postfixOps
 
-class Loader {
+class EntityLoader extends DaeLoader with BufferUtils {
+  private val floatSize = 4
+  private var vbos = new ListBuffer[Int]()
+  private var vaos = new ListBuffer[Int]()
 
-  import Helpers._
-
-  var vbos = new ListBuffer[Int]()
-  var vaos = new ListBuffer[Int]()
+  load("primitive/cube")
 
   def loadToVAO(vertices: List[Float], indices: List[Int]): BasicModel = {
     val vaoID = glGenVertexArrays()
@@ -40,7 +39,7 @@ class Loader {
    */
   private def storeEAO(indices: List[Int]): Unit = {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, createVBO())
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, storeDataInBuffer(indices), GL_STATIC_DRAW)
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, storeBuffer(indices), GL_STATIC_DRAW)
     // no need to unbind for EAO
   }
 
@@ -52,7 +51,7 @@ class Loader {
    */
   private def storeModelData(data: List[Float], size: Int): Unit = {
     glBindBuffer(GL_ARRAY_BUFFER, createVBO())
-    glBufferData(GL_ARRAY_BUFFER, storeDataInBuffer(data), GL_STATIC_DRAW)
+    glBufferData(GL_ARRAY_BUFFER, storeBuffer(data), GL_STATIC_DRAW)
     glVertexAttribPointer(0, size, GL_FLOAT, false, (floatSize * size) * 2, 0)
     glVertexAttribPointer(1, size, GL_FLOAT, false, (floatSize * size) * 2, floatSize * size)
     glBindBuffer(GL_ARRAY_BUFFER, 0)
@@ -63,20 +62,4 @@ class Loader {
     vbos += vboID
     vboID
   }
-}
-
-object Helpers {
-  def storeDataInBuffer(data: List[Float]): FloatBuffer = {
-    val buffer = BufferUtils.createFloatBuffer(data.length).put(data.toArray)
-    buffer.flip()
-    buffer
-  }
-
-  def storeDataInBuffer(data: List[Int]): IntBuffer = {
-    val buffer = BufferUtils.createIntBuffer(data.length).put(data.toArray)
-    buffer.flip()
-    buffer
-  }
-
-  val floatSize = 4
 }
