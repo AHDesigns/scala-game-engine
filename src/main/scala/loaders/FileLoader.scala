@@ -6,9 +6,7 @@ import scala.io.Source
 import scala.util.{Failure, Success, Try}
 
 trait FileLoader {
-  protected def load(filePath: String, stripNewlines: Boolean = false): Either[String, String] = {
-    val file = "res/" + filePath
-
+  protected def load(file: String, stripNewlines: Boolean = false): Either[String, String] = {
     readText(file, stripNewlines) match {
       case Failure(exception) => Left(s"Could not read file at $file\n$exception")
       case Success(value) => Right(value)

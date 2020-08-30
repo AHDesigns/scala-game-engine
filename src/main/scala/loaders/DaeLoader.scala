@@ -3,6 +3,7 @@ package loaders
 import scala.xml._
 
 /**
+ * might come back to this when I want an animation and color data
  * Dae format from blender notes
  * library_geometries contains vertex data
  * triangles \ p lists info about indices
@@ -17,30 +18,41 @@ trait DaeLoader {
     val xml = XML.load(s"res/models/$file.dae")
 
     val data = xml \ "library_geometries"
-    //    val materials = xml \ "library_materials"
-    //    val effects = xml \ "library_effects"
-    //    val material = data \ "geometry" \ "mesh" \ "triangles" \ "@material"
     val triangles = data \ "geometry" \ "mesh" \ "triangles"
-    //    println(material)
-    val from = getSrc(triangles \ "input")
-    val positions = get(triangles \ "p")
-    val vertices = from("VERTEX")
-    val normals = from("NORMAL")
-    println(vertices)
-    println(normals)
-    println(positions)
+    val mesh = data \ "geometry" \ "mesh"
+    val triangleInputs = triangles \ "input"
+    val positionOffset = triangleInputs.size
+    val positions = getFirst(triangles \ "p")
+    val getTriangleInput = partiallyGetTriangleInput(triangleInputs)
+
+    //    for {
+    //      target <- List("VERTEX", "NORMAL")
+    //      input <- getTriangleInput(target)
+    //      info <- getGeometryInfo(mesh, input)
+    //    } yield info
   }
 
-  private def getSrc(inputs: NodeSeq): String => Either[String, String] = (target: String) => {
-    inputs.find(where("semantic", target)).flatMap(_.attribute("source")) match {
-      case Some(value) => Right(value.text)
-      case None => Left(s"failed to find source for $target")
+  private def getGeometryInfo(mesh: NodeSeq, input: Input): Option[Int] = {
+    Some(1)
+  }
+
+  private def partiallyGetTriangleInput(inputs: NodeSeq): String => Either[String, Input] = (target: String) => {
+    val input = inputs.find(where("semantic", target))
+
+    val inputValues = for {
+      src <- input.flatMap(_.attribute("source"))
+      offset <- input.flatMap(_.attribute("offset"))
+    } yield (src, offset)
+
+    inputValues match {
+      case Some((src, offset)) => Right(new Input(src.text, offset.text))
+      case None => Left(s"could not get Input for $target")
     }
   }
 
   private def where(attribute: String, is: String)(node: Node): Boolean = node.attribute(attribute).getOrElse("").toString == is
 
-  private def get(data: NodeSeq): Option[String] = data map (_.text) match {
+  private def getFirst(data: NodeSeq): Option[String] = data map (_.text) match {
     case Nil => None
     case head :: _ => Some(head)
   }

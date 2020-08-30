@@ -3,7 +3,7 @@ package shaders
 import loaders.ShaderLoader
 import org.lwjgl.opengl.GL20._
 
-class StaticShader(shaderName: String, uniforms: Map[String, String] = Map.empty) extends ShaderLoader {
+class StaticShader(shaderName: String) extends ShaderLoader {
   private var horizon = 0f
   private val shaderProgram = load(shaderName) match {
     case Left(err) => println(err); 0

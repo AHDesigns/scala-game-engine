@@ -1,56 +1,65 @@
 package rendy
 
-import eventSystem.{DebugWireframe, Events, GameEnd}
+import entities.Entity
+import eventSystem.{DebugWireframe, Events, GameEnd, WindowResize}
+import org.joml.Matrix4f
 import org.lwjgl.opengl.GL11._
 import org.lwjgl.opengl.GL20.{glDisableVertexAttribArray, glEnableVertexAttribArray}
 import org.lwjgl.opengl.GL30.glBindVertexArray
+import utils.Control.GL
+import utils.Maths
 
-import scala.annotation.tailrec
-
-class Renderer extends Events {
+class Renderer() extends Events {
   private var isWireframe = false
+  private var projectionMatrix = perspective(800, 400)
   init()
 
   def init(): Unit = {
     events
+      .on[WindowResize] { window => projectionMatrix = perspective(window.width, window.height) }
       .on[DebugWireframe] { _ => wireframe() }
       .on[GameEnd] { _ => events.unsubscribe() }
   }
 
-  def GL[T](fn: => T): T = {
-    clearErrors
-    val res = fn
-    val err = glGetError()
-    if (err != 0) {
-      new RuntimeException(s"GL error $err").printStackTrace()
-      System.exit(1)
-    }
-    res
-  }
+  private def perspective(w: Float, h: Float) = new Matrix4f().setPerspective(
+    Math.toRadians(70).toFloat,
+    (w / h).toFloat,
+    0.01f,
+    1000f
+  )
 
-  @tailrec
-  private def clearErrors: Int = if (glGetError() == 0) 0 else clearErrors
+  def render(entity: Entity): Unit = {
 
-  def render(model: Model): Unit = {
-    model match {
-      case BasicModel(vaoID, indices) =>
-        glBindVertexArray(vaoID)
+    entity.model match {
+      case BasicModel(vaoID, indices, attributes) =>
+        val transformationMatrix = Maths.createTransformationMatrix(entity.position, entity.rotation, entity.scale)
+        entity.shader.draw(transformationMatrix, projectionMatrix)
+        GL {
+          glBindVertexArray(vaoID)
+        }
 
-        glEnableVertexAttribArray(0)
-        glEnableVertexAttribArray(1)
+        for (index <- 0 until attributes) GL {
+          glEnableVertexAttribArray(index)
+        }
 
         GL {
           glDrawElements(GL_TRIANGLES, indices, GL_UNSIGNED_INT, 0)
         }
 
-        glDisableVertexAttribArray(0)
-        glDisableVertexAttribArray(1)
-        glBindVertexArray(0)
+        for (index <- (attributes - 1) to 0) GL {
+          glDisableVertexAttribArray(index)
+        }
+
+        GL {
+          glBindVertexArray(0)
+        }
     }
   }
 
   private def wireframe(): Unit = {
-    glPolygonMode(GL_FRONT_AND_BACK, if (isWireframe) GL_FILL else GL_LINE)
+    GL {
+      glPolygonMode(GL_FRONT_AND_BACK, if (isWireframe) GL_FILL else GL_LINE)
+    }
     isWireframe = !isWireframe
   }
 }

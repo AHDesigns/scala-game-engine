@@ -1,11 +1,14 @@
 package game
 
+import entities.{Entity, Primitives}
 import eventSystem._
 import input.Handler
 import loaders.EntityLoader
+import org.joml.Vector3f
 import org.lwjgl.Version
 import rendy.Renderer
-import shaders.StaticShader
+import shaders.ColorShader
+import utils.Maths.Rotation
 import window.Window
 
 object Runner extends App with Events {
@@ -21,31 +24,16 @@ object Runner extends App with Events {
 
   val loader = new EntityLoader()
 
-  //  val vertices = List(
-  //    0.5f, 0.5f, 0.0f, // top right
-  //    0.5f, -0.5f, 0.0f, // bottom right
-  //    -0.5f, -0.5f, 0.0f, // bottom left
-  //    -0.5f, 0.5f, 0.0f // top left
-  //  )
-  val vertices = List(
-    // positions         // colors
-    0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, // bottom right
-    -0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, // bottom left
-    0.0f, 0.5f, 0.0f, 0.0f, 0.0f, 1.0f // top
-  )
-
-  val indices = List(
-    0, 1, 2
-  )
-
-  val model = loader.loadToVAO(vertices, indices)
-  val shader = new StaticShader("basic")
+  val model = loader.loadToVAO(Primitives.Cube)
+  val shader = new ColorShader("color")
+  val entity = new Entity(model, new Vector3f(0, 0, 0), new Rotation(0, 0, 0), 1, shader)
   val renderer = new Renderer()
 
   while (gameRunning) {
     window.clean()
-    shader.draw()
-    renderer.render(model)
+    renderer.render(entity)
+    //    entity.increaseRotation(new Rotation(0,0,1))
+    entity.increasePosition(new Vector3f(0, 0, -0.01f))
 
     EventSystem ! GameLoopTick()
 

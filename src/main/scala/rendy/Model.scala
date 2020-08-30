@@ -1,6 +1,6 @@
 package rendy
 
-class ModelData(val vertices: List[Float], val indices: List[Int]) {}
+case class ModelData(vertices: List[Float], indices: List[Int], size: Int, attributes: Int)
 
 trait Normals {
   protected val normals: List[Float]
@@ -16,4 +16,4 @@ trait Texture {
 
 sealed trait Model
 
-sealed case class BasicModel(vaoID: Int, indicesSize: Int) extends Model
+sealed case class BasicModel(vaoID: Int, indicesSize: Int, attributes: Int) extends Model
