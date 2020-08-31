@@ -1,5 +1,7 @@
 package eventSystem
 
+import org.joml.Matrix4f
+
 import scala.collection.immutable.Queue
 
 object EventSystem {
@@ -55,13 +57,17 @@ object EventsId {
   implicit val click: EventsId[Click] = new EventsId
   implicit val simpleEvent: EventsId[SimpleEvent] = new EventsId()
   implicit val debugWireframe: EventsId[DebugWireframe] = new EventsId()
+  implicit val inputMove: EventsId[InputMove] = new EventsId()
+  implicit val cameraMove: EventsId[CameraMove] = new EventsId()
 }
 
 sealed trait Event
 // Game Events -------------------------------------------------------
 final case class GameLoopStart() extends Event
 final case class GameLoopTick() extends Event
+
 final case class GameLoopEnd() extends Event
+
 final case class GameEnd() extends Event
 
 // Window Events -----------------------------------------------------
@@ -71,6 +77,11 @@ final case class WindowResize(width: Int, height: Int) extends Event
 
 // Inputs ------------------------------------------------------------
 final case class Click(x: Int, y: Int, keyCode: Int) extends Event
+
+final case class InputMove(x: Float, y: Float, z: Float) extends Event
+
+// Camera ------------------------------------------------------------
+final case class CameraMove(transform: Matrix4f) extends Event
 
 // Debug/Random Events -----------------------------------------------
 final case class SimpleEvent(data: AnyVal) extends Event

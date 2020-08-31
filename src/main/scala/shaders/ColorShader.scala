@@ -15,7 +15,7 @@ class ColorShader(shaderName: String) extends Shader with ShaderLoader {
   }
   println(s"shader program $program")
 
-  def draw(transformationMatrix: Matrix4f, projectionMatrix: Matrix4f): Unit = {
+  def draw(transformationMatrix: Matrix4f, projectionMatrix: Matrix4f, viewMatrix: Matrix4f): Unit = {
     //    horizon += 0.001f
     val horizontalLoc = glGetUniformLocation(program, "horizontal")
     val time = glfwGetTime()
@@ -28,6 +28,9 @@ class ColorShader(shaderName: String) extends Shader with ShaderLoader {
     }
     val projectionMatrixLoc = GL {
       glGetUniformLocation(program, "projectionMatrix")
+    }
+    val viewMatrixLoc = GL {
+      glGetUniformLocation(program, "viewMatrix")
     }
 
     if (colorLocation == -1) {
@@ -49,5 +52,6 @@ class ColorShader(shaderName: String) extends Shader with ShaderLoader {
     GL {
       glUniformMatrix4fv(projectionMatrixLoc, false, getMatrixBuffer(projectionMatrix))
     }
+    GL(glUniformMatrix4fv(viewMatrixLoc, false, getMatrixBuffer(viewMatrix)))
   }
 }

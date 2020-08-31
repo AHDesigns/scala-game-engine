@@ -1,6 +1,6 @@
 package game
 
-import entities.{Entity, Primitives}
+import entities.{Camera, Entity, Primitives}
 import eventSystem._
 import input.Handler
 import loaders.EntityLoader
@@ -26,14 +26,15 @@ object Runner extends App with Events {
 
   val model = loader.loadToVAO(Primitives.Cube)
   val shader = new ColorShader("color")
-  val entity = new Entity(model, new Vector3f(0, 0, 0), new Rotation(0, 0, 0), 1, shader)
+  val entity = new Entity(model, new Vector3f(0, 0, -5f), new Rotation(0, 0, 0), 1, shader)
   val renderer = new Renderer()
+  val camera = new Camera(0.1f)
 
   while (gameRunning) {
     window.clean()
     renderer.render(entity)
     //    entity.increaseRotation(new Rotation(0,0,1))
-    entity.increasePosition(new Vector3f(0, 0, -0.01f))
+    //    entity.increasePosition(new Vector3f(0, 0, -0.01f))
 
     EventSystem ! GameLoopTick()
 

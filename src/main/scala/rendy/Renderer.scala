@@ -1,7 +1,7 @@
 package rendy
 
 import entities.Entity
-import eventSystem.{DebugWireframe, Events, GameEnd, WindowResize}
+import eventSystem._
 import org.joml.Matrix4f
 import org.lwjgl.opengl.GL11._
 import org.lwjgl.opengl.GL20.{glDisableVertexAttribArray, glEnableVertexAttribArray}
@@ -12,11 +12,13 @@ import utils.Maths
 class Renderer() extends Events {
   private var isWireframe = false
   private var projectionMatrix = perspective(800, 400)
+  private var viewMatrix = new Matrix4f().identity()
   init()
 
   def init(): Unit = {
     events
       .on[WindowResize] { window => projectionMatrix = perspective(window.width, window.height) }
+      .on[CameraMove] { camera => viewMatrix = camera.transform }
       .on[DebugWireframe] { _ => wireframe() }
       .on[GameEnd] { _ => events.unsubscribe() }
   }
@@ -33,7 +35,7 @@ class Renderer() extends Events {
     entity.model match {
       case BasicModel(vaoID, indices, attributes) =>
         val transformationMatrix = Maths.createTransformationMatrix(entity.position, entity.rotation, entity.scale)
-        entity.shader.draw(transformationMatrix, projectionMatrix)
+        entity.shader.draw(transformationMatrix, projectionMatrix, viewMatrix)
         GL {
           glBindVertexArray(vaoID)
         }
