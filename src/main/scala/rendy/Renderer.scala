@@ -24,10 +24,7 @@ class Renderer() extends Events {
   }
 
   private def perspective(w: Float, h: Float) = new Matrix4f().setPerspective(
-    Math.toRadians(70).toFloat,
-    (w / h).toFloat,
-    0.01f,
-    1000f
+    Math.toRadians(70).toFloat, w / h, 0.01f, 1000f
   )
 
   def render(entity: Entity): Unit = {
@@ -36,32 +33,20 @@ class Renderer() extends Events {
       case BasicModel(vaoID, indices, attributes) =>
         val transformationMatrix = Maths.createTransformationMatrix(entity.position, entity.rotation, entity.scale)
         entity.shader.draw(transformationMatrix, projectionMatrix, viewMatrix)
-        GL {
-          glBindVertexArray(vaoID)
-        }
+        GL(glBindVertexArray(vaoID))
 
-        for (index <- 0 until attributes) GL {
-          glEnableVertexAttribArray(index)
-        }
+        for (index <- 0 until attributes) GL(glEnableVertexAttribArray(index))
 
-        GL {
-          glDrawElements(GL_TRIANGLES, indices, GL_UNSIGNED_INT, 0)
-        }
+        GL(glDrawElements(GL_TRIANGLES, indices, GL_UNSIGNED_INT, 0))
 
-        for (index <- (attributes - 1) to 0) GL {
-          glDisableVertexAttribArray(index)
-        }
+        for (index <- (attributes - 1) to 0) GL(glDisableVertexAttribArray(index))
 
-        GL {
-          glBindVertexArray(0)
-        }
+        GL(glBindVertexArray(0))
     }
   }
 
   private def wireframe(): Unit = {
-    GL {
-      glPolygonMode(GL_FRONT_AND_BACK, if (isWireframe) GL_FILL else GL_LINE)
-    }
+    GL(glPolygonMode(GL_FRONT_AND_BACK, if (isWireframe) GL_FILL else GL_LINE))
     isWireframe = !isWireframe
   }
 }

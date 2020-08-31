@@ -19,14 +19,14 @@ class EntityLoader extends DaeLoader {
   load("primitive/cube")
 
   def loadToVAO(modelData: ModelData): BasicModel = {
-    val vaoID = glGenVertexArrays()
+    val vaoID = GL(glGenVertexArrays())
     vaos += vaoID
-    glBindVertexArray(vaoID)
+    GL(glBindVertexArray(vaoID))
 
     storeModelData(modelData)
     storeEAO(modelData.indices)
 
-    glBindVertexArray(0)
+    GL(glBindVertexArray(0))
 
     BasicModel(vaoID, modelData.indices.size, modelData.attributes)
   }
@@ -39,8 +39,8 @@ class EntityLoader extends DaeLoader {
    * the VAO
    */
   private def storeEAO(indices: List[Int]): Unit = {
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, createVBO())
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, createBuffer(indices), GL_STATIC_DRAW)
+    GL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, createVBO()))
+    GL(glBufferData(GL_ELEMENT_ARRAY_BUFFER, createBuffer(indices), GL_STATIC_DRAW))
     // no need to unbind for EAO
   }
 
@@ -51,25 +51,22 @@ class EntityLoader extends DaeLoader {
    * size is the number of vertices per position, eg 2D data would be 2, 3D would be 3
    */
   private def storeModelData(modelData: ModelData): Unit = {
-    glBindBuffer(GL_ARRAY_BUFFER, createVBO())
-    glBufferData(GL_ARRAY_BUFFER, createBuffer(modelData.vertices), GL_STATIC_DRAW)
+    GL(glBindBuffer(GL_ARRAY_BUFFER, createVBO()))
+    GL(glBufferData(GL_ARRAY_BUFFER, createBuffer(modelData.vertices), GL_STATIC_DRAW))
 
     for (index <- 0 until modelData.attributes) {
-      println(s"binding atrrib $index")
       val size = modelData.size
       val attributes = modelData.attributes
       val stride = (floatSize * size) * attributes
 
-      GL {
-        glVertexAttribPointer(index, size, GL_FLOAT, false, stride, if (index == 0) 0 else size)
-      }
+      GL(glVertexAttribPointer(index, size, GL_FLOAT, false, stride, if (index == 0) 0 else size))
     }
 
-    glBindBuffer(GL_ARRAY_BUFFER, 0)
+    GL(glBindBuffer(GL_ARRAY_BUFFER, 0))
   }
 
   private def createVBO(): Int = {
-    val vboID = glGenBuffers()
+    val vboID = GL(glGenBuffers())
     vbos += vboID
     vboID
   }

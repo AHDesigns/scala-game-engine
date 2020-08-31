@@ -35,7 +35,6 @@ class Window extends Events {
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, y)
   }
 
-  //  GL { glViewport(0, 0, 800, 600) }
   val id: Long = glfwCreateWindow(1000, 600, "Hello World!", NULL, NULL)
   if (id == NULL) throw new RuntimeException("Failed to create the GLFW window")
 
@@ -47,21 +46,17 @@ class Window extends Events {
   glfwShowWindow(id)
   // does all the things
   createCapabilities
+
   println(glGetString(GL_VERSION))
-  //  glfwSetFramebufferSizeCallback
   glfwSetFramebufferSizeCallback(id, (_, width, height) => {
-    println(s"window is now $width by $height")
     EventSystem ! WindowResize(width, height)
-    GL {
-      glViewport(0, 0, width, height)
-    }
-    //    GL { glfwSetWindowAspectRatio(id, width, height) }
+    GL(glViewport(0, 0, width, height))
   })
 
   events
-    .on[GameEnd](_ => {
-      cleanUp()
-    })
+    .on[GameEnd] {
+      cleanUp
+    }
   // .on[GameLoopTick](_ => { update() })
 
   def clean(): Unit = {
@@ -73,7 +68,7 @@ class Window extends Events {
     glfwSwapBuffers(id) // swap the color buffers
   }
 
-  private def cleanUp(): Unit = {
+  private def cleanUp(e: GameEnd): Unit = {
     //  Destroy the window
     glfwDestroyWindow(id)
 
