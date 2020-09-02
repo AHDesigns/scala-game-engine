@@ -1,25 +1,8 @@
 package utils
 
 import org.joml.{Matrix4f, Vector3f}
-import org.lwjgl.system.MemoryStack
 
 object Maths {
-  def thingy(): Unit = {
-    try {
-      val stack = MemoryStack.stackPush
-      try {
-        val fb = new Matrix4f()
-          .perspective(Math.toRadians(45.0f).toFloat, 1.0f, 0.01f, 100.0f)
-          .lookAt(0.0f, 0.0f, 10.0f,
-            0.0f, 0.0f, 0.0f,
-            0.0f, 1.0f, 0.0f)
-          .get(stack.mallocFloat(16))
-        //      glUniformMatrix4fv(mat4Location, false, fb)
-      } finally if (stack != null) stack.close()
-    }
-
-  }
-
   def createTransformationMatrix(translation: Vector3f, rotation: Rotation, scale: Float): Matrix4f = {
     new Matrix4f()
       .translate(translation)

@@ -1,6 +1,6 @@
 package rendy
 
-import entities.Entity
+import entities.{Entity, Light}
 import eventSystem._
 import org.joml.Matrix4f
 import org.lwjgl.opengl.GL11._
@@ -16,6 +16,7 @@ class Renderer() extends Events {
   init()
 
   def init(): Unit = {
+    GL(glEnable(GL_DEPTH_TEST))
     events
       .on[WindowResize] { window => projectionMatrix = perspective(window.width, window.height) }
       .on[CameraMove] { camera => viewMatrix = camera.transform }
@@ -27,19 +28,19 @@ class Renderer() extends Events {
     Math.toRadians(70).toFloat, w / h, 0.01f, 1000f
   )
 
-  def render(entity: Entity): Unit = {
+  def render(entity: Entity, light: Light): Unit = {
 
     entity.model match {
       case BasicModel(vaoID, indices, attributes) =>
         val transformationMatrix = Maths.createTransformationMatrix(entity.position, entity.rotation, entity.scale)
-        entity.shader.draw(transformationMatrix, projectionMatrix, viewMatrix)
+        entity.shader.draw(transformationMatrix, projectionMatrix, viewMatrix, light)
         GL(glBindVertexArray(vaoID))
 
-        for (index <- 0 until attributes) GL(glEnableVertexAttribArray(index))
+        for (index <- attributes) GL(glEnableVertexAttribArray(index))
 
         GL(glDrawElements(GL_TRIANGLES, indices, GL_UNSIGNED_INT, 0))
 
-        for (index <- (attributes - 1) to 0) GL(glDisableVertexAttribArray(index))
+        for (index <- attributes) GL(glDisableVertexAttribArray(index))
 
         GL(glBindVertexArray(0))
     }

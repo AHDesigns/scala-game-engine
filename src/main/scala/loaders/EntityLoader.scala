@@ -4,31 +4,54 @@ import org.lwjgl.opengl.GL11._
 import org.lwjgl.opengl.GL15._
 import org.lwjgl.opengl.GL20._
 import org.lwjgl.opengl.GL30._
-import rendy.{BasicModel, ModelData}
+import rendy._
 import utils.Control.GL
 import utils.JavaBufferUtils.createBuffer
 
 import scala.collection.mutable.ListBuffer
 import scala.language.postfixOps
 
-class EntityLoader extends DaeLoader {
-  private val floatSize = 4
+class EntityLoader extends ObjLoader {
   private var vbos = new ListBuffer[Int]()
   private var vaos = new ListBuffer[Int]()
 
-  load("primitive/cube")
+  def loadModel(filePath: String): BasicModel = {
+    loadPrimitive(load(filePath))
+  }
 
-  def loadToVAO(modelData: ModelData): BasicModel = {
+  def loadPrimitive(modelData: ModelData): BasicModel = {
     val vaoID = GL(glGenVertexArrays())
     vaos += vaoID
     GL(glBindVertexArray(vaoID))
 
-    storeModelData(modelData)
     storeEAO(modelData.indices)
+    val attributes = modelData.attributes.map {
+      storeAttrib
+    }
 
     GL(glBindVertexArray(0))
 
-    BasicModel(vaoID, modelData.indices.size, modelData.attributes)
+    BasicModel(vaoID, modelData.indices.size, attributes)
+  }
+
+  private def storeAttrib(data: AttribData): Int = {
+    GL(glBindBuffer(GL_ARRAY_BUFFER, createVBO()))
+
+    val attribId = data match {
+      case _: PositionsData => (0)
+      case _: NormalsData => (1)
+      case _: ColorData => (2)
+      case _: TextureData => (3)
+    }
+    bindVertex(data, attribId)
+
+    GL(glBindBuffer(GL_ARRAY_BUFFER, 0))
+    attribId
+  }
+
+  private def bindVertex(data: AttribData, index: Int): Unit = {
+    GL(glBufferData(GL_ARRAY_BUFFER, createBuffer(data.vertexData), GL_STATIC_DRAW))
+    GL(glVertexAttribPointer(index, data.step, GL_FLOAT, false, 0, 0))
   }
 
   /**
@@ -42,27 +65,6 @@ class EntityLoader extends DaeLoader {
     GL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, createVBO()))
     GL(glBufferData(GL_ELEMENT_ARRAY_BUFFER, createBuffer(indices), GL_STATIC_DRAW))
     // no need to unbind for EAO
-  }
-
-  /**
-   * Create a Vertex Buffer Object
-   *
-   * Used for storing VAO data at a specific index
-   * size is the number of vertices per position, eg 2D data would be 2, 3D would be 3
-   */
-  private def storeModelData(modelData: ModelData): Unit = {
-    GL(glBindBuffer(GL_ARRAY_BUFFER, createVBO()))
-    GL(glBufferData(GL_ARRAY_BUFFER, createBuffer(modelData.vertices), GL_STATIC_DRAW))
-
-    for (index <- 0 until modelData.attributes) {
-      val size = modelData.size
-      val attributes = modelData.attributes
-      val stride = (floatSize * size) * attributes
-
-      GL(glVertexAttribPointer(index, size, GL_FLOAT, false, stride, if (index == 0) 0 else size))
-    }
-
-    GL(glBindBuffer(GL_ARRAY_BUFFER, 0))
   }
 
   private def createVBO(): Int = {

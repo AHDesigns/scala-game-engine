@@ -1,33 +1,34 @@
 package entities
 
-import rendy.ModelData
+import rendy.{ColorData, ModelData, PositionsData}
 
 object Primitives {
   val Triangle: ModelData = ModelData(
-    List(
+    PositionsData(List(
       0.5f, -0.5f, 0.0f,
       -0.5f, -0.5f, 0.0f,
       0.0f, 0.5f, 0.0f,
-    ),
+    )),
     List(0, 1, 2),
-    size = 3,
-    attributes = 1
+    colorData = Some(ColorData(List(
+      .5f, .6f, 1f,
+      .1f, .9f, 0f,
+      .9f, .2f, .1f,
+    ))),
   )
 
   val Quad: ModelData = ModelData(
-    List(
+    PositionsData(List(
       0.5f, 0.5f, 0.0f, // top right
       0.5f, -0.5f, 0.0f, // bottom right
       -0.5f, -0.5f, 0.0f, // bottom left
       -0.5f, 0.5f, 0.0f // top left
-    ),
+    )),
     List(0, 1, 2, 0, 2, 3),
-    size = 3,
-    attributes = 1
   )
 
   val Cube: ModelData = ModelData(
-    List( // Front face
+    PositionsData(List(
       -1.0f, -1.0f, 1.0f,
       1.0f, -1.0f, 1.0f,
       1.0f, 1.0f, 1.0f,
@@ -62,7 +63,7 @@ object Primitives {
       -1.0f, -1.0f, 1.0f,
       -1.0f, 1.0f, 1.0f,
       -1.0f, 1.0f, -1.0f
-    ),
+    )),
     List(
       0, 1, 2, 0, 2, 3, // front
       4, 5, 6, 4, 6, 7, // back
@@ -71,7 +72,5 @@ object Primitives {
       16, 17, 18, 16, 18, 19, // right
       20, 21, 22, 20, 22, 23, // left
     ),
-    size = 3,
-    attributes = 1
   )
 }

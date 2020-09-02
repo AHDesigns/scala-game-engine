@@ -35,7 +35,7 @@ class Window extends Events {
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, y)
   }
 
-  val id: Long = glfwCreateWindow(1000, 600, "Hello World!", NULL, NULL)
+  val id: Long = glfwCreateWindow(1000, 600, "GamyMcGameFace", NULL, NULL)
   if (id == NULL) throw new RuntimeException("Failed to create the GLFW window")
 
   // Make the OpenGL context current

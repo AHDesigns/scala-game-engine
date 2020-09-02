@@ -6,7 +6,7 @@ trait ShaderLoader extends FileLoader {
   protected def load(shaderFile: String): Either[String, Int] = {
     val shaderPath = "src/main/scala/shaders/" + shaderFile + ".glsl"
     for {
-      shaderCode <- super.load(shaderPath)
+      shaderCode <- super.loadFile(shaderPath)
       shaderPair <- splitShader(shaderCode)
       vertexShader <- compileShader(shaderPair.vertex, GL_VERTEX_SHADER)
       fragmentShader <- compileShader(shaderPair.fragment, GL_FRAGMENT_SHADER)
