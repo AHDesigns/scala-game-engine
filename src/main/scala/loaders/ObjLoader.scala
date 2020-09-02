@@ -6,19 +6,19 @@ import rendy._
 import scala.collection.mutable
 
 /**
- * Notes on exporting OBJ from blender
- * https://www.youtube.com/watch?v=KMWUjNE0fYI
- * include normals
- * include uvs
- * triangulate faces
- * objects as OBJ objects
- * "forward" -Z Forward
- * Up Y Up
- */
+  * Notes on exporting OBJ from blender
+  * https://www.youtube.com/watch?v=KMWUjNE0fYI
+  * include normals
+  * include uvs
+  * triangulate faces
+  * objects as OBJ objects
+  * "forward" -Z Forward
+  * Up Y Up
+  */
 
 /**
- * Load OBJ from res/models
- */
+  * Load OBJ from res/models
+  */
 trait ObjLoader extends FileLoader {
   protected def load(file: String): ModelData = {
     ObjJLoader.load(file) match {
@@ -44,79 +44,80 @@ trait ObjLoader extends FileLoader {
     val normalsArray = mutable.ArrayBuffer.empty[Float]
     val indicesArray = mutable.ArrayBuffer.empty[Int]
 
-    readFileByLines(s"res/models/$file.obj") { source => {
-      source.getLines().foreach { line =>
-        println(s"processing line $line")
-        line.split(" ") match {
-          case Array("v", x, y, z) =>
-            vertices += new Vector3f(F(x), F(y), F(z))
-          case Array("vt", u, v) => textures += new Vector2f(F(u), F(v))
-          case Array("vn", x, y, z) =>
-            normals += new Vector3f(F(x), F(y), F(z))
-          case Array("f", v1, v2, v3) =>
-            processVertex(
-              v1,
-              indices,
-              textures,
-              normals,
-              texturesArray,
-              normalsArray
-            );
-            processVertex(
-              v2,
-              indices,
-              textures,
-              normals,
-              texturesArray,
-              normalsArray
-            );
-            processVertex(
-              v3,
-              indices,
-              textures,
-              normals,
-              texturesArray,
-              normalsArray
-            );
-          case _ => ;
+    readFileByLines(s"res/models/$file.obj") { source =>
+      {
+        source.getLines().foreach { line =>
+          println(s"processing line $line")
+          line.split(" ") match {
+            case Array("v", x, y, z) =>
+              vertices += new Vector3f(F(x), F(y), F(z))
+            case Array("vt", u, v) => textures += new Vector2f(F(u), F(v))
+            case Array("vn", x, y, z) =>
+              normals += new Vector3f(F(x), F(y), F(z))
+            case Array("f", v1, v2, v3) =>
+              processVertex(
+                v1,
+                indices,
+                textures,
+                normals,
+                texturesArray,
+                normalsArray
+              );
+              processVertex(
+                v2,
+                indices,
+                textures,
+                normals,
+                texturesArray,
+                normalsArray
+              );
+              processVertex(
+                v3,
+                indices,
+                textures,
+                normals,
+                texturesArray,
+                normalsArray
+              );
+            case _ => ;
+          }
         }
-      }
-      var vertexPointer = 0;
-      for (vertex <- vertices) {
-        verticesArray(vertexPointer) = vertex.x
-        vertexPointer += 1
-        verticesArray(vertexPointer) = vertex.y
-        vertexPointer += 1
-        verticesArray(vertexPointer) = vertex.z
-      }
-      println("about to loop")
-      for (i <- indices.indices) {
-        indicesArray(i) = indices(i)
-      }
-      println("looped")
+        var vertexPointer = 0;
+        for (vertex <- vertices) {
+          verticesArray(vertexPointer) = vertex.x
+          vertexPointer += 1
+          verticesArray(vertexPointer) = vertex.y
+          vertexPointer += 1
+          verticesArray(vertexPointer) = vertex.z
+        }
+        println("about to loop")
+        for (i <- indices.indices) {
+          indicesArray(i) = indices(i)
+        }
+        println("looped")
 
-      //        ComplexModel(
-      //          verticesArray.toList,
-      //          indicesArray.toList,
-      //          List(
-      //            NormalsData(normalsArray.toList),
-      //            TextureData(texturesArray.toList),
-      //          )
-      //        )
-    }
+        //        ComplexModel(
+        //          verticesArray.toList,
+        //          indicesArray.toList,
+        //          List(
+        //            NormalsData(normalsArray.toList),
+        //            TextureData(texturesArray.toList),
+        //          )
+        //        )
+      }
     }
   }
 
   private def F(value: String): Float = value.toFloat
 
   private def processVertex(
-                             vertex: String,
-                             indices: mutable.ArrayBuffer[Int],
-                             textures: mutable.ArrayBuffer[Vector2f],
-                             normals: mutable.ArrayBuffer[Vector3f],
-                             textArray: mutable.ArrayBuffer[Float],
-                             normalsArray: mutable.ArrayBuffer[Float]
-                           ) {
+      vertex: String,
+      indices: mutable.ArrayBuffer[Int],
+      textures: mutable.ArrayBuffer[Vector2f],
+      normals: mutable.ArrayBuffer[Vector3f],
+      textArray: mutable.ArrayBuffer[Float],
+      normalsArray: mutable.ArrayBuffer[Float]
+  ) {
     val vertexData = vertex.split("/")
     val currentVertexPointer = vertexData(0).toInt - 1
     indices += (currentVertexPointer)

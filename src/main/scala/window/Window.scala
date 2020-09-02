@@ -48,10 +48,13 @@ class Window extends Events {
   createCapabilities
 
   println(glGetString(GL_VERSION))
-  glfwSetFramebufferSizeCallback(id, (_, width, height) => {
-    EventSystem ! WindowResize(width, height)
-    GL(glViewport(0, 0, width, height))
-  })
+  glfwSetFramebufferSizeCallback(
+    id,
+    (_, width, height) => {
+      EventSystem ! WindowResize(width, height)
+      GL(glViewport(0, 0, width, height))
+    }
+  )
 
   events
     .on[GameEnd] {
@@ -89,7 +92,11 @@ class Window extends Events {
       // Get the resolution of the primary monitor
       val vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor)
       // Center the window
-      glfwSetWindowPos(id, (vidmode.width - pWidth.get(0)) / 2, (vidmode.height - pHeight.get(0)) / 2)
+      glfwSetWindowPos(
+        id,
+        (vidmode.width - pWidth.get(0)) / 2,
+        (vidmode.height - pHeight.get(0)) / 2
+      )
     } finally if (stack != null) stack.close()
   } // the stack frame is popped automatically
 }

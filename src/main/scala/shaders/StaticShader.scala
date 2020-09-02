@@ -13,16 +13,29 @@ class StaticShader(color: Vector4f) extends Shader with ShaderLoader {
     case Right(id) => id
   }
 
-  def draw(transformationMatrix: Matrix4f, projectionMatrix: Matrix4f, viewMatrix: Matrix4f, light: Light): Unit = {
+  def draw(
+      transformationMatrix: Matrix4f,
+      projectionMatrix: Matrix4f,
+      viewMatrix: Matrix4f,
+      light: Light
+  ): Unit = {
     val colorLocation = GLU(glGetUniformLocation(program, "aColor"))
     val matrix = GLU(glGetUniformLocation(program, "transformationMatrix"))
-    val projectionMatrixLoc = GLU(glGetUniformLocation(program, "projectionMatrix"))
+    val projectionMatrixLoc = GLU(
+      glGetUniformLocation(program, "projectionMatrix")
+    )
     val viewMatrixLoc = GLU(glGetUniformLocation(program, "viewMatrix"))
 
     GL(glUseProgram(program))
     GL(glUniform4f(colorLocation, color.x, color.y, color.z, color.w))
     GL(glUniformMatrix4fv(matrix, false, getMatrixBuffer(transformationMatrix)))
-    GL(glUniformMatrix4fv(projectionMatrixLoc, false, getMatrixBuffer(projectionMatrix)))
+    GL(
+      glUniformMatrix4fv(
+        projectionMatrixLoc,
+        false,
+        getMatrixBuffer(projectionMatrix)
+      )
+    )
     GL(glUniformMatrix4fv(viewMatrixLoc, false, getMatrixBuffer(viewMatrix)))
   }
 }

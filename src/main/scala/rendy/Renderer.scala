@@ -4,7 +4,10 @@ import entities.{Entity, Light}
 import eventSystem._
 import org.joml.Matrix4f
 import org.lwjgl.opengl.GL11._
-import org.lwjgl.opengl.GL20.{glDisableVertexAttribArray, glEnableVertexAttribArray}
+import org.lwjgl.opengl.GL20.{
+  glDisableVertexAttribArray,
+  glEnableVertexAttribArray
+}
 import org.lwjgl.opengl.GL30.glBindVertexArray
 import utils.Control.GL
 import utils.Maths
@@ -18,22 +21,37 @@ class Renderer() extends Events {
   def init(): Unit = {
     GL(glEnable(GL_DEPTH_TEST))
     events
-      .on[WindowResize] { window => projectionMatrix = perspective(window.width, window.height) }
+      .on[WindowResize] { window =>
+        projectionMatrix = perspective(window.width, window.height)
+      }
       .on[CameraMove] { camera => viewMatrix = camera.transform }
       .on[DebugWireframe] { _ => wireframe() }
       .on[GameEnd] { _ => events.unsubscribe() }
   }
 
-  private def perspective(w: Float, h: Float) = new Matrix4f().setPerspective(
-    Math.toRadians(70).toFloat, w / h, 0.01f, 1000f
-  )
+  private def perspective(w: Float, h: Float) =
+    new Matrix4f().setPerspective(
+      Math.toRadians(70).toFloat,
+      w / h,
+      0.01f,
+      1000f
+    )
 
   def render(entity: Entity, light: Light): Unit = {
 
     entity.model match {
       case BasicModel(vaoID, indices, attributes) =>
-        val transformationMatrix = Maths.createTransformationMatrix(entity.position, entity.rotation, entity.scale)
-        entity.shader.draw(transformationMatrix, projectionMatrix, viewMatrix, light)
+        val transformationMatrix = Maths.createTransformationMatrix(
+          entity.position,
+          entity.rotation,
+          entity.scale
+        )
+        entity.shader.draw(
+          transformationMatrix,
+          projectionMatrix,
+          viewMatrix,
+          light
+        )
         GL(glBindVertexArray(vaoID))
 
         for (index <- attributes) GL(glEnableVertexAttribArray(index))

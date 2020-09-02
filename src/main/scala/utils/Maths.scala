@@ -3,7 +3,11 @@ package utils
 import org.joml.{Matrix4f, Vector3f}
 
 object Maths {
-  def createTransformationMatrix(translation: Vector3f, rotation: Rotation, scale: Float): Matrix4f = {
+  def createTransformationMatrix(
+      translation: Vector3f,
+      rotation: Rotation,
+      scale: Float
+  ): Matrix4f = {
     new Matrix4f()
       .translate(translation)
       .rotate(Math.toRadians(rotation.x).toFloat, new Vector3f(1, 0, 0))

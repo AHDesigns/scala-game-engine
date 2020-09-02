@@ -17,7 +17,8 @@ class Camera(speed: Float) extends Events {
     .on[InputMove] {
       case InputMove(0, 0, 0) => isMoving = false
       case InputMove(x, y, z) =>
-        translation = new Vector3f(x, z, y).normalize().mul(direction).mul(speed)
+        translation =
+          new Vector3f(x, z, y).normalize().mul(direction).mul(speed)
         isMoving = true
     }
     .on[GameLoopTick] {

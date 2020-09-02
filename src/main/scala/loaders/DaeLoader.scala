@@ -3,16 +3,16 @@ package loaders
 import scala.xml._
 
 /**
- * might come back to this when I want an animation and color data
- * Dae format from blender notes
- * library_geometries contains vertex data
- * triangles \ p lists info about indices
- * triangles \ @material links to library_materials / @id, which in turn links to a library effect
- */
+  * might come back to this when I want an animation and color data
+  * Dae format from blender notes
+  * library_geometries contains vertex data
+  * triangles \ p lists info about indices
+  * triangles \ @material links to library_materials / @id, which in turn links to a library effect
+  */
 
 /**
- * Load dae model format
- */
+  * Load dae model format
+  */
 trait DaeLoader {
   def load(file: String) = {
     val xml = XML.load(s"res/models/$file.dae")
@@ -36,36 +36,44 @@ trait DaeLoader {
     Some(1)
   }
 
-  private def partiallyGetTriangleInput(inputs: NodeSeq): String => Either[String, Input] = (target: String) => {
-    val input = inputs.find(where("semantic", target))
+  private def partiallyGetTriangleInput(
+      inputs: NodeSeq
+  ): String => Either[String, Input] =
+    (target: String) => {
+      val input = inputs.find(where("semantic", target))
 
-    val inputValues = for {
-      src <- input.flatMap(_.attribute("source"))
-      offset <- input.flatMap(_.attribute("offset"))
-    } yield (src, offset)
+      val inputValues = for {
+        src <- input.flatMap(_.attribute("source"))
+        offset <- input.flatMap(_.attribute("offset"))
+      } yield (src, offset)
 
-    inputValues match {
-      case Some((src, offset)) => Right(new Input(src.text, offset.text))
-      case None => Left(s"could not get Input for $target")
+      inputValues match {
+        case Some((src, offset)) => Right(new Input(src.text, offset.text))
+        case None                => Left(s"could not get Input for $target")
+      }
     }
-  }
 
-  private def where(attribute: String, is: String)(node: Node): Boolean = node.attribute(attribute).getOrElse("").toString == is
+  private def where(attribute: String, is: String)(node: Node): Boolean =
+    node.attribute(attribute).getOrElse("").toString == is
 
-  private def getFirst(data: NodeSeq): Option[String] = data map (_.text) match {
-    case Nil => None
-    case head :: _ => Some(head)
-  }
+  private def getFirst(data: NodeSeq): Option[String] =
+    data map (_.text) match {
+      case Nil       => None
+      case head :: _ => Some(head)
+    }
 
   class Input(val source: String, _offset: String) {
-    val offset: Int = try {
-      _offset.toInt
-    } catch {
-      case _: Throwable =>
-        println(s"Malformed dae file! input / offset value '${_offset}'could not be parsed to Int")
-        System.exit(1)
-        0
-    }
+    val offset: Int =
+      try {
+        _offset.toInt
+      } catch {
+        case _: Throwable =>
+          println(
+            s"Malformed dae file! input / offset value '${_offset}'could not be parsed to Int"
+          )
+          System.exit(1)
+          0
+      }
   }
 
 }

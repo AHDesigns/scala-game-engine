@@ -7,9 +7,9 @@ import scala.util.{Failure, Success, Try}
 
 trait FileLoader {
   protected def loadFile(
-                          file: String,
-                          stripNewlines: Boolean = false
-                        ): Either[String, String] = {
+      file: String,
+      stripNewlines: Boolean = false
+  ): Either[String, String] = {
     readText(file, stripNewlines) match {
       case Failure(exception) =>
         Left(s"Could not read file at $file\n$exception")
@@ -18,7 +18,7 @@ trait FileLoader {
   }
 
   protected def readFileByLines[T](file: String)(
-    lineProcessor: BufferedSource => T
+      lineProcessor: BufferedSource => T
   ): Either[String, T] = {
     (Try {
       Control.using(Source.fromFile(file)) {

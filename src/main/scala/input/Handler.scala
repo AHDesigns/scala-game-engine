@@ -13,28 +13,36 @@ class Handler(window: Window) extends Events {
 
   private def init(): Unit = {
     // Setup a key callback. It will be called every time a key is pressed, repeated or released.
-    glfwSetKeyCallback(window.id, (window: Long, key: Int, scancode: Int, keyAction: Int, mods: Int) => {
-      val action = getKeyPress(keyAction)
-      //      log(key, action)
-      if (movementKeys.contains(key)) move(key, action)
-      else if (keyAction == GLFW_RELEASE) {
-        if (key == GLFW_KEY_ESCAPE) EventSystem ! WindowClose()
-        if (key == GLFW_KEY_X) EventSystem ! DebugWireframe()
+    glfwSetKeyCallback(
+      window.id,
+      (window: Long, key: Int, scancode: Int, keyAction: Int, mods: Int) => {
+        val action = getKeyPress(keyAction)
+        //      log(key, action)
+        if (movementKeys.contains(key)) move(key, action)
+        else if (keyAction == GLFW_RELEASE) {
+          if (key == GLFW_KEY_ESCAPE) EventSystem ! WindowClose()
+          if (key == GLFW_KEY_X) EventSystem ! DebugWireframe()
+        }
       }
-    })
+    )
 
-    glfwSetWindowCloseCallback(window.id, _ => {
-      EventSystem ! WindowClose()
-    })
+    glfwSetWindowCloseCallback(
+      window.id,
+      _ => {
+        EventSystem ! WindowClose()
+      }
+    )
 
-    events.on[GameLoopTick](_ => {
-      // Poll for window events. The key callback will only be invoked during this call.
-      //      glfwPollEvents()
-    }).on[GameEnd](_ => {
-      // Free the window callbacks and destroy the window
-      glfwFreeCallbacks(window.id)
-      events.unsubscribe()
-    })
+    events
+      .on[GameLoopTick](_ => {
+        // Poll for window events. The key callback will only be invoked during this call.
+        //      glfwPollEvents()
+      })
+      .on[GameEnd](_ => {
+        // Free the window callbacks and destroy the window
+        glfwFreeCallbacks(window.id)
+        events.unsubscribe()
+      })
   }
 
   private def move(key: Int, action: KeyPress): Unit = {
@@ -50,13 +58,15 @@ class Handler(window: Window) extends Events {
     }
   }
 
-  private def getKeyPress(action: Int): KeyPress = action match {
-    case GLFW_PRESS => KeyDown()
-    case GLFW_RELEASE => KeyUp()
-    case GLFW_REPEAT => KeyHold()
-  }
+  private def getKeyPress(action: Int): KeyPress =
+    action match {
+      case GLFW_PRESS   => KeyDown()
+      case GLFW_RELEASE => KeyUp()
+      case GLFW_REPEAT  => KeyHold()
+    }
 
-  private def isPressed(key: Int): Boolean = glfwGetKey(window.id, key) == GLFW_PRESS
+  private def isPressed(key: Int): Boolean =
+    glfwGetKey(window.id, key) == GLFW_PRESS
 
   private def log(key: Int, action: KeyPress): Unit = {
     println("key press: " + key + " | action: " + action)

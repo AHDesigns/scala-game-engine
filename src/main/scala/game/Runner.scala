@@ -41,7 +41,6 @@ object Runner extends App with Events {
     new StaticShader(new Vector4f(.3f, .4f, .8f, 1f))
   )
 
-
   while (gameRunning) {
     window.clean()
     List(entity, entity2)

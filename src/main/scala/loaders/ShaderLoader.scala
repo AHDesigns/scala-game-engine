@@ -14,13 +14,17 @@ trait ShaderLoader extends FileLoader {
     } yield shaderProgram
   }
 
-  private def compileShader(shaderCode: String, shaderType: Int): Either[String, Int] = {
+  private def compileShader(
+      shaderCode: String,
+      shaderType: Int
+  ): Either[String, Int] = {
     val shaderId = glCreateShader(shaderType)
     glShaderSource(shaderId, shaderCode)
     glCompileShader(shaderId)
 
     glGetShaderi(shaderId, GL_COMPILE_STATUS) match {
-      case 0 => Left(s"Could not compile shader! ${glGetShaderInfoLog(shaderId, 512)}")
+      case 0 =>
+        Left(s"Could not compile shader! ${glGetShaderInfoLog(shaderId, 512)}")
       case _ => Right(shaderId)
     }
   }
@@ -32,7 +36,10 @@ trait ShaderLoader extends FileLoader {
     shaderIds.foreach(glDeleteShader)
 
     glGetProgrami(shaderProgram, GL_LINK_STATUS) match {
-      case 0 => Left(s"Could not link shader!\n${glGetProgramInfoLog(shaderProgram, 512)}")
+      case 0 =>
+        Left(
+          s"Could not link shader!\n${glGetProgramInfoLog(shaderProgram, 512)}"
+        )
       case _ => Right(shaderProgram)
     }
   }
@@ -41,10 +48,11 @@ trait ShaderLoader extends FileLoader {
     val shaders = shaderCode.split("#---")
     shaders.length match {
       case 2 => Right(ShaderPair(vertex = shaders(0), fragment = shaders(1)))
-      case _ => Left(
-        s"""shader did not appear to contain a vertex and fragment section.
-           |Does the file contain a '#---' line to indicate the separation""".stripMargin
-      )
+      case _ =>
+        Left(
+          s"""shader did not appear to contain a vertex and fragment section.
+            |Does the file contain a '#---' line to indicate the separation""".stripMargin
+        )
     }
   }
 
