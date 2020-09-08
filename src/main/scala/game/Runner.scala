@@ -1,17 +1,21 @@
 package game
 
-import entities.{Camera, Entity, Light, Primitives}
+import behaviours.PlayerMovement
+import entities.{Camera, Entity, Light}
 import eventSystem._
 import input.Handler
 import loaders.EntityLoader
 import org.joml.{Vector3f, Vector4f}
 import org.lwjgl.Version
 import rendy.Renderer
-import shaders.{ColorShader, StaticShader}
+import shaders.StaticShader
 import utils.Maths.Rotation
 import window.Window
 
+import scala.util.Random
+
 object Runner extends App with Events {
+  val FPS = 60
   println("Using LWJGL " + Version.getVersion + "!")
   private var gameRunning = true
 
@@ -20,40 +24,68 @@ object Runner extends App with Events {
 
   events.on[WindowClose](_ => gameRunning = false)
 
-  val renderer = new Renderer()
-  val camera = new Camera(0.1f)
+  val camera = new Camera()
+  val renderer = new Renderer(camera)
   val light = new Light()
   val loader = new EntityLoader()
 
-  val entity = new Entity(
-    loader.loadPrimitive(Primitives.Triangle),
-    new Vector3f(0, 0, -2.5f),
-    new Rotation(0, 0, 0),
-    1,
-    new ColorShader("color")
+  private def rand(n: Boolean = false) =
+    Random.nextFloat() + (if (n) -0.5f else 0)
+
+  val entities = (1 to 10 map { _ =>
+    new Entity(
+      Some(loader.loadModel("primitive/cube")),
+      new Vector3f(rand(true) * 10f, rand(true) * 10f, rand(true) * 3f),
+      new Rotation(rand() * 360, rand() * 360, 0),
+      0.5f,
+      Some(new StaticShader(new Vector4f(rand(), rand(), rand(), 1f)))
+    )
+  }).toList
+
+  val player = new Entity(
+    Some(loader.loadModel("primitive/dragon")),
+    new Vector3f(),
+    new Rotation(),
+    0.2f,
+    Some(new StaticShader(new Vector4f(1, 1, 1, 1))),
+    List(new PlayerMovement())
   )
 
-  val entity2 = new Entity(
-    loader.loadModel("primitive/cube"),
-    new Vector3f(2, 0, -3.5f),
-    new Rotation(0, 0, 0),
-    0.5f,
-    new StaticShader(new Vector4f(.3f, .4f, .8f, 1f))
-  )
+  val secsPerUpdate = 1d / FPS
+  var previous = getTime
+  var steps = 0d
 
+  private def sync(loopStartTime: Long): Unit = {
+    val loopSlot = 1f / FPS
+    val endTime = loopStartTime + loopSlot
+    while (getTime < endTime) try {
+      Thread.sleep(1)
+    } catch {
+      case _: InterruptedException => ;
+    }
+  }
+
+  private def getTime = System.nanoTime / 1_000_000_000.0
+
+  val objects = player :: entities
   while (gameRunning) {
-    window.clean()
-    List(entity, entity2)
-      .foreach(renderer.render(_, light))
-    //    renderer.render(entity, light)
+    val loopStartTime = getTime
+    val elapsed = loopStartTime - previous
+    previous = loopStartTime
+    steps += elapsed
 
-    EventSystem ! GameLoopTick()
+    while (steps >= secsPerUpdate) {
+      EventSystem ! GameLoopTick()
+      steps -= secsPerUpdate
+    }
 
-    window.draw()
+    window.draw {
+      objects.foreach(renderer.render(_, light))
+    }
     inputHandler.poll()
+    sync(loopStartTime.toLong)
   }
 
   EventSystem ! GameEnd()
-
   events.unsubscribe()
 }

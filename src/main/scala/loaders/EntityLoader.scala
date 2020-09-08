@@ -8,15 +8,17 @@ import rendy._
 import utils.Control.GL
 import utils.JavaBufferUtils.createBuffer
 
+import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 import scala.language.postfixOps
 
 class EntityLoader extends ObjLoader {
   private var vbos = new ListBuffer[Int]()
   private var vaos = new ListBuffer[Int]()
+  private val cache = mutable.Map.empty[String, Model]
 
-  def loadModel(filePath: String): BasicModel = {
-    loadPrimitive(load(filePath))
+  def loadModel(filePath: String): Model = {
+    cache.getOrElseUpdate(filePath, loadPrimitive(load(filePath)))
   }
 
   def loadPrimitive(modelData: ModelData): BasicModel = {
@@ -38,10 +40,10 @@ class EntityLoader extends ObjLoader {
     GL(glBindBuffer(GL_ARRAY_BUFFER, createVBO()))
 
     val attribId = data match {
-      case _: PositionsData => (0)
-      case _: NormalsData   => (1)
-      case _: ColorData     => (2)
-      case _: TextureData   => (3)
+      case _: PositionsData => 0
+      case _: NormalsData   => 1
+      case _: ColorData     => 2
+      case _: TextureData   => 3
     }
     bindVertex(data, attribId)
 

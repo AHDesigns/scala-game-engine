@@ -1,22 +1,29 @@
 package utils
 
+import entities.Entity
 import org.joml.{Matrix4f, Vector3f}
 
 object Maths {
-  def createTransformationMatrix(
-      translation: Vector3f,
-      rotation: Rotation,
-      scale: Float
-  ): Matrix4f = {
-    new Matrix4f()
-      .translate(translation)
-      .rotate(Math.toRadians(rotation.x).toFloat, new Vector3f(1, 0, 0))
-      .rotate(Math.toRadians(rotation.y).toFloat, new Vector3f(0, 1, 0))
-      .rotate(Math.toRadians(rotation.z).toFloat, new Vector3f(0, 0, 1))
-      .scale(new Vector3f(scale, scale, scale))
-  }
+  private val worldMatrix = new Matrix4f().identity()
 
-  class Rotation(var x: Float, var y: Float, var z: Float) {
+  def createTransformationMatrix(entity: Entity): Matrix4f =
+    new Matrix4f()
+      .translation(entity.position)
+      .rotateX(entity.rotation.x)
+      .rotateY(entity.rotation.y)
+      .rotateZ(entity.rotation.z)
+      .scale(entity.scale)
+
+  /**
+    * Create Rotation in radians by passing in degrees
+    */
+  class Rotation(var x: Float = 0, var y: Float = 0, var z: Float = 0) {
+    x = x.toRadians
+    y = y.toRadians
+    z = z.toRadians
+
+    def toVec = new Vector3f(x, y, z)
+
     def +=(rotation: Rotation): Rotation = {
       x += rotation.x
       y += rotation.y
@@ -25,4 +32,7 @@ object Maths {
     }
   }
 
+  val Right = new Vector3f(1f, 0f, 0f)
+  val Forward = new Vector3f(0f, 0f, 1f)
+  val Up = new Vector3f(0f, 1f, 0f)
 }

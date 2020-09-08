@@ -25,6 +25,8 @@ class StaticShader(color: Vector4f) extends Shader with ShaderLoader {
       glGetUniformLocation(program, "projectionMatrix")
     )
     val viewMatrixLoc = GLU(glGetUniformLocation(program, "viewMatrix"))
+    val lightColLoc = GLU(glGetUniformLocation(program, "lightCol"))
+    val lightPosLoc = GLU(glGetUniformLocation(program, "lightPos"))
 
     GL(glUseProgram(program))
     GL(glUniform4f(colorLocation, color.x, color.y, color.z, color.w))
@@ -37,5 +39,7 @@ class StaticShader(color: Vector4f) extends Shader with ShaderLoader {
       )
     )
     GL(glUniformMatrix4fv(viewMatrixLoc, false, getMatrixBuffer(viewMatrix)))
+    loadVec3(lightPosLoc, light.position)
+    loadVec3(lightColLoc, light.color)
   }
 }

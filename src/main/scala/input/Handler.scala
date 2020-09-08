@@ -7,11 +7,18 @@ import org.lwjgl.glfw.GLFW._
 import window.Window
 
 class Handler(window: Window) extends Events {
+  val mouseSensitivity = 70 // 1 - 100 would be in-game option
+  private var lastMouse: (Int, Int) = window.getMousePos match {
+    case (x, y) => (x * mouseSensitivity, y * mouseSensitivity)
+  }
   init()
 
   def poll(): Unit = glfwPollEvents()
 
   private def init(): Unit = {
+    // hide the mouse
+    glfwSetInputMode(window.id, GLFW_CURSOR, GLFW_CURSOR_DISABLED)
+
     // Setup a key callback. It will be called every time a key is pressed, repeated or released.
     glfwSetKeyCallback(
       window.id,
@@ -23,6 +30,19 @@ class Handler(window: Window) extends Events {
           if (key == GLFW_KEY_ESCAPE) EventSystem ! WindowClose()
           if (key == GLFW_KEY_X) EventSystem ! DebugWireframe()
         }
+      }
+    )
+
+    glfwSetCursorPosCallback(
+      window.id,
+      (_, x: Double, y: Double) => {
+        // 0,0 is top left
+        val (oldX, oldY) = lastMouse
+        // round to Int as these come in as really precise doubles, but the decimal value never changes (Macbook pro)
+        val newX = x.toInt * mouseSensitivity
+        val newY = y.toInt * mouseSensitivity
+        EventSystem ! MouseMove(newX - oldX, newY - oldY)
+        lastMouse = (newX, newY)
       }
     )
 

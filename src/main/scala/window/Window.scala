@@ -52,7 +52,9 @@ class Window extends Events {
     id,
     (_, width, height) => {
       EventSystem ! WindowResize(width, height)
-      GL(glViewport(0, 0, width, height))
+      GL {
+        glViewport(0, 0, width, height)
+      }
     }
   )
 
@@ -62,12 +64,10 @@ class Window extends Events {
     }
   // .on[GameLoopTick](_ => { update() })
 
-  def clean(): Unit = {
+  def draw(drawFn: => Unit): Unit = {
     glClearColor(0.0f, 0.8f, 0.8f, 0.0f)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT) // clear the framebuffer
-  }
-
-  def draw(): Unit = {
+    drawFn
     glfwSwapBuffers(id) // swap the color buffers
   }
 
@@ -79,6 +79,14 @@ class Window extends Events {
     glfwTerminate()
     glfwSetErrorCallback(null).free()
     events.unsubscribe()
+  }
+
+  def getMousePos: (Int, Int) = {
+    import org.lwjgl.BufferUtils
+    val x = BufferUtils.createDoubleBuffer(1)
+    val y = BufferUtils.createDoubleBuffer(1)
+    glfwGetCursorPos(id, x, y)
+    (x.get().toInt, y.get().toInt)
   }
 
   private def center(): Unit = {

@@ -1,6 +1,6 @@
 package rendy
 
-import entities.{Entity, Light}
+import entities.{Camera, Entity, Light}
 import eventSystem._
 import org.joml.Matrix4f
 import org.lwjgl.opengl.GL11._
@@ -12,14 +12,16 @@ import org.lwjgl.opengl.GL30.glBindVertexArray
 import utils.Control.GL
 import utils.Maths
 
-class Renderer() extends Events {
+class Renderer(camera: Camera) extends Events {
   private var isWireframe = false
   private var projectionMatrix = perspective(800, 400)
-  private var viewMatrix = new Matrix4f().identity()
+  private var viewMatrix = Maths.createTransformationMatrix(camera)
   init()
 
   def init(): Unit = {
     GL(glEnable(GL_DEPTH_TEST))
+    GL(glEnable(GL_CULL_FACE))
+    GL(glCullFace(GL_BACK))
     events
       .on[WindowResize] { window =>
         projectionMatrix = perspective(window.width, window.height)
@@ -38,29 +40,27 @@ class Renderer() extends Events {
     )
 
   def render(entity: Entity, light: Light): Unit = {
-
-    entity.model match {
+    entity.model.foreach {
       case BasicModel(vaoID, indices, attributes) =>
-        val transformationMatrix = Maths.createTransformationMatrix(
-          entity.position,
-          entity.rotation,
-          entity.scale
-        )
-        entity.shader.draw(
-          transformationMatrix,
-          projectionMatrix,
-          viewMatrix,
-          light
-        )
-        GL(glBindVertexArray(vaoID))
+        // TODO: store this in entity to save calculating
+        val transformationMatrix = Maths.createTransformationMatrix(entity)
+        entity.shader.foreach { s =>
+          s.draw(
+            transformationMatrix,
+            projectionMatrix,
+            viewMatrix,
+            light
+          )
+          GL(glBindVertexArray(vaoID))
 
-        for (index <- attributes) GL(glEnableVertexAttribArray(index))
+          for (index <- attributes) GL(glEnableVertexAttribArray(index))
 
-        GL(glDrawElements(GL_TRIANGLES, indices, GL_UNSIGNED_INT, 0))
+          GL(glDrawElements(GL_TRIANGLES, indices, GL_UNSIGNED_INT, 0))
 
-        for (index <- attributes) GL(glDisableVertexAttribArray(index))
+          for (index <- attributes) GL(glDisableVertexAttribArray(index))
 
-        GL(glBindVertexArray(0))
+          GL(glBindVertexArray(0))
+        }
     }
   }
 
