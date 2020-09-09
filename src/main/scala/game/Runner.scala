@@ -14,7 +14,7 @@ import window.Window
 
 import scala.util.Random
 
-object Runner extends App with Events {
+object Runner extends App with EventListener {
   val FPS = 60
   println("Using LWJGL " + Version.getVersion + "!")
   private var gameRunning = true

@@ -6,7 +6,7 @@ import org.lwjgl.glfw.Callbacks.glfwFreeCallbacks
 import org.lwjgl.glfw.GLFW._
 import window.Window
 
-class Handler(window: Window) extends Events {
+class Handler(window: Window) extends EventListener {
   val mouseSensitivity = 70 // 1 - 100 would be in-game option
   private var lastMouse: (Int, Int) = window.getMousePos match {
     case (x, y) => (x * mouseSensitivity, y * mouseSensitivity)

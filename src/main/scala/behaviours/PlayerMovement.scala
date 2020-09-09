@@ -1,10 +1,10 @@
 package behaviours
 
 import entities.Entity
-import eventSystem.{Events, InputMove, MouseMove}
+import eventSystem.{EventListener, InputMove, MouseMove}
 import org.joml.Vector3f
 
-class PlayerMovement extends Behaviour with Events {
+class PlayerMovement extends Behaviour with EventListener {
   private val speed = 0.1f
   private val rotSpeed = 0.00001f
   private var movement = new Vector3f()

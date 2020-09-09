@@ -10,15 +10,15 @@ class EventSystemSpec extends AnyFlatSpec with should.Matchers {
 
     listener.on[SimpleEvent](_ => { count += 1 })
 
-    count should be (1)
+    count should be(1)
 
     EventSystem ! SimpleEvent()
 
-    count should be (2)
+    count should be(2)
 
     EventSystem ! SimpleEvent()
 
-    count should be (3)
+    count should be(3)
 
     listener.unsubscribe()
   }
@@ -32,7 +32,7 @@ class EventSystemSpec extends AnyFlatSpec with should.Matchers {
 
     EventSystem ! SimpleEvent()
 
-    count should be (0)
+    count should be(0)
 
     listener.unsubscribe()
   }
@@ -43,14 +43,14 @@ class EventSystemSpec extends AnyFlatSpec with should.Matchers {
 
     listener.on[SimpleEvent](count += _.data.asInstanceOf[Int])
 
-    count should be (0)
+    count should be(0)
 
     EventSystem ! SimpleEvent(5)
 
-    count should be (5)
+    count should be(5)
 
-    EventSystem ! WindowResize(1,2)
-    EventSystem ! Click(1,2,3)
+    EventSystem ! WindowResize(1, 2)
+    EventSystem ! Click(1, 2, 3)
 
     listener.unsubscribe()
   }
@@ -60,13 +60,17 @@ class EventSystemSpec extends AnyFlatSpec with should.Matchers {
     var count2 = 0
     val listener = EventSystem.subscribe()
 
-    listener.on[SimpleEvent](_ => { count = 3 })
-    listener.on[SimpleEvent](_ => { count2 = 8 })
+    listener.on[SimpleEvent](_ => {
+      count = 3
+    })
+    listener.on[SimpleEvent](_ => {
+      count2 = 8
+    })
 
     EventSystem ! SimpleEvent()
 
-    count should be (3)
-    count2 should be (8)
+    count should be(3)
+    count2 should be(8)
 
     listener.unsubscribe()
   }
@@ -80,30 +84,31 @@ class EventSystemSpec extends AnyFlatSpec with should.Matchers {
 
     EventSystem ! SimpleEvent()
 
-    count should be (15)
+    count should be(15)
 
     listener.unsubscribe()
   }
 
   it should "be chainable" in {
     val count = 0
-    EventSystem.subscribe()
+    EventSystem
+      .subscribe()
       .on[SimpleEvent](_ => {})
       .on[SimpleEvent](_ => {})
       .unsubscribe()
 
-    count should be (0)
+    count should be(0)
   }
 
   "Events trait" should "subscribe automatically" in {
-    object Foo extends Events
+    object Foo extends EventListener
     var count = 0
 
     Foo.events.on[SimpleEvent](_ => { count = 3 })
 
     EventSystem ! SimpleEvent()
 
-    count should be (3)
+    count should be(3)
 
     Foo.events.unsubscribe()
   }

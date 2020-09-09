@@ -1,6 +1,6 @@
 package window
 
-import eventSystem.{EventSystem, Events, GameEnd, WindowResize}
+import eventSystem.{EventListener, EventSystem, GameEnd, WindowResize}
 import org.lwjgl.glfw.GLFW._
 import org.lwjgl.glfw.GLFWErrorCallback
 import org.lwjgl.opengl.GL.createCapabilities
@@ -10,7 +10,7 @@ import org.lwjgl.system.MemoryUtil._
 import utils.Control.GL
 import utils.System.isMacOs
 
-class Window extends Events {
+class Window extends EventListener {
   // Create the window
   private val n = GLFW_FALSE
   private val y = GLFW_TRUE

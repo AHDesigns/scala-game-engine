@@ -1,7 +1,7 @@
 package entities
 
 import behaviours.Behaviour
-import eventSystem.{Events, GameLoopTick}
+import eventSystem.{EventListener, GameLoopTick}
 import org.joml.Vector3f
 import rendy.Model
 import shaders.Shader
@@ -14,7 +14,7 @@ class Entity(
     val scale: Float = 1f,
     val shader: Option[Shader] = None,
     val behaviours: List[Behaviour] = List.empty
-) extends Events {
+) extends EventListener {
   this.behaviours foreach (_.init(this))
   this.events.on[GameLoopTick] { _ => this.behaviours foreach (_.update()) }
 }

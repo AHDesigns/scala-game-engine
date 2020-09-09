@@ -12,7 +12,7 @@ import org.lwjgl.opengl.GL30.glBindVertexArray
 import utils.Control.GL
 import utils.Maths
 
-class Renderer(camera: Camera) extends Events {
+class Renderer(camera: Camera) extends EventListener {
   private var isWireframe = false
   private var projectionMatrix = perspective(800, 400)
   private var viewMatrix = Maths.createTransformationMatrix(camera)
