@@ -11,6 +11,7 @@ class PlayerMovement extends Behaviour with EventListener {
   private var isMoving = false
   private var translation = new Vector3f()
 
+  // TODO: implicit?
   def init(e: Entity): Unit = {
     me = e
     events

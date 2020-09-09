@@ -1,6 +1,7 @@
 package loaders
 
 import org.lwjgl.opengl.GL20._
+import utils.Control.GL
 
 trait ShaderLoader extends FileLoader {
   protected def load(shaderFile: String): Either[String, Int] = {
@@ -18,9 +19,15 @@ trait ShaderLoader extends FileLoader {
       shaderCode: String,
       shaderType: Int
   ): Either[String, Int] = {
-    val shaderId = glCreateShader(shaderType)
-    glShaderSource(shaderId, shaderCode)
-    glCompileShader(shaderId)
+    val shaderId = GL {
+      glCreateShader(shaderType)
+    }
+    GL {
+      glShaderSource(shaderId, shaderCode)
+    }
+    GL {
+      glCompileShader(shaderId)
+    }
 
     glGetShaderi(shaderId, GL_COMPILE_STATUS) match {
       case 0 =>
@@ -30,12 +37,22 @@ trait ShaderLoader extends FileLoader {
   }
 
   private def linkShaders(shaderIds: List[Int]): Either[String, Int] = {
-    val shaderProgram = glCreateProgram()
-    shaderIds.foreach(glAttachShader(shaderProgram, _))
-    glLinkProgram(shaderProgram)
-    shaderIds.foreach(glDeleteShader)
+    val shaderProgram = GL {
+      glCreateProgram()
+    }
+    shaderIds.foreach(GL {
+      glAttachShader(shaderProgram, _)
+    })
+    GL {
+      glLinkProgram(shaderProgram)
+    }
+    shaderIds.foreach(GL {
+      glDeleteShader _
+    })
 
-    glGetProgrami(shaderProgram, GL_LINK_STATUS) match {
+    GL {
+      glGetProgrami(shaderProgram, GL_LINK_STATUS)
+    } match {
       case 0 =>
         Left(
           s"Could not link shader!\n${glGetProgramInfoLog(shaderProgram, 512)}"

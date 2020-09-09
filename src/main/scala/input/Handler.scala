@@ -4,6 +4,7 @@ import eventSystem._
 import input.Handler.movementKeys
 import org.lwjgl.glfw.Callbacks.glfwFreeCallbacks
 import org.lwjgl.glfw.GLFW._
+import utils.Control.GL
 import window.Window
 
 class Handler(window: Window) extends EventListener {
@@ -17,52 +18,52 @@ class Handler(window: Window) extends EventListener {
 
   private def init(): Unit = {
     // hide the mouse
-    glfwSetInputMode(window.id, GLFW_CURSOR, GLFW_CURSOR_DISABLED)
+    GL {
+      glfwSetInputMode(window.id, GLFW_CURSOR, GLFW_CURSOR_DISABLED)
+    }
 
     // Setup a key callback. It will be called every time a key is pressed, repeated or released.
-    glfwSetKeyCallback(
-      window.id,
-      (window: Long, key: Int, scancode: Int, keyAction: Int, mods: Int) => {
-        val action = getKeyPress(keyAction)
-        //      log(key, action)
-        if (movementKeys.contains(key)) move(key, action)
-        else if (keyAction == GLFW_RELEASE) {
-          if (key == GLFW_KEY_ESCAPE) EventSystem ! WindowClose()
-          if (key == GLFW_KEY_X) EventSystem ! DebugWireframe()
+    GL {
+      glfwSetKeyCallback(
+        window.id,
+        (window: Long, key: Int, scancode: Int, keyAction: Int, mods: Int) => {
+          val action = getKeyPress(keyAction)
+          //      log(key, action)
+          if (movementKeys.contains(key)) move(key, action)
+          else if (keyAction == GLFW_RELEASE) {
+            if (key == GLFW_KEY_ESCAPE) EventSystem ! WindowClose()
+            if (key == GLFW_KEY_X) EventSystem ! DebugWireframe()
+          }
         }
-      }
-    )
+      )
+    }
 
-    glfwSetCursorPosCallback(
-      window.id,
-      (_, x: Double, y: Double) => {
-        // 0,0 is top left
-        val (oldX, oldY) = lastMouse
-        // round to Int as these come in as really precise doubles, but the decimal value never changes (Macbook pro)
-        val newX = x.toInt * mouseSensitivity
-        val newY = y.toInt * mouseSensitivity
-        EventSystem ! MouseMove(newX - oldX, newY - oldY)
-        lastMouse = (newX, newY)
-      }
-    )
+    GL {
+      glfwSetCursorPosCallback(
+        window.id,
+        (_, x: Double, y: Double) => {
+          // 0,0 is top left
+          val (oldX, oldY) = lastMouse
+          // round to Int as these come in as really precise doubles, but the decimal value never changes (Macbook pro)
+          val newX = x.toInt * mouseSensitivity
+          val newY = y.toInt * mouseSensitivity
+          EventSystem ! MouseMove(newX - oldX, newY - oldY)
+          lastMouse = (newX, newY)
+        }
+      )
+    }
 
-    glfwSetWindowCloseCallback(
-      window.id,
-      _ => {
-        EventSystem ! WindowClose()
-      }
-    )
+    GL {
+      glfwSetWindowCloseCallback(window.id, _ => EventSystem ! WindowClose())
+    }
 
-    events
-      .on[GameLoopTick](_ => {
-        // Poll for window events. The key callback will only be invoked during this call.
-        //      glfwPollEvents()
-      })
-      .on[GameEnd](_ => {
-        // Free the window callbacks and destroy the window
+    events.on[GameEnd](_ => {
+      // Free the window callbacks and destroy the window
+      GL {
         glfwFreeCallbacks(window.id)
-        events.unsubscribe()
-      })
+      }
+      events.unsubscribe()
+    })
   }
 
   private def move(key: Int, action: KeyPress): Unit = {

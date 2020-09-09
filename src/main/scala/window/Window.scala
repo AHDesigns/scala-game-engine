@@ -48,27 +48,43 @@ class Window extends EventListener {
   createCapabilities
 
   println(glGetString(GL_VERSION))
-  glfwSetFramebufferSizeCallback(
-    id,
-    (_, width, height) => {
-      EventSystem ! WindowResize(width, height)
-      GL {
-        glViewport(0, 0, width, height)
+  GL {
+    glfwSetFramebufferSizeCallback(
+      id,
+      (_, width, height) => {
+        EventSystem ! WindowResize(width, height)
+        GL {
+          glViewport(0, 0, width, height)
+        }
       }
-    }
-  )
+    )
+  }
 
-  events
-    .on[GameEnd] {
-      cleanUp
-    }
-  // .on[GameLoopTick](_ => { update() })
+  events.on[GameEnd] {
+    cleanUp
+  }
 
   def draw(drawFn: => Unit): Unit = {
-    glClearColor(0.0f, 0.8f, 0.8f, 0.0f)
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT) // clear the framebuffer
+    GL {
+      glClearColor(0.0f, 0.8f, 0.8f, 0.0f)
+    }
+    GL {
+      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+    } // clear the framebuffer
     drawFn
-    glfwSwapBuffers(id) // swap the color buffers
+    GL {
+      glfwSwapBuffers(id)
+    } // swap the color buffers
+  }
+
+  def getMousePos: (Int, Int) = {
+    import org.lwjgl.BufferUtils
+    val x = BufferUtils.createDoubleBuffer(1)
+    val y = BufferUtils.createDoubleBuffer(1)
+    GL {
+      glfwGetCursorPos(id, x, y)
+    }
+    (x.get().toInt, y.get().toInt)
   }
 
   private def cleanUp(e: GameEnd): Unit = {
@@ -79,14 +95,6 @@ class Window extends EventListener {
     glfwTerminate()
     glfwSetErrorCallback(null).free()
     events.unsubscribe()
-  }
-
-  def getMousePos: (Int, Int) = {
-    import org.lwjgl.BufferUtils
-    val x = BufferUtils.createDoubleBuffer(1)
-    val y = BufferUtils.createDoubleBuffer(1)
-    glfwGetCursorPos(id, x, y)
-    (x.get().toInt, y.get().toInt)
   }
 
   private def center(): Unit = {

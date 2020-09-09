@@ -20,11 +20,11 @@ trait FileLoader {
   protected def readFileByLines[T](file: String)(
       lineProcessor: BufferedSource => T
   ): Either[String, T] = {
-    (Try {
+    Try {
       Control.using(Source.fromFile(file)) {
         lineProcessor
       }
-    }) match {
+    } match {
       case Success(value) => Right(value)
       case Failure(exception) =>
         exception.printStackTrace()

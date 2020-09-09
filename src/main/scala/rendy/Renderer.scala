@@ -4,10 +4,7 @@ import entities.{Camera, Entity, Light}
 import eventSystem._
 import org.joml.Matrix4f
 import org.lwjgl.opengl.GL11._
-import org.lwjgl.opengl.GL20.{
-  glDisableVertexAttribArray,
-  glEnableVertexAttribArray
-}
+import org.lwjgl.opengl.GL20.{glDisableVertexAttribArray, glEnableVertexAttribArray}
 import org.lwjgl.opengl.GL30.glBindVertexArray
 import utils.Control.GL
 import utils.Maths
@@ -19,9 +16,15 @@ class Renderer(camera: Camera) extends EventListener {
   init()
 
   def init(): Unit = {
-    GL(glEnable(GL_DEPTH_TEST))
-    GL(glEnable(GL_CULL_FACE))
-    GL(glCullFace(GL_BACK))
+    GL {
+      glEnable(GL_DEPTH_TEST)
+    }
+    GL {
+      glEnable(GL_CULL_FACE)
+    }
+    GL {
+      glCullFace(GL_BACK)
+    }
     events
       .on[WindowResize] { window =>
         projectionMatrix = perspective(window.width, window.height)
@@ -51,21 +54,33 @@ class Renderer(camera: Camera) extends EventListener {
             viewMatrix,
             light
           )
-          GL(glBindVertexArray(vaoID))
+          GL {
+            glBindVertexArray(vaoID)
+          }
 
-          for (index <- attributes) GL(glEnableVertexAttribArray(index))
+          for (index <- attributes) GL {
+            glEnableVertexAttribArray(index)
+          }
 
-          GL(glDrawElements(GL_TRIANGLES, indices, GL_UNSIGNED_INT, 0))
+          GL {
+            glDrawElements(GL_TRIANGLES, indices, GL_UNSIGNED_INT, 0)
+          }
 
-          for (index <- attributes) GL(glDisableVertexAttribArray(index))
+          for (index <- attributes) GL {
+            glDisableVertexAttribArray(index)
+          }
 
-          GL(glBindVertexArray(0))
+          GL {
+            glBindVertexArray(0)
+          }
         }
     }
   }
 
   private def wireframe(): Unit = {
-    GL(glPolygonMode(GL_FRONT_AND_BACK, if (isWireframe) GL_FILL else GL_LINE))
+    GL {
+      glPolygonMode(GL_FRONT_AND_BACK, if (isWireframe) GL_FILL else GL_LINE)
+    }
     isWireframe = !isWireframe
   }
 }

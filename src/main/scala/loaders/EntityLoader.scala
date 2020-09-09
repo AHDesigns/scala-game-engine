@@ -22,22 +22,30 @@ class EntityLoader extends ObjLoader {
   }
 
   def loadPrimitive(modelData: ModelData): BasicModel = {
-    val vaoID = GL(glGenVertexArrays())
+    val vaoID = GL {
+      glGenVertexArrays()
+    }
     vaos += vaoID
-    GL(glBindVertexArray(vaoID))
+    GL {
+      glBindVertexArray(vaoID)
+    }
 
     storeEAO(modelData.indices)
     val attributes = modelData.attributes.map {
       storeAttrib
     }
 
-    GL(glBindVertexArray(0))
+    GL {
+      glBindVertexArray(0)
+    }
 
     BasicModel(vaoID, modelData.indices.size, attributes)
   }
 
   private def storeAttrib(data: AttribData): Int = {
-    GL(glBindBuffer(GL_ARRAY_BUFFER, createVBO()))
+    GL {
+      glBindBuffer(GL_ARRAY_BUFFER, createVBO())
+    }
 
     val attribId = data match {
       case _: PositionsData => 0
@@ -47,19 +55,19 @@ class EntityLoader extends ObjLoader {
     }
     bindVertex(data, attribId)
 
-    GL(glBindBuffer(GL_ARRAY_BUFFER, 0))
+    GL {
+      glBindBuffer(GL_ARRAY_BUFFER, 0)
+    }
     attribId
   }
 
   private def bindVertex(data: AttribData, index: Int): Unit = {
-    GL(
-      glBufferData(
-        GL_ARRAY_BUFFER,
-        createBuffer(data.vertexData),
-        GL_STATIC_DRAW
-      )
-    )
-    GL(glVertexAttribPointer(index, data.step, GL_FLOAT, false, 0, 0))
+    GL {
+      glBufferData(GL_ARRAY_BUFFER, createBuffer(data.vertexData), GL_STATIC_DRAW)
+    }
+    GL {
+      glVertexAttribPointer(index, data.step, GL_FLOAT, false, 0, 0)
+    }
   }
 
   /**
@@ -70,19 +78,19 @@ class EntityLoader extends ObjLoader {
     * the VAO
     */
   private def storeEAO(indices: List[Int]): Unit = {
-    GL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, createVBO()))
-    GL(
-      glBufferData(
-        GL_ELEMENT_ARRAY_BUFFER,
-        createBuffer(indices),
-        GL_STATIC_DRAW
-      )
-    )
+    GL {
+      glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, createVBO())
+    }
+    GL {
+      glBufferData(GL_ELEMENT_ARRAY_BUFFER, createBuffer(indices), GL_STATIC_DRAW)
+    }
     // no need to unbind for EAO
   }
 
   private def createVBO(): Int = {
-    val vboID = GL(glGenBuffers())
+    val vboID = GL {
+      glGenBuffers()
+    }
     vbos += vboID
     vboID
   }
