@@ -72,8 +72,8 @@ class Handler(window: Window) extends EventListener {
         var x, y, z = 0f
         if (isPressed(GLFW_KEY_A)) x -= 1
         if (isPressed(GLFW_KEY_D)) x += 1
-        if (isPressed(GLFW_KEY_W)) y += 1
-        if (isPressed(GLFW_KEY_S)) y -= 1
+        if (isPressed(GLFW_KEY_W)) y -= 1
+        if (isPressed(GLFW_KEY_S)) y += 1
         EventSystem ! InputMove(x, y, z)
       case _ => ;
     }

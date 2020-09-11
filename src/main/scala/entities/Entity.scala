@@ -33,6 +33,10 @@ case class Entity(
     Entity.entities.remove(id)
     this.events.unsubscribe()
   }
+
+  /** Get a behaviour if it exists on this entity */
+  def getBehaviour(behaviour: Behaviour): Option[Behaviour] =
+    behaviours.find(_.getClass == behaviour.getClass)
 }
 
 object Entity {

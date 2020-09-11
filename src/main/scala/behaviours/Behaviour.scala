@@ -10,7 +10,7 @@ trait Behaviour {
   final def bind(entity: Entity): Unit = me = entity
 
   /** Init is invoked on entity construction */
-  def init(): Unit
+  def init(): Unit = {}
 
   /** Update is invoked every game tick */
   def update(): Unit = {

@@ -1,7 +1,7 @@
 package game
 
-import behaviours.CameraMovement
-import entities.{Entity, Light, Transform}
+import behaviours.{CameraMovement, Light, Rotate}
+import entities.{Entity, Transform}
 import eventSystem._
 import input.Handler
 import loaders.EntityLoader
@@ -40,8 +40,17 @@ object Runner extends App with EventListener {
     )
   )
   val renderer = new Renderer(camera)
-  val light = new Light()
   val loader = new EntityLoader()
+
+//  val light = new Entity(
+//    Transform(position = new Vector3f(0, 0, -25)),
+//    behaviours = List(new Light(new Vector3f(1, 1, 1)))
+//  )
+  val light = new Entity(
+    Transform(position = new Vector3f(0, 0, -25)),
+    behaviours = List(new Rotate())
+  ) with Light
+  light.setColor(new Vector3f(1, 1, 1))
 
   private def rand(n: Boolean = false) = Random.nextFloat() + (if (n) -0.5f else 0)
 
@@ -52,6 +61,29 @@ object Runner extends App with EventListener {
       ),
       Some(loader.loadModel("primitive/cube")),
       Some(new StaticShader(new Vector4f(rand(), rand(), rand(), 1f)))
+    )
+  }
+
+  val max = 100
+  1 to max foreach { idx =>
+    new Entity(
+      Transform(new Vector3f(idx, 0f, 0f), scale = 0.2f),
+      Some(loader.loadModel("primitive/cube")),
+      Some(new StaticShader(new Vector4f(idx / max, 1, 1, 1f)))
+    )
+  }
+  1 to max foreach { idx =>
+    new Entity(
+      Transform(new Vector3f(0f, idx, 0f), scale = 0.2f),
+      Some(loader.loadModel("primitive/cube")),
+      Some(new StaticShader(new Vector4f(1, 1, idx / max, 1f)))
+    )
+  }
+  1 to max foreach { idx =>
+    new Entity(
+      Transform(new Vector3f(0f, 0f, idx), scale = 0.2f),
+      Some(loader.loadModel("primitive/cube")),
+      Some(new StaticShader(new Vector4f(1, idx / max, 1, 1f)))
     )
   }
 

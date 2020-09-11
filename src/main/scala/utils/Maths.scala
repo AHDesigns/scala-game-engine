@@ -11,10 +11,9 @@ object Maths {
       case Entity(Transform(position, rotation, _), _, _, _, _) =>
         new Matrix4f()
           .rotateX(rotation.x)
-          .rotateY(rotation.y)
+          .rotateY(-rotation.y)
           .rotateZ(rotation.z)
-          .translate(-position.x, -position.y, -position.z)
-      //          .translate(position)
+          .translate(new Vector3f(position).negate())
     }
 
   def createTransformationMatrix(entity: Entity): Matrix4f =

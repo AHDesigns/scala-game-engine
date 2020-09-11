@@ -1,6 +1,7 @@
 package rendy
 
-import entities.{Entity, Light}
+import behaviours.Light
+import entities.Entity
 import eventSystem._
 import org.joml.Matrix4f
 import org.lwjgl.opengl.GL11._
@@ -16,15 +17,9 @@ class Renderer(camera: Entity) extends EventListener {
   init()
 
   def init(): Unit = {
-    GL {
-      glEnable(GL_DEPTH_TEST)
-    }
-    GL {
-      glEnable(GL_CULL_FACE)
-    }
-    GL {
-      glCullFace(GL_BACK)
-    }
+    GL { glEnable(GL_DEPTH_TEST) }
+    GL { glEnable(GL_CULL_FACE) }
+    GL { glCullFace(GL_BACK) }
     events
       .on[WindowResize] { window =>
         projectionMatrix = perspective(window.width, window.height)
@@ -42,7 +37,7 @@ class Renderer(camera: Entity) extends EventListener {
       1000f
     )
 
-  def render(entity: Entity, light: Light): Unit = {
+  def render[A <: Entity with Light](entity: Entity, light: A): Unit = {
     viewMatrix = Maths.createViewMatrix(camera)
     entity.mesh.foreach {
       case BasicMesh(vaoID, indices, attributes) =>

@@ -1,6 +1,7 @@
 package shaders
 
-import entities.Light
+import behaviours.Light
+import entities.Entity
 import loaders.ShaderLoader
 import org.joml.Matrix4f
 import org.lwjgl.glfw.GLFW.glfwGetTime
@@ -14,11 +15,11 @@ class ColorShader(shaderName: String) extends Shader with ShaderLoader {
     case Right(id) => id
   }
 
-  def draw(
+  def draw[A <: Entity with Light](
       transformationMatrix: Matrix4f,
       projectionMatrix: Matrix4f,
       viewMatrix: Matrix4f,
-      light: Light
+      light: A
   ): Unit = {
     val time = GL {
       glfwGetTime()

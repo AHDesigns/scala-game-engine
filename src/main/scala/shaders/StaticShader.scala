@@ -1,6 +1,7 @@
 package shaders
 
-import entities.Light
+import behaviours.Light
+import entities.Entity
 import loaders.ShaderLoader
 import org.joml.{Matrix4f, Vector4f}
 import org.lwjgl.opengl.GL20._
@@ -13,12 +14,13 @@ class StaticShader(color: Vector4f) extends Shader with ShaderLoader {
     case Right(id) => id
   }
 
-  def draw(
+  def draw[A <: Entity with Light](
       transformationMatrix: Matrix4f,
       projectionMatrix: Matrix4f,
       viewMatrix: Matrix4f,
-      light: Light
+      light: A
   ): Unit = {
+    // TODO: refactor the get and set into a single method
     val colorLocation = GLU {
       glGetUniformLocation(program, "aColor")
     }
@@ -53,7 +55,7 @@ class StaticShader(color: Vector4f) extends Shader with ShaderLoader {
     GL {
       glUniformMatrix4fv(viewMatrixLoc, false, getMatrixBuffer(viewMatrix))
     }
-    loadVec3(lightPosLoc, light.position)
-    loadVec3(lightColLoc, light.color)
+    loadVec3(lightPosLoc, light.transform.position)
+    loadVec3(lightColLoc, light.getColor)
   }
 }
