@@ -22,18 +22,12 @@ class EntityLoader extends ObjLoader {
   }
 
   def loadPrimitive(modelData: MeshData): BasicMesh = {
-    val vaoID = GL {
-      glGenVertexArrays()
-    }
+    val vaoID = GL { glGenVertexArrays() }
     vaos += vaoID
-    GL {
-      glBindVertexArray(vaoID)
-    }
+    GL { glBindVertexArray(vaoID) }
 
     storeEAO(modelData.indices)
-    val attributes = modelData.attributes.map {
-      storeAttrib
-    }
+    val attributes = modelData.attributes.map { storeAttrib }
 
     GL {
       glBindVertexArray(0)

@@ -4,8 +4,6 @@ import entities.{Entity, Transform}
 import org.joml.{Matrix4f, Vector3f}
 
 object Maths {
-  private val worldMatrix = new Matrix4f().identity()
-
   def createViewMatrix(entity: Entity): Matrix4f =
     entity match {
       case Entity(Transform(position, rotation, _), _, _, _, _) =>
@@ -30,21 +28,21 @@ object Maths {
   /**
     * Create Rotation in radians by passing in degrees
     */
-  class Rotation(var x: Float = 0, var y: Float = 0, var z: Float = 0) {
+  case class Rot(var x: Float = 0, var y: Float = 0, var z: Float = 0) {
     x = x.toRadians
     y = y.toRadians
     z = z.toRadians
 
     def toVec = new Vector3f(x, y, z)
 
-    def +=(rotation: Rotation): Rotation = {
+    def +=(rotation: Rot): Rot = {
       x += rotation.x
       y += rotation.y
       z += rotation.z
       this
     }
 
-    def +(rotation: Rotation): Rotation = new Rotation(x, y, z) += rotation
+    def +(rotation: Rot): Rot = Rot(x, y, z) += rotation
   }
 
   val Right = new Vector3f(1f, 0f, 0f)

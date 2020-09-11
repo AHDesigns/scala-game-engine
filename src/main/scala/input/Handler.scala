@@ -18,9 +18,7 @@ class Handler(window: Window) extends EventListener {
 
   private def init(): Unit = {
     // hide the mouse
-    GL {
-      glfwSetInputMode(window.id, GLFW_CURSOR, GLFW_CURSOR_DISABLED)
-    }
+    GL { glfwSetInputMode(window.id, GLFW_CURSOR, GLFW_CURSOR_DISABLED) }
 
     // Setup a key callback. It will be called every time a key is pressed, repeated or released.
     GL {
@@ -53,15 +51,11 @@ class Handler(window: Window) extends EventListener {
       )
     }
 
-    GL {
-      glfwSetWindowCloseCallback(window.id, _ => EventSystem ! WindowClose())
-    }
+    GL { glfwSetWindowCloseCallback(window.id, _ => EventSystem ! WindowClose()) }
 
     events.on[GameEnd](_ => {
       // Free the window callbacks and destroy the window
-      GL {
-        glfwFreeCallbacks(window.id)
-      }
+      GL { glfwFreeCallbacks(window.id) }
       events.unsubscribe()
     })
   }

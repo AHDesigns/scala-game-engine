@@ -22,7 +22,7 @@ object EventSystem {
     ) cb.asInstanceOf[E => Unit](event)
   }
 
-  // TODO: support unlistening to a single event
+  // TODO: support un-listening to a single event
   class EventListener(private val listenerId: IdValue) {
     private var listening = true
 
