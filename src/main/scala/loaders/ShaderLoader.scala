@@ -15,44 +15,24 @@ trait ShaderLoader extends FileLoader {
     } yield shaderProgram
   }
 
-  private def compileShader(
-      shaderCode: String,
-      shaderType: Int
-  ): Either[String, Int] = {
-    val shaderId = GL {
-      glCreateShader(shaderType)
-    }
-    GL {
-      glShaderSource(shaderId, shaderCode)
-    }
-    GL {
-      glCompileShader(shaderId)
-    }
+  private def compileShader(shaderCode: String, shaderType: Int): Either[String, Int] = {
+    val shaderId = GL { glCreateShader(shaderType) }
+    GL { glShaderSource(shaderId, shaderCode) }
+    GL { glCompileShader(shaderId) }
 
     glGetShaderi(shaderId, GL_COMPILE_STATUS) match {
-      case 0 =>
-        Left(s"Could not compile shader! ${glGetShaderInfoLog(shaderId, 512)}")
+      case 0 => Left(s"Could not compile shader! ${glGetShaderInfoLog(shaderId, 512)}")
       case _ => Right(shaderId)
     }
   }
 
   private def linkShaders(shaderIds: List[Int]): Either[String, Int] = {
-    val shaderProgram = GL {
-      glCreateProgram()
-    }
-    shaderIds.foreach(GL {
-      glAttachShader(shaderProgram, _)
-    })
-    GL {
-      glLinkProgram(shaderProgram)
-    }
-    shaderIds.foreach(GL {
-      glDeleteShader _
-    })
+    val shaderProgram = GL { glCreateProgram() }
+    shaderIds.foreach(GL { glAttachShader(shaderProgram, _) })
+    GL { glLinkProgram(shaderProgram) }
+    shaderIds.foreach(GL { glDeleteShader _ })
 
-    GL {
-      glGetProgrami(shaderProgram, GL_LINK_STATUS)
-    } match {
+    GL { glGetProgrami(shaderProgram, GL_LINK_STATUS) } match {
       case 0 => Left(s"Could not link shader!\n${glGetProgramInfoLog(shaderProgram, 512)}")
       case _ => Right(shaderProgram)
     }
@@ -71,5 +51,4 @@ trait ShaderLoader extends FileLoader {
   }
 
   case class ShaderPair(vertex: String, fragment: String)
-
 }

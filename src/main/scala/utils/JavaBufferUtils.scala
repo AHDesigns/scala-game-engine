@@ -18,10 +18,9 @@ object JavaBufferUtils {
     buffer
   }
 
-  def getMatrixBuffer(matrix: Matrix4f, capicity: Int = 16): FloatBuffer = {
-    val buffer = BufferUtils.createFloatBuffer(capicity)
+  def getMatrixBuffer(matrix: Matrix4f, capacity: Int = 16): FloatBuffer = {
+    val buffer = BufferUtils.createFloatBuffer(capacity)
     matrix.get(buffer)
-    //    buffer.flip()
     buffer
   }
 }

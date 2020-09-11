@@ -13,9 +13,9 @@ case class MeshData(
     textures,
     normalsData
   ).filter(_.isDefined).map(_.get)
+
   val count: Int = attributes.size
   val stride: Int = attributes.map(_.step).sum
-  println("steps", attributes.map(_.step).sum)
 }
 
 case class TexturedMeshJ(

@@ -5,7 +5,6 @@ import org.lwjgl.glfw.GLFW._
 import org.lwjgl.glfw.GLFWErrorCallback
 import org.lwjgl.opengl.GL.createCapabilities
 import org.lwjgl.opengl.GL11._
-import org.lwjgl.system.MemoryStack._
 import org.lwjgl.system.MemoryUtil._
 import utils.Control.GL
 import utils.System.isMacOs
@@ -53,37 +52,27 @@ class Window extends EventListener {
       id,
       (_, width, height) => {
         EventSystem ! WindowResize(width, height)
-        GL {
-          glViewport(0, 0, width, height)
-        }
+        GL { glViewport(0, 0, width, height) }
       }
     )
   }
 
-  events.on[GameEnd] {
-    cleanUp
-  }
+  events.on[GameEnd] { cleanUp }
 
   def draw(drawFn: => Unit): Unit = {
-    GL {
-      glClearColor(0.0f, 0.8f, 0.8f, 0.0f)
-    }
-    GL {
-      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-    } // clear the framebuffer
+    GL { glClearColor(0.0f, 0.8f, 0.8f, 0.0f) }
+    // clear the framebuffer
+    GL { glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT) }
     drawFn
-    GL {
-      glfwSwapBuffers(id)
-    } // swap the color buffers
+    // swap the color buffers
+    GL { glfwSwapBuffers(id) }
   }
 
   def getMousePos: (Int, Int) = {
     import org.lwjgl.BufferUtils
     val x = BufferUtils.createDoubleBuffer(1)
     val y = BufferUtils.createDoubleBuffer(1)
-    GL {
-      glfwGetCursorPos(id, x, y)
-    }
+    GL { glfwGetCursorPos(id, x, y) }
     (x.get().toInt, y.get().toInt)
   }
 
@@ -96,23 +85,4 @@ class Window extends EventListener {
     glfwSetErrorCallback(null).free()
     events.unsubscribe()
   }
-
-  private def center(): Unit = {
-    // Get the thread stack and push a new frame
-    val stack = stackPush
-    try {
-      val pWidth = stack.mallocInt(1) // int*
-      val pHeight = stack.mallocInt(1)
-      // Get the window size passed to glfwCreateWindow
-      glfwGetWindowSize(id, pWidth, pHeight)
-      // Get the resolution of the primary monitor
-      val vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor)
-      // Center the window
-      glfwSetWindowPos(
-        id,
-        (vidmode.width - pWidth.get(0)) / 2,
-        (vidmode.height - pHeight.get(0)) / 2
-      )
-    } finally if (stack != null) stack.close()
-  } // the stack frame is popped automatically
 }

@@ -17,8 +17,6 @@ trait Shader {
   ): Unit
 
   protected def loadVec3(location: Int, v: Vector3f): Unit = {
-    GL {
-      glUniform3f(location, v.x, v.y, v.z)
-    }
+    GL { glUniform3f(location, v.x, v.y, v.z) }
   }
 }

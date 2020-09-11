@@ -26,9 +26,7 @@ object Control {
   }
 
   def GLU(fn: => Int): Int = {
-    val uniform = GL {
-      fn
-    }
+    val uniform = GL { fn }
     if (uniform == -1) {
       new RuntimeException("could not get uniform").printStackTrace()
       java.lang.System.exit(1)

@@ -21,40 +21,18 @@ class StaticShader(color: Vector4f) extends Shader with ShaderLoader {
       light: A
   ): Unit = {
     // TODO: refactor the get and set into a single method
-    val colorLocation = GLU {
-      glGetUniformLocation(program, "aColor")
-    }
-    val matrix = GLU {
-      glGetUniformLocation(program, "transformationMatrix")
-    }
-    val projectionMatrixLoc = GLU {
-      glGetUniformLocation(program, "projectionMatrix")
-    }
-    val viewMatrixLoc = GLU {
-      glGetUniformLocation(program, "viewMatrix")
-    }
-    val lightColLoc = GLU {
-      glGetUniformLocation(program, "lightCol")
-    }
-    val lightPosLoc = GLU {
-      glGetUniformLocation(program, "lightPos")
-    }
+    val colorLocation = GLU { glGetUniformLocation(program, "aColor") }
+    val matrix = GLU { glGetUniformLocation(program, "transformationMatrix") }
+    val projectionMatrixLoc = GLU { glGetUniformLocation(program, "projectionMatrix") }
+    val viewMatrixLoc = GLU { glGetUniformLocation(program, "viewMatrix") }
+    val lightColLoc = GLU { glGetUniformLocation(program, "lightCol") }
+    val lightPosLoc = GLU { glGetUniformLocation(program, "lightPos") }
 
-    GL {
-      glUseProgram(program)
-    }
-    GL {
-      glUniform4f(colorLocation, color.x, color.y, color.z, color.w)
-    }
-    GL {
-      glUniformMatrix4fv(matrix, false, getMatrixBuffer(transformationMatrix))
-    }
-    GL {
-      glUniformMatrix4fv(projectionMatrixLoc, false, getMatrixBuffer(projectionMatrix))
-    }
-    GL {
-      glUniformMatrix4fv(viewMatrixLoc, false, getMatrixBuffer(viewMatrix))
-    }
+    GL { glUseProgram(program) }
+    GL { glUniform4f(colorLocation, color.x, color.y, color.z, color.w) }
+    GL { glUniformMatrix4fv(matrix, false, getMatrixBuffer(transformationMatrix)) }
+    GL { glUniformMatrix4fv(projectionMatrixLoc, false, getMatrixBuffer(projectionMatrix)) }
+    GL { glUniformMatrix4fv(viewMatrixLoc, false, getMatrixBuffer(viewMatrix)) }
     loadVec3(lightPosLoc, light.transform.position)
     loadVec3(lightColLoc, light.getColor)
   }
