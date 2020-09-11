@@ -1,18 +1,32 @@
 package utils
 
-import entities.Entity
+import entities.{Entity, Transform}
 import org.joml.{Matrix4f, Vector3f}
 
 object Maths {
   private val worldMatrix = new Matrix4f().identity()
 
+  def createViewMatrix(entity: Entity): Matrix4f =
+    entity match {
+      case Entity(Transform(position, rotation, _), _, _, _, _) =>
+        new Matrix4f()
+          .rotateX(rotation.x)
+          .rotateY(rotation.y)
+          .rotateZ(rotation.z)
+          .translate(-position.x, -position.y, -position.z)
+      //          .translate(position)
+    }
+
   def createTransformationMatrix(entity: Entity): Matrix4f =
-    new Matrix4f()
-      .translation(entity.position)
-      .rotateX(entity.rotation.x)
-      .rotateY(entity.rotation.y)
-      .rotateZ(entity.rotation.z)
-      .scale(entity.scale)
+    entity match {
+      case Entity(Transform(position, rotation, scale), _, _, _, _) =>
+        new Matrix4f()
+          .translation(position)
+          .rotateX(rotation.x)
+          .rotateY(rotation.y)
+          .rotateZ(rotation.z)
+          .scale(scale)
+    }
 
   /**
     * Create Rotation in radians by passing in degrees
@@ -30,6 +44,8 @@ object Maths {
       z += rotation.z
       this
     }
+
+    def +(rotation: Rotation): Rotation = new Rotation(x, y, z) += rotation
   }
 
   val Right = new Vector3f(1f, 0f, 0f)

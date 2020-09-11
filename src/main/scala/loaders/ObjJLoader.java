@@ -2,7 +2,7 @@ package loaders;
 
 import org.joml.Vector2f;
 import org.joml.Vector3f;
-import rendy.TexturedModelJ;
+import rendy.TexturedMeshJ;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ObjJLoader {
-    public static TexturedModelJ load(String fileName) {
+    public static TexturedMeshJ load(String fileName) {
         FileReader fr = null;
         try {
             fr = new FileReader(new File("res/models/" + fileName + ".obj"));
@@ -93,7 +93,7 @@ public class ObjJLoader {
         for (int i = 0; i < indicies.size(); i++) {
             indiciesArray[i] = indicies.get(i);
         }
-        return new TexturedModelJ(
+        return new TexturedMeshJ(
                 verticiesArray,
                 indiciesArray,
                 normalsArray,

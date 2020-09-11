@@ -4,9 +4,17 @@ import entities.Entity
 
 // TODO: put event system into init and update, probably
 trait Behaviour {
-  def init(entity: Entity): Unit
+  final var me: Entity = Entity.empty
+  final var hasUpdate = true
 
-  def update(): Unit
+  final def bind(entity: Entity): Unit = me = entity
 
-  var me: Entity = Entity.empty
+  /** Init is invoked on entity construction */
+  def init(): Unit
+
+  /** Update is invoked every game tick */
+  def update(): Unit = {
+    // prevent update calls if trait behavior is not overridden
+    hasUpdate = false
+  }
 }

@@ -1,6 +1,6 @@
 package rendy
 
-case class ModelData(
+case class MeshData(
     positions: PositionsData,
     indices: List[Int],
     textures: Option[TextureData] = None,
@@ -18,7 +18,7 @@ case class ModelData(
   println("steps", attributes.map(_.step).sum)
 }
 
-case class TexturedModelJ(
+case class TexturedMeshJ(
     _vertices: Array[Float],
     _indices: Array[Int],
     normals: Array[Float],
@@ -28,10 +28,9 @@ case class TexturedModelJ(
   val indices: List[Int] = _indices.toList
 }
 
-sealed trait Model
+sealed trait Mesh
 
-sealed case class BasicModel(vaoID: Int, indicesSize: Int, attributes: Seq[Int])
-    extends Model
+sealed case class BasicMesh(vaoID: Int, indicesSize: Int, attributes: Seq[Int]) extends Mesh
 
 sealed trait AttribData {
   val vertexData: List[Float]

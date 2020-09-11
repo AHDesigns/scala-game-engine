@@ -1,12 +1,13 @@
 package eventSystem
 
-import identifier._
+import identifier.ID
+import identifier.ID.IdValue
 
 import scala.collection.immutable.Queue
 
 object EventSystem {
   private var lastId = 1
-  private var listeners: Map[IdWrapper, Queue[(ID, _ >: Event => Unit)]] =
+  private var listeners: Map[ID, Queue[(IdValue, _ >: Event => Unit)]] =
     Map.empty
 
   def subscribe(): EventListener = {
@@ -21,7 +22,8 @@ object EventSystem {
     ) cb.asInstanceOf[E => Unit](event)
   }
 
-  class EventListener(private val listenerId: ID) {
+  // TODO: support unlistening to a single event
+  class EventListener(private val listenerId: IdValue) {
     private var listening = true
 
     def on[E <: Event](cb: E => Unit)(implicit e: EventId[E]): EventListener = {

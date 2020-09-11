@@ -1,9 +1,9 @@
 package entities
 
-import rendy.{ColorData, ModelData, PositionsData}
+import rendy.{ColorData, MeshData, PositionsData}
 
 object Primitives {
-  val Triangle: ModelData = ModelData(
+  val Triangle: MeshData = MeshData(
     PositionsData(
       List(
         0.5f, -0.5f, 0.0f, -0.5f, -0.5f, 0.0f, 0.0f, 0.5f, 0.0f
@@ -19,7 +19,7 @@ object Primitives {
     )
   )
 
-  val Quad: ModelData = ModelData(
+  val Quad: MeshData = MeshData(
     PositionsData(
       List(
         0.5f, 0.5f, 0.0f, // top right
@@ -31,26 +31,20 @@ object Primitives {
     List(0, 1, 2, 0, 2, 3)
   )
 
-  val Cube: ModelData = ModelData(
+  val Cube: MeshData = MeshData(
     PositionsData(
       List(
-        -1.0f, -1.0f, 1.0f, 1.0f, -1.0f, 1.0f, 1.0f, 1.0f, 1.0f, -1.0f, 1.0f,
-        1.0f,
+        -1.0f, -1.0f, 1.0f, 1.0f, -1.0f, 1.0f, 1.0f, 1.0f, 1.0f, -1.0f, 1.0f, 1.0f,
         // Back face
-        -1.0f, -1.0f, -1.0f, -1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f, 1.0f, -1.0f,
-        -1.0f,
+        -1.0f, -1.0f, -1.0f, -1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f, 1.0f, -1.0f, -1.0f,
         // Top face
-        -1.0f, 1.0f, -1.0f, -1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
-        -1.0f,
+        -1.0f, 1.0f, -1.0f, -1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, -1.0f,
         // Bottom face
-        -1.0f, -1.0f, -1.0f, 1.0f, -1.0f, -1.0f, 1.0f, -1.0f, 1.0f, -1.0f,
-        -1.0f, 1.0f,
+        -1.0f, -1.0f, -1.0f, 1.0f, -1.0f, -1.0f, 1.0f, -1.0f, 1.0f, -1.0f, -1.0f, 1.0f,
         // Right face
-        1.0f, -1.0f, -1.0f, 1.0f, 1.0f, -1.0f, 1.0f, 1.0f, 1.0f, 1.0f, -1.0f,
-        1.0f,
+        1.0f, -1.0f, -1.0f, 1.0f, 1.0f, -1.0f, 1.0f, 1.0f, 1.0f, 1.0f, -1.0f, 1.0f,
         // Left face
-        -1.0f, -1.0f, -1.0f, -1.0f, -1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f, 1.0f,
-        -1.0f
+        -1.0f, -1.0f, -1.0f, -1.0f, -1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f, 1.0f, -1.0f
       )
     ),
     List(

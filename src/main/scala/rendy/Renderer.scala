@@ -1,6 +1,6 @@
 package rendy
 
-import entities.{Camera, Entity, Light}
+import entities.{Entity, Light}
 import eventSystem._
 import org.joml.Matrix4f
 import org.lwjgl.opengl.GL11._
@@ -9,10 +9,10 @@ import org.lwjgl.opengl.GL30.glBindVertexArray
 import utils.Control.GL
 import utils.Maths
 
-class Renderer(camera: Camera) extends EventListener {
+class Renderer(camera: Entity) extends EventListener {
   private var isWireframe = false
   private var projectionMatrix = perspective(800, 400)
-  private var viewMatrix = Maths.createTransformationMatrix(camera)
+  private var viewMatrix = Maths.createViewMatrix(camera)
   init()
 
   def init(): Unit = {
@@ -43,17 +43,14 @@ class Renderer(camera: Camera) extends EventListener {
     )
 
   def render(entity: Entity, light: Light): Unit = {
-    entity.model.foreach {
-      case BasicModel(vaoID, indices, attributes) =>
+    viewMatrix = Maths.createViewMatrix(camera)
+    entity.mesh.foreach {
+      case BasicMesh(vaoID, indices, attributes) =>
         // TODO: store this in entity to save calculating
         val transformationMatrix = Maths.createTransformationMatrix(entity)
         entity.shader.foreach { s =>
-          s.draw(
-            transformationMatrix,
-            projectionMatrix,
-            viewMatrix,
-            light
-          )
+          s.draw(transformationMatrix, projectionMatrix, viewMatrix, light)
+
           GL {
             glBindVertexArray(vaoID)
           }

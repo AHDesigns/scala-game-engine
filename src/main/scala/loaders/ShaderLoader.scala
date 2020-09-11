@@ -53,10 +53,7 @@ trait ShaderLoader extends FileLoader {
     GL {
       glGetProgrami(shaderProgram, GL_LINK_STATUS)
     } match {
-      case 0 =>
-        Left(
-          s"Could not link shader!\n${glGetProgramInfoLog(shaderProgram, 512)}"
-        )
+      case 0 => Left(s"Could not link shader!\n${glGetProgramInfoLog(shaderProgram, 512)}")
       case _ => Right(shaderProgram)
     }
   }

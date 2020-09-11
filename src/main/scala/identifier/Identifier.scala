@@ -1,5 +1,5 @@
 package identifier
 
 trait Identifier {
-  val id: IdWrapper = IdManager.gen()
+  val id: ID = ID()
 }

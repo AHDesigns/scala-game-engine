@@ -1,29 +1,41 @@
 package entities
 
 import behaviours.Behaviour
-import eventSystem.{EventListener, GameLoopTick}
-import org.joml.Vector3f
-import rendy.Model
+import eventSystem.{EntityCreated, EventListener, EventSystem, GameLoopTick}
+import identifier.ID
+import rendy.Mesh
 import shaders.Shader
-import utils.Maths.Rotation
 
-class Entity(
-    val model: Option[Model] = None,
-    val position: Vector3f = new Vector3f(0, 0, 0),
-    val rotation: Rotation = new Rotation(0, 0, 0),
-    val scale: Float = 1f,
-    val shader: Option[Shader] = None,
-    val behaviours: List[Behaviour] = List.empty
+import scala.collection.mutable
+
+case class Entity(
+    transform: Transform = Transform(),
+    mesh: Option[Mesh] = None,
+    shader: Option[Shader] = None,
+    behaviours: List[Behaviour] = List.empty,
+    name: String = ""
 ) extends EventListener {
-  this.behaviours foreach (_.init(this))
-  this.events.on[GameLoopTick] { _ => this.behaviours foreach (_.update()) }
+  val id: ID = if (name.nonEmpty) ID(name) else ID()
+  Entity.entities.addOne(id, this)
+
+  this.behaviours foreach (b => {
+    b.bind(this)
+    b.init()
+  })
+
+  this.events.on[GameLoopTick] { _ =>
+    this.behaviours filter (_.hasUpdate) foreach (_.update())
+  }
+
+  EventSystem ! EntityCreated(this)
+
+  def destroy(): Unit = {
+    Entity.entities.remove(id)
+    this.events.unsubscribe()
+  }
 }
 
 object Entity {
-  val empty = new Entity(
-    None,
-    new Vector3f(0, 0, 0),
-    new Rotation(0, 0, 0),
-    0.0f
-  )
+  lazy val empty = new Entity()
+  val entities = mutable.HashMap.empty[ID, Entity]
 }

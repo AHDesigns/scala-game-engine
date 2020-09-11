@@ -15,13 +15,13 @@ import scala.language.postfixOps
 class EntityLoader extends ObjLoader {
   private var vbos = new ListBuffer[Int]()
   private var vaos = new ListBuffer[Int]()
-  private val cache = mutable.Map.empty[String, Model]
+  private val cache = mutable.Map.empty[String, Mesh]
 
-  def loadModel(filePath: String): Model = {
+  def loadModel(filePath: String): Mesh = {
     cache.getOrElseUpdate(filePath, loadPrimitive(load(filePath)))
   }
 
-  def loadPrimitive(modelData: ModelData): BasicModel = {
+  def loadPrimitive(modelData: MeshData): BasicMesh = {
     val vaoID = GL {
       glGenVertexArrays()
     }
@@ -39,7 +39,7 @@ class EntityLoader extends ObjLoader {
       glBindVertexArray(0)
     }
 
-    BasicModel(vaoID, modelData.indices.size, attributes)
+    BasicMesh(vaoID, modelData.indices.size, attributes)
   }
 
   private def storeAttrib(data: AttribData): Int = {

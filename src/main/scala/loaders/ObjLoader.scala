@@ -20,10 +20,10 @@ import scala.collection.mutable
   * Load OBJ from res/models
   */
 trait ObjLoader extends FileLoader {
-  protected def load(file: String): ModelData = {
+  protected def load(file: String): MeshData = {
     ObjJLoader.load(file) match {
-      case TexturedModelJ(vertices, indices, normals, textures) =>
-        ModelData(
+      case TexturedMeshJ(vertices, indices, normals, textures) =>
+        MeshData(
           PositionsData(vertices.toList),
           indices.toList,
           normalsData = Some(NormalsData(normals.toList)),

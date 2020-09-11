@@ -1,5 +1,6 @@
 package eventSystem
 
+import entities.Entity
 import identifier.Identifier
 import org.joml.Matrix4f
 
@@ -16,19 +17,19 @@ object EventId {
   implicit val inputMove: EventId[InputMove] = new EventId
   implicit val mouseMove: EventId[MouseMove] = new EventId
   implicit val cameraMove: EventId[CameraMove] = new EventId
+  implicit val entityCreated: EventId[EntityCreated] = new EventId
+  implicit val entityDeleted: EventId[EntityDestroyed] = new EventId
 }
 
 class EventId[E] extends Identifier
 
 sealed trait Event
 
+// TODO: make all these pass a data val and use in callback to aid extraction
 // Game Events -------------------------------------------------------
 final case class GameLoopStart() extends Event
-
 final case class GameLoopTick() extends Event
-
 final case class GameLoopEnd() extends Event
-
 final case class GameEnd() extends Event
 
 // Window Events -----------------------------------------------------
@@ -45,6 +46,11 @@ final case class InputMove(x: Float, y: Float, z: Float) extends Event
 
 // Camera ------------------------------------------------------------
 final case class CameraMove(transform: Matrix4f) extends Event
+
+// Entity events ------------------------------------------------------------
+final case class EntityCreated(entity: Entity) extends Event
+
+final case class EntityDestroyed(entity: Entity) extends Event
 
 // Debug/Random Events -----------------------------------------------
 final case class SimpleEvent(data: AnyVal) extends Event
