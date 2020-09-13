@@ -1,19 +1,18 @@
 package shaders
 
-import behaviours.Light
-import entities.Entity
 import org.joml.{Matrix4f, Vector3f}
 import org.lwjgl.opengl.GL20._
+import systems.RenderLight
 import utils.Control.GL
 
 trait Shader {
   val program: Int
 
-  def draw[A <: Entity with Light](
+  def draw(
       transformationMatrix: Matrix4f,
       projectionMatrix: Matrix4f,
       viewMatrix: Matrix4f,
-      light: A
+      light: RenderLight
   ): Unit
 
   protected def loadVec3(location: Int, v: Vector3f): Unit = {

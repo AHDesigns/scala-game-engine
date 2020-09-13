@@ -1,11 +1,10 @@
 package shaders
 
-import behaviours.Light
-import entities.Entity
 import loaders.ShaderLoader
 import org.joml.Matrix4f
 import org.lwjgl.glfw.GLFW.glfwGetTime
 import org.lwjgl.opengl.GL20._
+import systems.RenderLight
 import utils.Control.{GL, GLU}
 import utils.JavaBufferUtils.getMatrixBuffer
 
@@ -15,11 +14,11 @@ class ColorShader(shaderName: String) extends Shader with ShaderLoader {
     case Right(id) => id
   }
 
-  def draw[A <: Entity with Light](
+  def draw(
       transformationMatrix: Matrix4f,
       projectionMatrix: Matrix4f,
       viewMatrix: Matrix4f,
-      light: A
+      light: RenderLight
   ): Unit = {
     val time = GL { glfwGetTime() }
     val greenValue = (Math.sin(time).toFloat / 2f) + 0.5f

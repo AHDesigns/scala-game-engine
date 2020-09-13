@@ -1,11 +1,10 @@
-package behaviours
+package components
 
-import entities.{Entity, Transform}
+import entities.Entity
 import eventSystem.{EntityCreated, EventListener}
 import identifier.ID
-import org.joml.Vector3f
 
-class Follow(entityId: ID, displacement: Transform) extends Behaviour with EventListener {
+class Follow(entityId: ID, displacement: Transform) extends Component with EventListener {
   var following: Option[Entity] = None
 
   override def init(): Unit = {
@@ -24,10 +23,10 @@ class Follow(entityId: ID, displacement: Transform) extends Behaviour with Event
   }
 
   override def update(): Unit = {
-    following.foreach {
-      case Entity(Transform(position, rotation, scale), _, _, _, _) =>
-        me.transform.position = position add (displacement.position, new Vector3f())
-        me.transform.rotation = rotation + displacement.rotation
-    }
+//    following.foreach {
+//      case Entity(Transform(position, rotation, scale), _, _, _, _) =>
+//        me.transform.position = position add (displacement.position, new Vector3f())
+//        me.transform.rotation = rotation + displacement.rotation
+//    }
   }
 }

@@ -1,19 +1,15 @@
 package rendy
 
-import behaviours.Light
 import entities.Entity
 import eventSystem._
 import org.joml.Matrix4f
 import org.lwjgl.opengl.GL11._
-import org.lwjgl.opengl.GL20.{glDisableVertexAttribArray, glEnableVertexAttribArray}
-import org.lwjgl.opengl.GL30.glBindVertexArray
 import utils.Control.GL
-import utils.Maths
 
 class Renderer(camera: Entity) extends EventListener {
   private var isWireframe = false
   private var projectionMatrix = perspective(800, 400)
-  private var viewMatrix = Maths.createViewMatrix(camera)
+//  private var viewMatrix = Maths.createViewMatrix(camera)
   init()
 
   def init(): Unit = {
@@ -22,7 +18,7 @@ class Renderer(camera: Entity) extends EventListener {
     GL { glCullFace(GL_BACK) }
     events
       .on[WindowResize] { window => projectionMatrix = perspective(window.width, window.height) }
-      .on[CameraMove] { camera => viewMatrix = camera.transform }
+//      .on[CameraMove] { camera => viewMatrix = camera.transform }
       .on[DebugWireframe] { _ => wireframe() }
       .on[GameEnd] { _ => events.unsubscribe() }
   }
@@ -35,7 +31,7 @@ class Renderer(camera: Entity) extends EventListener {
       1000f
     )
 
-  def render[A <: Entity with Light](entity: Entity, light: A): Unit = {
+  /* def render[A <: Entity with Light](entity: Entity, light: A): Unit = {
     viewMatrix = Maths.createViewMatrix(camera)
     entity.mesh.foreach {
       case BasicMesh(vaoID, indices, attributes) =>
@@ -55,7 +51,7 @@ class Renderer(camera: Entity) extends EventListener {
           GL { glBindVertexArray(0) }
         }
     }
-  }
+  }*/
 
   private def wireframe(): Unit = {
     GL { glPolygonMode(GL_FRONT_AND_BACK, if (isWireframe) GL_FILL else GL_LINE) }

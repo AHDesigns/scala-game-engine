@@ -1,5 +1,6 @@
 package eventSystem
 
+import components.Component
 import entities.Entity
 import identifier.Identifier
 import org.joml.Matrix4f
@@ -19,6 +20,8 @@ object EventId {
   implicit val cameraMove: EventId[CameraMove] = new EventId
   implicit val entityCreated: EventId[EntityCreated] = new EventId
   implicit val entityDeleted: EventId[EntityDestroyed] = new EventId
+  implicit val componentCreated: EventId[ComponentCreated] = new EventId
+  implicit val componentDeleted: EventId[ComponentDeleted] = new EventId
 }
 
 class EventId[E] extends Identifier
@@ -34,14 +37,11 @@ final case class GameEnd() extends Event
 
 // Window Events -----------------------------------------------------
 final case class WindowClose() extends Event
-
 final case class WindowResize(width: Int, height: Int) extends Event
 
 // Inputs ------------------------------------------------------------
 final case class Click(x: Int, y: Int, keyCode: Int) extends Event
-
 final case class MouseMove(x: Int, y: Int) extends Event
-
 final case class InputMove(x: Float, y: Float, z: Float) extends Event
 
 // Camera ------------------------------------------------------------
@@ -49,10 +49,12 @@ final case class CameraMove(transform: Matrix4f) extends Event
 
 // Entity events ------------------------------------------------------------
 final case class EntityCreated(entity: Entity) extends Event
-
 final case class EntityDestroyed(entity: Entity) extends Event
+
+// Component events --------------------------------------------------
+final case class ComponentCreated(component: Component) extends Event
+final case class ComponentDeleted(component: Component) extends Event
 
 // Debug/Random Events -----------------------------------------------
 final case class SimpleEvent(data: AnyVal) extends Event
-
 final case class DebugWireframe() extends Event
