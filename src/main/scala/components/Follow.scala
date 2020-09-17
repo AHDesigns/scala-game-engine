@@ -15,7 +15,7 @@ class Follow(entityId: ID, displacement: Transform) extends Component with Event
         events.on[EntityCreated] {
           case EntityCreated(e) =>
             if (e.id == entityId) {
-              following = Some(e)
+//              following = Some(e)
               events.unsubscribe()
             }
         }

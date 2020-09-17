@@ -38,17 +38,17 @@ object RenderSystem extends EventListener {
       .on[WindowResize] { window => projectionMatrix = perspective(window.width, window.height) }
       .on[DebugWireframe] { _ => wireframe() }
       .on[GameEnd] { _ => events.unsubscribe() }
-      .on[ComponentCreated] { e =>
-        e.component match {
-          case comp: Camera =>
-            cameras += ((comp.me.id, comp))
-            activeCamera = comp.me.id
-          case comp: Light      => lights += ((comp.me.id, comp))
-          case comp: MeshShader => models += ((comp.me.id, comp))
-          case comp: Transform  => transforms += ((comp.me.id, comp))
-          case _                => ;
-        }
-      }
+//      .on[ComponentCreated] { e =>
+//        e.component match {
+//          case comp: Camera =>
+//            cameras += ((comp.me.id, comp))
+//            activeCamera = comp.me.id
+//          case comp: Light      => lights += ((comp.me.id, comp))
+//          case comp: MeshShader => models += ((comp.me.id, comp))
+//          case comp: Transform  => transforms += ((comp.me.id, comp))
+//          case _                => ;
+//        }
+//      }
     //    .on[CameraMove] { camera => viewMatrix = camera.transform }
   }
 

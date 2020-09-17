@@ -1,16 +1,16 @@
 package components
 
 import entities.Entity
-import eventSystem.{ComponentCreated, EventSystem}
+import identifier.Identifier
 
 // TODO: put event system into init and update, probably
-trait Component {
+trait Component extends Identifier {
   final var me: Entity = Entity.empty
   final var hasUpdate = true
 
   final def bind(entity: Entity): Unit = {
     me = entity
-    EventSystem ! ComponentCreated(this)
+//    EventSystem ! ComponentCreated(this)
   }
 
   /**

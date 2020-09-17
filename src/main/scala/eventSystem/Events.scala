@@ -1,7 +1,6 @@
 package eventSystem
 
-import components.Component
-import entities.Entity
+import ecs.{Entity, Model, Transform}
 import identifier.Identifier
 import org.joml.Matrix4f
 
@@ -20,8 +19,9 @@ object EventId {
   implicit val cameraMove: EventId[CameraMove] = new EventId
   implicit val entityCreated: EventId[EntityCreated] = new EventId
   implicit val entityDeleted: EventId[EntityDestroyed] = new EventId
-  implicit val componentCreated: EventId[ComponentCreated] = new EventId
-  implicit val componentDeleted: EventId[ComponentDeleted] = new EventId
+
+  implicit val componentTransformCreated: EventId[ComponentTransformCreated] = new EventId
+  implicit val componentModelCreated: EventId[ComponentModelCreated] = new EventId
 }
 
 class EventId[E] extends Identifier
@@ -52,8 +52,8 @@ final case class EntityCreated(entity: Entity) extends Event
 final case class EntityDestroyed(entity: Entity) extends Event
 
 // Component events --------------------------------------------------
-final case class ComponentCreated(component: Component) extends Event
-final case class ComponentDeleted(component: Component) extends Event
+final case class ComponentTransformCreated(component: Transform, entity: Entity) extends Event
+final case class ComponentModelCreated(component: Model) extends Event
 
 // Debug/Random Events -----------------------------------------------
 final case class SimpleEvent(data: AnyVal) extends Event

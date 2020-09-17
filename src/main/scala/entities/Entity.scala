@@ -1,7 +1,7 @@
 package entities
 
 import components.Component
-import eventSystem.{EntityCreated, EventListener, EventSystem, GameLoopTick}
+import eventSystem.{EventListener, GameLoopTick}
 import identifier.ID
 
 import scala.collection.mutable
@@ -20,7 +20,7 @@ case class Entity(name: String = "", components: List[Component] = List.empty)
     this.components filter (_.hasUpdate) foreach (_.update())
   }
 
-  EventSystem ! EntityCreated(this)
+//  EventSystem ! EntityCreated(this)
 
   def destroy(): Unit = {
     this.components foreach (_.destroy())
