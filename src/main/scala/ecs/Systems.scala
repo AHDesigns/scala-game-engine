@@ -17,27 +17,28 @@ object MoveSystem extends System with EventListener {
   def addMsg(m: MoveEvent): Unit = { msgs = m :: msgs }
 
   def init(): Unit = {
-    println("move system created")
     events.on[ComponentTransformCreated] {
       case ComponentTransformCreated(_, entity) =>
         println("adding")
         activeEntities += entity.id
     }
-
   }
 
   def update(): Unit = {
-    println("processing move events")
-    // process and empty msgs
-    for (MoveEvent(id, x, y) <- msgs) {
-      println(id, x, y)
-      if (activeEntities.contains(id)) {
-        println("in active list")
-        Transform.data.get(id).map {
-          case Transform(xn, yn) => Transform.data.update(id, Transform(x + xn, y + yn))
-        }
+    ECS.getComponents[Transform] foreach (entityComponents => {
+      for (MoveEvent(id, x, y) <- msgs if activeEntities.contains(id)) {
+        val currentTransforms = entityComponents.getOrElse(
+          id,
+          throw new RuntimeException("i think this should happen")
+        )
+        entityComponents.update(
+          id,
+          currentTransforms.map {
+            case Transform(xn, yn) => Transform(x + xn, y + yn)
+          }
+        )
       }
-    }
-    msgs = List.empty
+      msgs = List.empty
+    })
   }
 }

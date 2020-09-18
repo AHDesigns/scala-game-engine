@@ -2,7 +2,7 @@ package game
 
 import ecs._
 
-object ECS extends App {
+object ECSTest extends App {
   // reference MoveSystem to activate
   MoveSystem.init()
 
@@ -16,12 +16,12 @@ object ECS extends App {
     .addComponent(Transform(2, 2))
     .hasComponent[Model]
 
-  println(Transform.data)
-  println(Model.data)
-
+  println(ECS.getComponents[Transform])
   MoveSystem.update()
-  println(Transform.data)
   MoveSystem.addMsg(MoveEvent(player.id, 10, 10))
   MoveSystem.update()
-  println(Transform.data)
+  println(ECS.getComponents[Transform])
+  MoveSystem.addMsg(MoveEvent(player2.id, 10, 10))
+  MoveSystem.update()
+  println(ECS.getComponents[Transform])
 }

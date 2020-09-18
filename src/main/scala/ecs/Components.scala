@@ -1,36 +1,43 @@
 package ecs
 
-import eventSystem.{ComponentModelCreated, ComponentTransformCreated, EventSystem}
+import eventSystem.{ComponentModelCreated, ComponentTransformCreated, EventListener, EventSystem}
 import identifier.{ID, Identifier}
 
 import scala.collection.mutable
 
-sealed trait Component {
-  def bind(entity: Entity): Unit
-}
+object ECS extends EventListener {
+  // componentId -> (entityId, components[])
+  private val ecs: mutable.HashMap[ID, mutable.HashMap[ID, List[_ <: Component]]] =
+    mutable.HashMap.empty
 
-trait ComponentObject[A <: Component] {
-  final val data = mutable.HashMap.empty[ID, A]
-}
+  def addComponent[A <: Component](entity: Entity, component: A)(implicit
+      componentId: ComponentId[A]
+  ): Unit = {
+    ecs.get(componentId.id) match {
+      case None =>
+        ecs.update(componentId.id, mutable.HashMap(entity.id -> List(component)))
+      case Some(value) =>
+        val newcomps = component :: value.getOrElse(entity.id, Nil)
+        value.update(entity.id, newcomps)
+    }
+    component match {
+      case c: Transform => EventSystem ! ComponentTransformCreated(c, entity)
+      case c: Model     => EventSystem ! ComponentModelCreated(c)
+    }
+  }
 
-case class Transform(x: Int, y: Int) extends Component {
-  def bind(entity: Entity): Unit = {
-    Transform.data += entity.id -> this
-    println("creating transform")
-    EventSystem ! ComponentTransformCreated(this, entity)
+  type EntityComponents[A] = mutable.HashMap[ID, List[A]]
+  def getComponents[A <: Component](implicit
+      componentId: ComponentId[A]
+  ): Option[EntityComponents[A]] = {
+    ecs.get(componentId.id).asInstanceOf[Option[EntityComponents[A]]]
   }
 }
 
-object Transform extends ComponentObject[Transform] {}
+sealed trait Component {}
 
-case class Model(mesh: String, shader: Float) extends Component {
-  def bind(entity: Entity): Unit = {
-    Model.data += entity.id -> this
-    EventSystem ! ComponentModelCreated(this)
-  }
-}
-
-object Model extends ComponentObject[Model] {}
+case class Transform(x: Int, y: Int) extends Component
+case class Model(mesh: String, shader: Float) extends Component
 
 class ComponentId[E] extends Identifier
 object ComponentId {
