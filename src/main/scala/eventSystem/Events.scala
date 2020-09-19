@@ -1,6 +1,7 @@
 package eventSystem
 
-import ecs.{Entity, Model, Transform}
+import components.{Model, Transform}
+import entities.Entity
 import identifier.Identifier
 import org.joml.Matrix4f
 
@@ -13,6 +14,7 @@ object EventId {
   implicit val windowResize: EventId[WindowResize] = new EventId
   implicit val click: EventId[Click] = new EventId
   implicit val simpleEvent: EventId[SimpleEvent] = new EventId
+  implicit val emptyEvent: EventId[EmptyEvent] = new EventId
   implicit val debugWireframe: EventId[DebugWireframe] = new EventId
   implicit val inputMove: EventId[InputMove] = new EventId
   implicit val mouseMove: EventId[MouseMove] = new EventId
@@ -56,5 +58,6 @@ final case class ComponentTransformCreated(component: Transform, entity: Entity)
 final case class ComponentModelCreated(component: Model) extends Event
 
 // Debug/Random Events -----------------------------------------------
+final case class EmptyEvent() extends Event
 final case class SimpleEvent(data: AnyVal) extends Event
 final case class DebugWireframe() extends Event

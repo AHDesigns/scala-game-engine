@@ -8,7 +8,7 @@ import loaders.EntityLoader
 import org.joml.{Vector3f, Vector4f}
 import org.lwjgl.Version
 import shaders.StaticShader
-import systems.RenderSystem
+import systems.{MoveSystem, RenderSystem}
 import utils.Maths.Rot
 import window.Window
 
@@ -26,25 +26,17 @@ object Runner extends App with EventListener {
 
   // TODO: register all systems
   RenderSystem.init()
+  MoveSystem.init()
+
   val loader = new EntityLoader()
 
-  new Entity(
-    "camera",
-    List(
-      Transform(new Vector3f(0, 5, 0), Rot(45, 45, 0)),
-      new Camera(),
-      new CameraMovement()
-    )
-  )
+  new Entity()
+    .addComponent(Transform(new Vector3f(0, 5, 0), Rot(45, 45, 0)))
+    .addComponent(Camera())
 
-  //light
-  new Entity(
-    "light",
-    List(
-      Transform(position = new Vector3f(0, 0, -25)),
-      Light(new Vector3f(1, 1, 1))
-    )
-  )
+  new Entity()
+    .addComponent(Transform(position = new Vector3f(0, 0, -25)))
+    .addComponent(Light(new Vector3f(1, 1, 1)))
 
   private def rand(n: Boolean = false) = Random.nextFloat() + (if (n) -0.5f else 0)
 
@@ -71,18 +63,14 @@ object Runner extends App with EventListener {
 //    )
 //  }
 
-  // Player
-  new Entity(
-    "player",
-    List(
-      Transform(scale = 1.5f),
+  new Entity()
+    .addComponent(Transform(scale = 1.5f))
+    .addComponent(
       MeshShader(
         loader.loadModel("primitive/cube"),
         new StaticShader(new Vector4f(1, 1, 1, 1))
-      ),
-      new PlayerMovement()
+      )
     )
-  )
 
   val secsPerUpdate = 1d / FPS
   var previous = getTime
@@ -108,11 +96,12 @@ object Runner extends App with EventListener {
 
     while (steps >= secsPerUpdate) {
       EventSystem ! GameLoopTick()
+      MoveSystem.update()
       steps -= secsPerUpdate
     }
 
     window.draw {
-      RenderSystem.renderAll()
+      RenderSystem.update()
       // TODO: get in batches rather than an entity at at time
 //      Entity.entities.foreach {
 //        case (_, entity) => renderer.render(entity, light)

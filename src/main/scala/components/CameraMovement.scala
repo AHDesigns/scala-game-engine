@@ -3,14 +3,14 @@ package components
 import eventSystem.{EventListener, InputMove, MouseMove}
 import org.joml.Vector3f
 
-class CameraMovement(inverse: Boolean = false) extends Component with EventListener {
+class CameraMovement(inverse: Boolean = false) extends EventListener {
   private val speed = 0.1f
   private val rotSpeed = 0.00001f
   private var movement = new Vector3f()
   private var isMoving = false
   private var translation = new Vector3f()
 
-  override def init(): Unit = {
+  def init(): Unit = {
     events
       .on[InputMove] {
         case InputMove(0, 0, 0) => isMoving = false
@@ -32,7 +32,7 @@ class CameraMovement(inverse: Boolean = false) extends Component with EventListe
 //    translation = movement.rotateY(me.transform.rotation.y, new Vector3f())
   }
 
-  override def update(): Unit = {
+  def update(): Unit = {
     if (isMoving) {
 //      me.transform.position.add(translation)
     }

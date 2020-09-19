@@ -117,7 +117,7 @@ trait ObjLoader extends FileLoader {
       normals: mutable.ArrayBuffer[Vector3f],
       textArray: mutable.ArrayBuffer[Float],
       normalsArray: mutable.ArrayBuffer[Float]
-  ) {
+  ): Unit = {
     val vertexData = vertex.split("/")
     val currentVertexPointer = vertexData(0).toInt - 1
     indices += (currentVertexPointer)

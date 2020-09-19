@@ -1,7 +1,8 @@
-package ecs
+package components
 
-import eventSystem.{ComponentModelCreated, ComponentTransformCreated, EventListener, EventSystem}
-import identifier.{ID, Identifier}
+import entities.Entity
+import eventSystem._
+import identifier.ID
 
 import scala.collection.mutable
 
@@ -20,9 +21,17 @@ object ECS extends EventListener {
         val newcomps = component :: value.getOrElse(entity.id, Nil)
         value.update(entity.id, newcomps)
     }
+    emit(component, entity)
+  }
+
+  def emit(component: Component, entity: Entity): Unit = {
+    // TODO: find a way to use implicits to handle all these
     component match {
-      case c: Transform => EventSystem ! ComponentTransformCreated(c, entity)
-      case c: Model     => EventSystem ! ComponentModelCreated(c)
+      case c: Transform  => EventSystem ! ComponentTransformCreated(c, entity)
+      case c: Model      => EventSystem ! ComponentModelCreated(c)
+      case c: Camera     => ;
+      case c: Light      => ;
+      case c: MeshShader => ;
     }
   }
 
@@ -32,15 +41,4 @@ object ECS extends EventListener {
   ): Option[EntityComponents[A]] = {
     ecs.get(componentId.id).asInstanceOf[Option[EntityComponents[A]]]
   }
-}
-
-sealed trait Component {}
-
-case class Transform(x: Int, y: Int) extends Component
-case class Model(mesh: String, shader: Float) extends Component
-
-class ComponentId[E] extends Identifier
-object ComponentId {
-  implicit val transform: ComponentId[Transform] = new ComponentId
-  implicit val model: ComponentId[Model] = new ComponentId
 }

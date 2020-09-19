@@ -1,12 +1,12 @@
 package rendy
 
-import entities.Entity
+import entities.EntityOld
 import eventSystem._
 import org.joml.Matrix4f
 import org.lwjgl.opengl.GL11._
 import utils.Control.GL
 
-class Renderer(camera: Entity) extends EventListener {
+class Renderer(camera: EntityOld) extends EventListener {
   private var isWireframe = false
   private var projectionMatrix = perspective(800, 400)
 //  private var viewMatrix = Maths.createViewMatrix(camera)
@@ -23,10 +23,10 @@ class Renderer(camera: Entity) extends EventListener {
       .on[GameEnd] { _ => events.unsubscribe() }
   }
 
-  private def perspective(w: Float, h: Float) =
+  private def perspective(w: Int, h: Int) =
     new Matrix4f().setPerspective(
       Math.toRadians(70).toFloat,
-      w / h,
+      w.toFloat / h.toFloat,
       0.01f,
       1000f
     )

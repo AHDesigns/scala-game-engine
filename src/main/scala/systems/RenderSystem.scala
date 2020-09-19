@@ -30,6 +30,8 @@ object RenderSystem extends EventListener {
   val cameras = mutable.HashMap.empty[ID, Camera]
   val lights = mutable.HashMap.empty[ID, Light]
 
+  def update(): Unit = {}
+
   def init(): Unit = {
     GL { glEnable(GL_DEPTH_TEST) }
     GL { glEnable(GL_CULL_FACE) }
@@ -52,10 +54,10 @@ object RenderSystem extends EventListener {
     //    .on[CameraMove] { camera => viewMatrix = camera.transform }
   }
 
-  private def perspective(w: Float, h: Float) =
+  private def perspective(w: Int, h: Int) =
     new Matrix4f().setPerspective(
       Math.toRadians(70).toFloat,
-      w / h,
+      w.toFloat / h.toFloat,
       0.01f,
       1000f
     )
