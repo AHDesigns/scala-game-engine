@@ -4,6 +4,7 @@ import eventSystem._
 import input.Handler.movementKeys
 import org.lwjgl.glfw.Callbacks.glfwFreeCallbacks
 import org.lwjgl.glfw.GLFW._
+import systems.{PlayerMoveBy, PlayerMovementSystem, PlayerTurnBy}
 import utils.Control.GL
 import window.Window
 
@@ -45,7 +46,13 @@ class Handler(window: Window) extends EventListener {
           // round to Int as these come in as really precise doubles, but the decimal value never changes (Macbook pro)
           val newX = x.toInt * mouseSensitivity
           val newY = y.toInt * mouseSensitivity
-          EventSystem ! MouseMove(newX - oldX, newY - oldY)
+          // x is right left
+          // y is up down
+//          EventSystem ! MouseMove(newX - oldX, newY - oldY)
+//          PlayerMovementSystem ! PlayerTurnBy((newX - oldX).toFloat, (newY - oldY).toFloat, 0)
+          // TODO Handler should speak to a UI PlayerInputController rather than player movement directly
+          // such a class would delegate the player's inputs, eg, UI or game character
+          PlayerMovementSystem ! PlayerTurnBy((newY - oldY).toFloat, (newX - oldX).toFloat, 0)
           lastMouse = (newX, newY)
         }
       )
@@ -68,7 +75,8 @@ class Handler(window: Window) extends EventListener {
         if (isPressed(GLFW_KEY_D)) x += 1
         if (isPressed(GLFW_KEY_W)) y -= 1
         if (isPressed(GLFW_KEY_S)) y += 1
-        EventSystem ! InputMove(x, y, z)
+//        EventSystem ! InputMove(x, y, z)
+        PlayerMovementSystem ! PlayerMoveBy(x, y, z)
       case _ => ;
     }
   }

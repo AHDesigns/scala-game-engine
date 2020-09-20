@@ -1,4 +1,4 @@
-package systems
+package ecs
 
 import identifier.Identifier
 

@@ -1,11 +1,11 @@
 package eventSystem
 
-import components.{Model, Transform}
-import entities.Entity
+import ecs._
 import identifier.Identifier
 import org.joml.Matrix4f
 
 object EventId {
+  // TODO could a macro save some ball ache?
   implicit val gameLoopStart: EventId[GameLoopStart] = new EventId
   implicit val gameLoopTick: EventId[GameLoopTick] = new EventId
   implicit val gameLoopEnd: EventId[GameLoopEnd] = new EventId
@@ -24,6 +24,9 @@ object EventId {
 
   implicit val componentTransformCreated: EventId[ComponentTransformCreated] = new EventId
   implicit val componentModelCreated: EventId[ComponentModelCreated] = new EventId
+  implicit val componentCameraCreated: EventId[ComponentCameraCreated] = new EventId
+  implicit val componentLightCreated: EventId[ComponentLightCreated] = new EventId
+  implicit val componentPlayerMovementCreated: EventId[ComponentPlayerMovementCreated] = new EventId
 }
 
 class EventId[E] extends Identifier
@@ -55,7 +58,11 @@ final case class EntityDestroyed(entity: Entity) extends Event
 
 // Component events --------------------------------------------------
 final case class ComponentTransformCreated(component: Transform, entity: Entity) extends Event
-final case class ComponentModelCreated(component: Model) extends Event
+final case class ComponentModelCreated(component: Model, entity: Entity) extends Event
+final case class ComponentCameraCreated(component: Camera, entity: Entity) extends Event
+final case class ComponentLightCreated(component: Light, entity: Entity) extends Event
+final case class ComponentPlayerMovementCreated(component: PlayerMovement, entity: Entity)
+    extends Event
 
 // Debug/Random Events -----------------------------------------------
 final case class EmptyEvent() extends Event

@@ -4,7 +4,7 @@ import loaders.ShaderLoader
 import org.joml.Matrix4f
 import org.lwjgl.glfw.GLFW.glfwGetTime
 import org.lwjgl.opengl.GL20._
-import systems.RenderLight
+import systems.render.RenderLight
 import utils.Control.{GL, GLU}
 import utils.JavaBufferUtils.getMatrixBuffer
 

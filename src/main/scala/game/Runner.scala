@@ -1,18 +1,17 @@
 package game
 
-import components._
-import entities.Entity
+import ecs._
+import entities.CoordinateSystem
 import eventSystem._
 import input.Handler
 import loaders.EntityLoader
 import org.joml.{Vector3f, Vector4f}
 import org.lwjgl.Version
 import shaders.StaticShader
-import systems.{MoveSystem, RenderSystem}
+import systems.render.{GLRenderer, RenderSystem}
+import systems.{MoveSystem, PlayerMovementSystem}
 import utils.Maths.Rot
 import window.Window
-
-import scala.util.Random
 
 object Runner extends App with EventListener {
   val FPS = 60
@@ -25,52 +24,35 @@ object Runner extends App with EventListener {
   events.on[WindowClose](_ => gameRunning = false)
 
   // TODO: register all systems
-  RenderSystem.init()
+  RenderSystem.init(new GLRenderer())
   MoveSystem.init()
+  PlayerMovementSystem.init()
 
   val loader = new EntityLoader()
 
-  new Entity()
-    .addComponent(Transform(new Vector3f(0, 5, 0), Rot(45, 45, 0)))
-    .addComponent(Camera())
+  new Entity("camera")
+    .addComponent(Transform(new Vector3f(10, 0, 10), Rot(0, 45, 0)))
+    .addComponent(Camera("player camera"))
+//    .addComponent(PlayerMovement(isCamera = true))
+//    .addComponent(PlayerMovement(true))
+//    .addComponent(Transform(new Vector3f(0, 5, 0), Rot(45, 45)))
 
-  new Entity()
-    .addComponent(Transform(position = new Vector3f(0, 0, -25)))
+  new Entity("Main light")
+    .addComponent(Transform(position = new Vector3f(0, 0, 25)))
     .addComponent(Light(new Vector3f(1, 1, 1)))
+    .addComponent(PlayerMovement(isCamera = true))
 
-  private def rand(n: Boolean = false) = Random.nextFloat() + (if (n) -0.5f else 0)
-
-//  val max = 100
-//  1 to max foreach { idx =>
-//    new Entity(
-//      Transform(new Vector3f(idx, 0f, 0f), scale = 0.2f),
-//      Some(loader.loadModel("primitive/cube")),
-//      Some(new StaticShader(new Vector4f(idx / max, 1, 1, 1f)))
-//    )
-//  }
-//  1 to max foreach { idx =>
-//    new Entity(
-//      Transform(new Vector3f(0f, idx, 0f), scale = 0.2f),
-//      Some(loader.loadModel("primitive/cube")),
-//      Some(new StaticShader(new Vector4f(1, 1, idx / max, 1f)))
-//    )
-//  }
-//  1 to max foreach { idx =>
-//    new Entity(
-//      components.Transform(new Vector3f(0f, 0f, idx), scale = 0.2f),
-//      Some(loader.loadModel("primitive/cube")),
-//      Some(new StaticShader(new Vector4f(1, idx / max, 1, 1f)))
-//    )
-//  }
-
-  new Entity()
+  new Entity("Player")
     .addComponent(Transform(scale = 1.5f))
     .addComponent(
-      MeshShader(
+      Model(
         loader.loadModel("primitive/cube"),
         new StaticShader(new Vector4f(1, 1, 1, 1))
       )
     )
+    .addComponent(PlayerMovement())
+
+  val coordinateSystem = new CoordinateSystem(10, loader)
 
   val secsPerUpdate = 1d / FPS
   var previous = getTime
@@ -96,6 +78,7 @@ object Runner extends App with EventListener {
 
     while (steps >= secsPerUpdate) {
       EventSystem ! GameLoopTick()
+      PlayerMovementSystem.update()
       MoveSystem.update()
       steps -= secsPerUpdate
     }

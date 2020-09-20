@@ -2,7 +2,7 @@ package shaders
 
 import org.joml.{Matrix4f, Vector3f}
 import org.lwjgl.opengl.GL20._
-import systems.RenderLight
+import systems.render.RenderLight
 import utils.Control.GL
 
 trait Shader {

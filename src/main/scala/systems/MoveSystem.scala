@@ -1,45 +1,68 @@
 package systems
 
-import components.{ECS, Transform}
+import ecs.{ECS, System, SystemMessage, Transform}
 import eventSystem.{ComponentTransformCreated, EventListener}
 import identifier.ID
+import org.joml.Vector3f
 
+import scala.collection.immutable.Queue
 import scala.collection.mutable
 
-sealed trait MoveSystemMessage extends SystemMessage
-case class SimpleMove(entityId: ID, x: Float, y: Float) extends MoveSystemMessage
+sealed trait MoveSystemMessage extends SystemMessage {
+  val entityId: ID
+}
+case class Move(entityId: ID, vector: Vector3f, local: Boolean = true) extends MoveSystemMessage
+case class Rotate(entityId: ID, x: Float, y: Float, z: Float) extends MoveSystemMessage
+
 object MoveSystem extends System with EventListener {
-  var msgs = List.empty[MoveSystemMessage]
+  private var msgQ = Queue.empty[MoveSystemMessage]
 
   final val activeEntities = mutable.HashSet.empty[ID]
 
-  def addMsg(m: SimpleMove): Unit = { msgs = m :: msgs }
+  def !(m: MoveSystemMessage): Unit = { msgQ = msgQ.appended(m) }
 
   def init(): Unit = {
     events.on[ComponentTransformCreated] {
-      case ComponentTransformCreated(_, entity) =>
-        println("adding")
-        activeEntities += entity.id
+      case ComponentTransformCreated(_, entity) => activeEntities += entity.id
     }
   }
 
   def update(): Unit = {
-    ECS.getComponents[Transform] foreach (entityComponents => {
-      msgs.filter(msg => activeEntities.contains(msg.entityId)) foreach {
-        case SimpleMove(id, x, y) =>
-          val currentTransforms = entityComponents.getOrElse(
-            id,
-            throw new RuntimeException("i think this should happen")
-          )
-          entityComponents.update(
-            id,
-            currentTransforms.map { t: Transform =>
-              t.position.add(x, y, 0f)
-              t
+    val entitiesWithTransforms = ECS.demandComponents[Transform]
+    msgQ.filter(msg => activeEntities.contains(msg.entityId)) foreach {
+      case Rotate(id, x, y, z) =>
+        val currentTransforms = entitiesWithTransforms.getOrElse(id, throw Errors.noEntity)
+        entitiesWithTransforms.update(
+          id,
+          currentTransforms.map { t: Transform =>
+            t.rotation.y += y
+            t.rotation.x += x
+            t
+          }
+        )
+      case Move(id, vector, local) =>
+        val currentTransforms = entitiesWithTransforms.getOrElse(id, throw Errors.noEntity)
+        entitiesWithTransforms.update(
+          id,
+          currentTransforms.map { t: Transform =>
+            val newDirection = {
+              if (local) {
+                vector.rotateY(t.rotation.y, new Vector3f())
+              } else {
+                vector
+              }
             }
-          )
-      }
-      msgs = List.empty
-    })
+            t.position.add(newDirection)
+            t
+          }
+        )
+    }
+    msgQ = Queue.empty
   }
+}
+
+object Errors {
+  val noEntity = new RuntimeException(
+    "unable to find active entity from transforms, maybe it's transform was removed without an event?"
+  )
 }
