@@ -1,9 +1,13 @@
 package input
 
+import ecs.{Entity, Model, RigidBody, Transform}
 import eventSystem._
 import input.Handler.movementKeys
+import loaders.EntityLoader
+import org.joml.{Vector3f, Vector4f}
 import org.lwjgl.glfw.Callbacks.glfwFreeCallbacks
 import org.lwjgl.glfw.GLFW._
+import shaders.StaticShader
 import systems.{PlayerMoveBy, PlayerMovementSystem, PlayerTurnBy}
 import utils.Control.GL
 import window.Window
@@ -32,6 +36,7 @@ class Handler(window: Window) extends EventListener {
           else if (keyAction == GLFW_RELEASE) {
             if (key == GLFW_KEY_ESCAPE) EventSystem ! WindowClose()
             if (key == GLFW_KEY_X) EventSystem ! DebugWireframe()
+            if (key == GLFW_KEY_B) makeBox()
           }
         }
       )
@@ -65,6 +70,20 @@ class Handler(window: Window) extends EventListener {
       GL { glfwFreeCallbacks(window.id) }
       events.unsubscribe()
     })
+  }
+
+  private def makeBox(): Unit = {
+
+    val loader = new EntityLoader()
+    new Entity()
+      .addComponent(Transform(new Vector3f(), scale = 0.5f))
+      .addComponent(RigidBody())
+      .addComponent(
+        Model(
+          loader.loadModel("primitive/cube"),
+          new StaticShader(new Vector4f(1, 1, 1, 1f))
+        )
+      )
   }
 
   private def move(key: Int, action: KeyPress): Unit = {

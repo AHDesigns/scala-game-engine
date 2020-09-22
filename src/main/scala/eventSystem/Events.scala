@@ -22,11 +22,13 @@ object EventId {
   implicit val entityCreated: EventId[EntityCreated] = new EventId
   implicit val entityDeleted: EventId[EntityDestroyed] = new EventId
 
-  implicit val componentTransformCreated: EventId[ComponentTransformCreated] = new EventId
-  implicit val componentModelCreated: EventId[ComponentModelCreated] = new EventId
-  implicit val componentCameraCreated: EventId[ComponentCameraCreated] = new EventId
-  implicit val componentLightCreated: EventId[ComponentLightCreated] = new EventId
-  implicit val componentPlayerMovementCreated: EventId[ComponentPlayerMovementCreated] = new EventId
+  implicit val componentTransformCreated: EventId[ComponentCreatedTransform] = new EventId
+  implicit val componentModelCreated: EventId[ComponentCreatedModel] = new EventId
+  implicit val componentCameraCreated: EventId[ComponentCreatedCamera] = new EventId
+  implicit val componentLightCreated: EventId[ComponentCreatedLight] = new EventId
+  implicit val componentPlayerMovementCreated: EventId[ComponentCreatedPlayerMovement] = new EventId
+  implicit val componentCreatedCollider: EventId[ComponentCreatedCollider] = new EventId
+  implicit val componentCreatedRigidBody: EventId[ComponentCreatedRigidBody] = new EventId
 }
 
 class EventId[E] extends Identifier
@@ -57,12 +59,14 @@ final case class EntityCreated(entity: Entity) extends Event
 final case class EntityDestroyed(entity: Entity) extends Event
 
 // Component events --------------------------------------------------
-final case class ComponentTransformCreated(component: Transform, entity: Entity) extends Event
-final case class ComponentModelCreated(component: Model, entity: Entity) extends Event
-final case class ComponentCameraCreated(component: Camera, entity: Entity) extends Event
-final case class ComponentLightCreated(component: Light, entity: Entity) extends Event
-final case class ComponentPlayerMovementCreated(component: PlayerMovement, entity: Entity)
+final case class ComponentCreatedTransform(component: Transform, entity: Entity) extends Event
+final case class ComponentCreatedModel(component: Model, entity: Entity) extends Event
+final case class ComponentCreatedCamera(component: Camera, entity: Entity) extends Event
+final case class ComponentCreatedLight(component: Light, entity: Entity) extends Event
+final case class ComponentCreatedPlayerMovement(component: PlayerMovement, entity: Entity)
     extends Event
+final case class ComponentCreatedCollider(component: Collider, entity: Entity) extends Event
+final case class ComponentCreatedRigidBody(component: RigidBody, entity: Entity) extends Event
 
 // Debug/Random Events -----------------------------------------------
 final case class EmptyEvent() extends Event

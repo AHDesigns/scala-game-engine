@@ -44,8 +44,4 @@ object Maths {
 
     def +(rotation: Rot): Rot = Rot(x, y, z) += rotation
   }
-
-  val Right = new Vector3f(1f, 0f, 0f)
-  val Forward = new Vector3f(0f, 0f, 1f)
-  val Up = new Vector3f(0f, 1f, 0f)
 }

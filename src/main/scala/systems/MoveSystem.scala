@@ -1,9 +1,10 @@
 package systems
 
 import ecs.{ECS, System, SystemMessage, Transform}
-import eventSystem.{ComponentTransformCreated, EventListener}
+import eventSystem.{ComponentCreatedTransform, EventListener}
 import identifier.ID
 import org.joml.Vector3f
+import utils.Direction
 
 import scala.collection.immutable.Queue
 import scala.collection.mutable
@@ -11,7 +12,12 @@ import scala.collection.mutable
 sealed trait MoveSystemMessage extends SystemMessage {
   val entityId: ID
 }
-case class Move(entityId: ID, vector: Vector3f, local: Boolean = true) extends MoveSystemMessage
+case class Move(entityId: ID, vector: Vector3f, local: Boolean) extends MoveSystemMessage
+object Move {
+  def apply(entityId: ID, direction: Direction, local: Boolean = true) =
+    new Move(entityId, direction.toVec, local)
+}
+
 case class Rotate(entityId: ID, x: Float, y: Float, z: Float) extends MoveSystemMessage
 
 object MoveSystem extends System with EventListener {
@@ -22,12 +28,12 @@ object MoveSystem extends System with EventListener {
   def !(m: MoveSystemMessage): Unit = { msgQ = msgQ.appended(m) }
 
   def init(): Unit = {
-    events.on[ComponentTransformCreated] {
-      case ComponentTransformCreated(_, entity) => activeEntities += entity.id
+    events.on[ComponentCreatedTransform] {
+      case ComponentCreatedTransform(_, entity) => activeEntities += entity.id
     }
   }
 
-  def update(): Unit = {
+  def update(time: Double): Unit = {
     val entitiesWithTransforms = ECS.demandComponents[Transform]
     msgQ.filter(msg => activeEntities.contains(msg.entityId)) foreach {
       case Rotate(id, x, y, z) =>

@@ -21,7 +21,7 @@ object RenderSystem extends EventListener {
   var lights = List.empty[RenderLight]
   var models = List.empty[RenderModel]
 
-  def update(): Unit = {
+  def update(time: Double): Unit = {
     // TODO: make active camera rather than just doing this
     val camera = cameras.getOrElse(activeCamera, throw new RuntimeException("no active camera"))
     val light = lights.find(_.isInstanceOf[RenderLight]).get
@@ -37,14 +37,14 @@ object RenderSystem extends EventListener {
       .on[WindowResize] { window => projectionMatrix = perspective(window.width, window.height) }
       .on[DebugWireframe] { _ => renderer.wireframe() }
       .on[GameEnd] { _ => events.unsubscribe() }
-      .on[ComponentTransformCreated] {
-        case ComponentTransformCreated(_, entity) => storeComponent(entity)
+      .on[ComponentCreatedTransform] {
+        case ComponentCreatedTransform(_, entity) => storeComponent(entity)
       }
-      .on[ComponentModelCreated] { case ComponentModelCreated(_, entity) => storeComponent(entity) }
-      .on[ComponentCameraCreated] {
-        case ComponentCameraCreated(_, entity) => storeComponent(entity)
+      .on[ComponentCreatedModel] { case ComponentCreatedModel(_, entity) => storeComponent(entity) }
+      .on[ComponentCreatedCamera] {
+        case ComponentCreatedCamera(_, entity) => storeComponent(entity)
       }
-      .on[ComponentLightCreated] { case ComponentLightCreated(_, entity) => storeComponent(entity) }
+      .on[ComponentCreatedLight] { case ComponentCreatedLight(_, entity) => storeComponent(entity) }
     //    .on[CameraMove] { camera => viewMatrix = camera.transform }
   }
 

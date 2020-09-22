@@ -41,11 +41,13 @@ object ECS extends EventListener {
     def emit(component: Component, entity: Entity): Unit = {
       // TODO: find a way to use implicits to handle all these
       component match {
-        case c: Transform      => EventSystem ! ComponentTransformCreated(c, entity)
-        case c: Model          => EventSystem ! ComponentModelCreated(c, entity)
-        case c: Camera         => EventSystem ! ComponentCameraCreated(c, entity)
-        case c: Light          => EventSystem ! ComponentLightCreated(c, entity)
-        case c: PlayerMovement => EventSystem ! ComponentPlayerMovementCreated(c, entity)
+        case c: Transform      => EventSystem ! ComponentCreatedTransform(c, entity)
+        case c: Model          => EventSystem ! ComponentCreatedModel(c, entity)
+        case c: Camera         => EventSystem ! ComponentCreatedCamera(c, entity)
+        case c: Light          => EventSystem ! ComponentCreatedLight(c, entity)
+        case c: PlayerMovement => EventSystem ! ComponentCreatedPlayerMovement(c, entity)
+        case c: RigidBody      => EventSystem ! ComponentCreatedRigidBody(c, entity)
+        case c: Collider       => EventSystem ! ComponentCreatedCollider(c, entity)
       }
     }
   }

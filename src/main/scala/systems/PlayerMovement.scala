@@ -1,7 +1,7 @@
 package systems
 
 import ecs.{PlayerMovement, System, SystemMessage}
-import eventSystem.{ComponentPlayerMovementCreated, EventListener}
+import eventSystem.{ComponentCreatedPlayerMovement, EventListener}
 import identifier.ID
 import org.joml.Vector3f
 
@@ -30,8 +30,8 @@ object PlayerMovementSystem extends System with EventListener {
   def !(m: PlayerMovementSystemMessage): Unit = { msgQ = m :: msgQ }
 
   def init(): Unit = {
-    events.on[ComponentPlayerMovementCreated] {
-      case ComponentPlayerMovementCreated(component, entity) =>
+    events.on[ComponentCreatedPlayerMovement] {
+      case ComponentCreatedPlayerMovement(component, entity) =>
         activeEntities += (entity.id -> component)
     }
   }
@@ -44,7 +44,7 @@ object PlayerMovementSystem extends System with EventListener {
         isMoving = true
     }
 
-  def update(): Unit = {
+  def update(time: Double): Unit = {
     msgQ foreach {
       case PlayerMoveTo(x, y, z, _) => ???
       case PlayerMoveBy(x, y, z, _) => handleMove((x, y, z));
@@ -62,7 +62,7 @@ object PlayerMovementSystem extends System with EventListener {
     if (isMoving) {
       activeEntities foreach {
         case (entity, _) =>
-          MoveSystem ! Move(entity, movement)
+          MoveSystem ! Move(entity, movement, local = true)
       }
     }
   }
