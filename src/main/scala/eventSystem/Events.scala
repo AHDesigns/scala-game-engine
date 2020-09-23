@@ -38,7 +38,7 @@ sealed trait Event
 // TODO: make all these pass a data val and use in callback to aid extraction
 // Game Events -------------------------------------------------------
 final case class GameLoopStart() extends Event
-final case class GameLoopTick() extends Event
+final case class GameLoopTick(timeElapsed: Float) extends Event
 final case class GameLoopEnd() extends Event
 final case class GameEnd() extends Event
 

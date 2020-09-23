@@ -1,8 +1,6 @@
 package ecs
 
-import identifier.Identifier
-
-trait System extends Identifier {
+trait System {
   def init(): Unit
-  def update(timeElapsed: Double = 0d): Unit
+  def update(timeElapsed: Float): Unit
 }

@@ -9,6 +9,7 @@ case class RenderModel(model: Model, transform: Transform)
 case class RenderLight(light: Light, transform: Transform)
 case class RenderCamera(camera: Camera, transform: Transform)
 
+// This is a special system that doesn't extend the usual System trait
 object RenderSystem extends EventListener {
   private var renderer: Renderer = _
 
@@ -16,7 +17,6 @@ object RenderSystem extends EventListener {
   private var activeCamera: ID = ID("camera")
   // private var viewMatrix = Maths.createViewMatrix(camera)
 
-  // TODO: quick first pass
   var cameras = Map.empty[ID, RenderCamera]
   var lights = List.empty[RenderLight]
   var models = List.empty[RenderModel]

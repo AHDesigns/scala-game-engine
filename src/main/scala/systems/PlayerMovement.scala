@@ -44,7 +44,7 @@ object PlayerMovementSystem extends System with EventListener {
         isMoving = true
     }
 
-  def update(time: Double): Unit = {
+  def update(time: Float): Unit = {
     msgQ foreach {
       case PlayerMoveTo(x, y, z, _) => ???
       case PlayerMoveBy(x, y, z, _) => handleMove((x, y, z));

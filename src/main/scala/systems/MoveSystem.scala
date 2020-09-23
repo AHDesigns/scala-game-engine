@@ -33,7 +33,7 @@ object MoveSystem extends System with EventListener {
     }
   }
 
-  def update(time: Double): Unit = {
+  def update(time: Float): Unit = {
     val entitiesWithTransforms = ECS.demandComponents[Transform]
     msgQ.filter(msg => activeEntities.contains(msg.entityId)) foreach {
       case Rotate(id, x, y, z) =>

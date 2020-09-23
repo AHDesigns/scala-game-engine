@@ -13,19 +13,18 @@ object RigidBodySystem extends System with EventListener {
   final val activeEntities = mutable.HashSet.empty[ID]
 
   override def init(): Unit = {
-
     events.on[ComponentCreatedRigidBody] {
       case ComponentCreatedRigidBody(_, entity) => activeEntities += entity.id
     }
   }
 
-  def update(timeElapsed: Double): Unit = {
+  def update(timeElapsed: Float): Unit = {
     val entitiesWithRigidBody = ECS.demandComponents[RigidBody]
     entitiesWithRigidBody foreach {
       case (id, rb :: Nil) =>
         val res = calculateResultantDirection(rb, timeElapsed.toFloat, Nil)
         if (!res.equals(Directions.None.toVec)) {
-          val deltaVec = res.mul(timeElapsed.toFloat, new Vector3f())
+          val deltaVec = res.mul(timeElapsed, new Vector3f())
           MoveSystem ! Move(id, deltaVec, local = false)
         }
       case _ => ;
