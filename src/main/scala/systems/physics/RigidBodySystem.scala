@@ -1,6 +1,6 @@
 package systems.physics
 
-import ecs.{ECS, RigidBody, System}
+import ecs.{ECS, RigidBody, System, SystemMessage}
 import eventSystem.{ComponentCreatedRigidBody, EventListener}
 import identifier.ID
 import org.joml.Vector3f
@@ -9,7 +9,14 @@ import utils.Directions
 
 import scala.collection.mutable
 
+sealed trait RigidBodySystemMessage extends SystemMessage {
+  val entityId: ID
+}
+case class Impulse(entityId: ID, vector: Vector3f) extends RigidBodySystemMessage
+
 object RigidBodySystem extends System with EventListener {
+  private var msgQ = Map.empty[ID, Seq[RigidBodySystemMessage]]
+
   final val activeEntities = mutable.HashSet.empty[ID]
 
   override def init(): Unit = {
@@ -18,17 +25,27 @@ object RigidBodySystem extends System with EventListener {
     }
   }
 
+  def !(m: RigidBodySystemMessage): Unit = {
+    val existingMs = msgQ.getOrElse(m.entityId, Seq.empty)
+    msgQ = msgQ + (m.entityId -> (m +: existingMs))
+  }
+
   def update(timeElapsed: Float): Unit = {
     val entitiesWithRigidBody = ECS.demandComponents[RigidBody]
+
     entitiesWithRigidBody foreach {
       case (id, rb :: Nil) =>
-        val res = calculateResultantDirection(rb, timeElapsed.toFloat, Nil)
+        val impulses = msgQ.getOrElse(id, Seq.empty) map {
+          case Impulse(_, vector) => vector
+        }
+        val res = calculateResultantDirection(rb, timeElapsed.toFloat, impulses)
         if (!res.equals(Directions.None.toVec)) {
           val deltaVec = res.mul(timeElapsed, new Vector3f())
           MoveSystem ! Move(id, deltaVec, local = false)
         }
       case _ => ;
     }
+    msgQ = Map.empty
   }
 
   private def calculateResultantDirection(

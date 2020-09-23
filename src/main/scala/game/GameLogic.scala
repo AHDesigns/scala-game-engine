@@ -1,7 +1,7 @@
 package game
 
-import ecs.colliders.{Plane, Sphere}
 import ecs._
+import ecs.colliders.Plane
 import entities.CoordinateSystem
 import org.joml.{Vector3f, Vector4f}
 import shaders.StaticShader
@@ -24,12 +24,15 @@ object GameLogic extends App with BambooEngine {
       .addComponent(Transform(new Vector3f(10, 0, 10), Rot(0, 45, 0)))
       .addComponent(Camera("player camera"))
       .addComponent(PlayerMovement(isCamera = true))
-      .addComponent(Collider(Sphere(1)))
+      .addComponent(RigidBody())
+      .addComponent(Collider(Plane(Axis.Y)))
+//      .addComponent(Collider(Sphere(1)))
     //    .addComponent(PlayerMovement(true))
     //    .addComponent(Transform(new Vector3f(0, 5, 0), Rot(45, 45)))
 
     new Entity("Floor")
-      .addComponent(Collider(Plane(Axis.Y, -10f)))
+      .addComponent(Transform(new Vector3f(0, -1, 0), Rot()))
+      .addComponent(Collider(Plane(Axis.Y)))
 
     new Entity("Main light")
       .addComponent(Transform(position = new Vector3f(0, 0, 25)))

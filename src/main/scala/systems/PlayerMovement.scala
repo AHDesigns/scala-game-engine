@@ -4,6 +4,8 @@ import ecs.{PlayerMovement, System, SystemMessage}
 import eventSystem.{ComponentCreatedPlayerMovement, EventListener}
 import identifier.ID
 import org.joml.Vector3f
+import systems.physics.{Impulse, RigidBodySystem}
+import utils.Directions
 
 import scala.collection.mutable
 
@@ -13,6 +15,7 @@ final case class PlayerMoveBy(x: Float, y: Float, z: Float, local: Boolean = tru
 final case class PlayerMoveTo(x: Float, y: Float, z: Float, local: Boolean = true)
     extends PlayerMovementSystemMessage
 final case class PlayerTurnBy(x: Float, y: Float, z: Float) extends PlayerMovementSystemMessage
+final case class PlayerJump() extends PlayerMovementSystemMessage
 
 object PlayerMovementSystem extends System with EventListener {
   private val inverse = false
@@ -46,6 +49,11 @@ object PlayerMovementSystem extends System with EventListener {
 
   def update(time: Float): Unit = {
     msgQ foreach {
+      case PlayerJump() =>
+        activeEntities foreach {
+          case (entity, _) =>
+            RigidBodySystem ! Impulse(entity, Directions.Up.toVec.mul(100))
+        }
       case PlayerMoveTo(x, y, z, _) => ???
       case PlayerMoveBy(x, y, z, _) => handleMove((x, y, z));
       case PlayerTurnBy(x, y, z) =>

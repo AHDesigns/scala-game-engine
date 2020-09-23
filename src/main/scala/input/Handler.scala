@@ -8,7 +8,7 @@ import org.joml.{Vector3f, Vector4f}
 import org.lwjgl.glfw.Callbacks.glfwFreeCallbacks
 import org.lwjgl.glfw.GLFW._
 import shaders.StaticShader
-import systems.{PlayerMoveBy, PlayerMovementSystem, PlayerTurnBy}
+import systems.{PlayerJump, PlayerMoveBy, PlayerMovementSystem, PlayerTurnBy}
 import utils.Control.GL
 import window.Window
 
@@ -37,6 +37,7 @@ class Handler(window: Window) extends EventListener {
             if (key == GLFW_KEY_ESCAPE) EventSystem ! WindowClose()
             if (key == GLFW_KEY_X) EventSystem ! DebugWireframe()
             if (key == GLFW_KEY_B) makeBox()
+            if (key == GLFW_KEY_SPACE) PlayerMovementSystem ! PlayerJump()
           }
         }
       )
