@@ -13,6 +13,7 @@ sealed trait RigidBodySystemMessage extends SystemMessage {
   val entityId: ID
 }
 case class Impulse(entityId: ID, vector: Vector3f) extends RigidBodySystemMessage
+case class Collision(entityId: ID, entity2Id: ID) extends RigidBodySystemMessage
 
 object RigidBodySystem extends System with EventListener {
   private var msgQ = Map.empty[ID, Seq[RigidBodySystemMessage]]
@@ -37,11 +38,13 @@ object RigidBodySystem extends System with EventListener {
       case (id, rb :: Nil) =>
         val impulses = msgQ.getOrElse(id, Seq.empty) map {
           case Impulse(_, vector) => vector
+          case _: Collision       => rb.vFinal.set(0)
         }
         val res = calculateResultantDirection(rb, timeElapsed.toFloat, impulses)
         if (!res.equals(Directions.None.toVec)) {
           val deltaVec = res.mul(timeElapsed, new Vector3f())
           MoveSystem ! Move(id, deltaVec, local = false)
+          ColliderSystem ! CheckCollisions(id)
         }
       case _ => ;
     }

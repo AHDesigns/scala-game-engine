@@ -1,6 +1,7 @@
 package input
 
-import ecs.{Entity, Model, RigidBody, Transform}
+import ecs.colliders.Plane
+import ecs._
 import eventSystem._
 import input.Handler.movementKeys
 import loaders.EntityLoader
@@ -9,6 +10,7 @@ import org.lwjgl.glfw.Callbacks.glfwFreeCallbacks
 import org.lwjgl.glfw.GLFW._
 import shaders.StaticShader
 import systems.{PlayerJump, PlayerMoveBy, PlayerMovementSystem, PlayerTurnBy}
+import utils.Axis
 import utils.Control.GL
 import window.Window
 
@@ -79,6 +81,8 @@ class Handler(window: Window) extends EventListener {
     new Entity()
       .addComponent(Transform(new Vector3f(), scale = 0.5f))
       .addComponent(RigidBody())
+      .addComponent(PlayerMovement())
+      .addComponent(Collider(Plane(Axis.Y)))
       .addComponent(
         Model(
           loader.loadModel("primitive/cube"),

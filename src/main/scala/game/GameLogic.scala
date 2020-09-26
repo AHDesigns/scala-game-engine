@@ -5,7 +5,7 @@ import ecs.colliders.Plane
 import entities.CoordinateSystem
 import org.joml.{Vector3f, Vector4f}
 import shaders.StaticShader
-import systems.physics.RigidBodySystem
+import systems.physics.ColliderSystem
 import systems.{MoveSystem, PlayerMovementSystem}
 import utils.Axis
 import utils.Maths.Rot
@@ -14,18 +14,16 @@ object GameLogic extends App with BambooEngine {
   override val FPS: Int = 60
 
   override val systems: Seq[ecs.System] = List(
-    RigidBodySystem,
     PlayerMovementSystem,
-    MoveSystem
+    MoveSystem,
+    ColliderSystem
   )
 
   gameLoop {
     new Entity("camera")
       .addComponent(Transform(new Vector3f(10, 0, 10), Rot(0, 45, 0)))
       .addComponent(Camera("player camera"))
-      .addComponent(PlayerMovement(isCamera = true))
-      .addComponent(RigidBody())
-      .addComponent(Collider(Plane(Axis.Y)))
+//      .addComponent(PlayerMovement(isCamera = true))
 //      .addComponent(Collider(Sphere(1)))
     //    .addComponent(PlayerMovement(true))
     //    .addComponent(Transform(new Vector3f(0, 5, 0), Rot(45, 45)))
@@ -48,6 +46,7 @@ object GameLogic extends App with BambooEngine {
         )
       )
       .addComponent(RigidBody())
+      .addComponent(Collider(Plane(Axis.Y)))
     //    .addComponent(PlayerMovement())
 
     new CoordinateSystem(10, loader)
