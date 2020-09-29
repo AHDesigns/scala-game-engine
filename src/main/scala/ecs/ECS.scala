@@ -17,9 +17,28 @@ import scala.collection.mutable
   * componentId -> (entityId, components[])[]
   */
 object ECS extends EventListener {
+
+  //  private var lastId = 1
+//  /** A map of systems and components they care about */
+//  private var systems = Map.empty[ID, List[_ <: Component]]
+//
+//  def subscribe(): ComponentListener = {
+//    lastId += 1
+//    new ComponentListener(lastId)
+//  }
+//
+//  class ComponentListener(private val listenerId: IdValue) {
+//    def onCreated[C <: Component](cb: C => Unit)(implicit c: ComponentId[C]): ComponentListener = {
+//ljjjjjk
+//    }
+//  }
   // componentId -> (entityId, components[])
   private val ecs: mutable.HashMap[ID, mutable.HashMap[ID, List[_ <: Component]]] =
     mutable.HashMap.empty
+
+  def removeComponent[A <: Component](entity: Entity, component: ComponentId[A]): Unit = {
+    ComponentSystem ! Delete(entity.id, component)
+  }
 
   /** Add a component to the ECS
     *
@@ -35,6 +54,7 @@ object ECS extends EventListener {
         val newComps = component :: value.getOrElse(entity.id, Nil)
         value.update(entity.id, newComps)
     }
+    ComponentSystem ! component
     emit(component, entity)
 
     /** this only exists for pattern matching */
@@ -48,6 +68,7 @@ object ECS extends EventListener {
         case c: PlayerMovement => EventSystem ! ComponentCreatedPlayerMovement(c, entity)
         case c: RigidBody      => EventSystem ! ComponentCreatedRigidBody(c, entity)
         case c: Collider       => EventSystem ! ComponentCreatedCollider(c, entity)
+        case c: Delete         => ;
       }
     }
   }

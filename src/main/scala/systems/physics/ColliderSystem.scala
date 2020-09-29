@@ -11,6 +11,7 @@ import scala.collection.immutable.Queue
 
 // TODO: make much better with https://www.toptal.com/game/video-game-physics-part-ii-collision-detection-for-solid-objects
 
+//@deprecated("not deprecated, but more a shit WIP")
 sealed trait ColliderSystemMessage extends SystemMessage {
   val entityId: ID
 }

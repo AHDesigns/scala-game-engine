@@ -15,6 +15,7 @@ sealed trait RigidBodySystemMessage extends SystemMessage {
 case class Impulse(entityId: ID, vector: Vector3f) extends RigidBodySystemMessage
 case class Collision(entityId: ID, entity2Id: ID) extends RigidBodySystemMessage
 
+//@deprecated("not deprecated, but more a shit WIP")
 object RigidBodySystem extends System with EventListener {
   private var msgQ = Map.empty[ID, Seq[RigidBodySystemMessage]]
 

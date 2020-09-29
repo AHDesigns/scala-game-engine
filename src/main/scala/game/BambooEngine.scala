@@ -21,7 +21,9 @@ trait BambooEngine extends EventListener {
     val window = new Window()
     val inputHandler = new Handler(window)
 
-    events.on[WindowClose](_ => gameRunning = false)
+    events.on[WindowClose](_ => {
+      gameRunning = false
+    })
     // Setup all systems
     RenderSystem.init(new GLRenderer())
     systems foreach (_.init())

@@ -11,7 +11,14 @@ class Entity(val name: String = "") extends EventListener with Identifier {
 
   def addComponent[A <: Component](component: A)(implicit componentId: ComponentId[A]): Entity = {
     components += componentId.id
+    component.init(id)
     ECS.addComponent(this, component)
+    this
+  }
+
+  def removeComponent[A <: Component](implicit component: ComponentId[A]): Entity = {
+    components -= component.id
+    ECS.removeComponent(this, component)
     this
   }
 

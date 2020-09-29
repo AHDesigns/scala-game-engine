@@ -1,21 +1,21 @@
-package eventSystem
+package observer
 
-import identifier.ID
 import identifier.ID.IdValue
+import identifier.{ID, Identifier}
 
 import scala.collection.immutable.Queue
 
-object EventSystem {
+class ObserverSystem[Observable, ObservableId[_] <: Identifier] {
   private var lastId = 1
-  private var listeners: Map[ID, Queue[(IdValue, _ >: Event => Unit)]] =
+  private var listeners: Map[ID, Queue[(IdValue, _ >: Observable => Unit)]] =
     Map.empty
 
-  def subscribe(): EventListener = {
+  def subscribe(): Observer = {
     lastId += 1
-    new EventListener(lastId)
+    new Observer(lastId)
   }
 
-  def ![E <: Event](event: E)(implicit e: EventId[E]): Unit = {
+  def ![E <: Observable](event: E)(implicit e: ObservableId[E]): Unit = {
     for (
       cbs <- listeners.get(e.id);
       (_, cb) <- cbs
@@ -23,10 +23,10 @@ object EventSystem {
   }
 
   // TODO: support un-listening to a single event
-  class EventListener(private val listenerId: IdValue) {
+  class Observer(private val listenerId: IdValue) {
     private var listening = true
 
-    def on[E <: Event](cb: E => Unit)(implicit e: EventId[E]): EventListener = {
+    def on[E <: Observable](cb: E => Unit)(implicit e: ObservableId[E]): Observer = {
       if (!listening) {
         println(
           s"Listener is no longer subscribed to events. Attempted to listen to $e"

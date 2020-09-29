@@ -23,12 +23,13 @@ object GameLogic extends App with BambooEngine {
     new Entity("camera")
       .addComponent(Transform(new Vector3f(10, 0, 10), Rot(0, 45, 0)))
       .addComponent(Camera("player camera"))
-//      .addComponent(PlayerMovement(isCamera = true))
+      .addComponent(PlayerMovement(isCamera = true))
+      .removeComponent[PlayerMovement]
 //      .addComponent(Collider(Sphere(1)))
     //    .addComponent(PlayerMovement(true))
     //    .addComponent(Transform(new Vector3f(0, 5, 0), Rot(45, 45)))
 
-    new Entity("Floor")
+    val floor = new Entity("Floor")
       .addComponent(Transform(new Vector3f(0, -1, 0), Rot()))
       .addComponent(Collider(Plane(Axis.Y)))
 

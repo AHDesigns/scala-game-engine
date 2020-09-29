@@ -1,7 +1,7 @@
 package systems
 
-import ecs.{ECS, System, SystemMessage, Transform}
-import eventSystem.{ComponentCreatedTransform, EventListener}
+import ecs.{ComponentId, ComponentObserver, Delete, ECS, System, SystemMessage, Transform}
+import eventSystem.EventListener
 import identifier.ID
 import org.joml.Vector3f
 import utils.Direction
@@ -20,7 +20,7 @@ object Move {
 
 case class Rotate(entityId: ID, x: Float, y: Float, z: Float) extends MoveSystemMessage
 
-object MoveSystem extends System with EventListener {
+object MoveSystem extends System with EventListener with ComponentObserver {
   private var msgQ = Queue.empty[MoveSystemMessage]
 
   final val activeEntities = mutable.HashSet.empty[ID]
@@ -28,9 +28,11 @@ object MoveSystem extends System with EventListener {
   def !(m: MoveSystemMessage): Unit = { msgQ = msgQ.appended(m) }
 
   def init(): Unit = {
-    events.on[ComponentCreatedTransform] {
-      case ComponentCreatedTransform(_, entity) => activeEntities += entity.id
-    }
+    components
+      .on[Transform] { activeEntities += _.entityId }
+      .on[Delete](delIs(ComponentId.transform) {
+        activeEntities -= _.entityId
+      })
   }
 
   def update(time: Float): Unit = {
