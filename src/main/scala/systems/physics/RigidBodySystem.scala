@@ -23,7 +23,7 @@ object RigidBodySystem extends System with EventListener {
 
   override def init(): Unit = {
     events.on[ComponentCreatedRigidBody] {
-      case ComponentCreatedRigidBody(_, entity) => activeEntities += entity.id
+      case ComponentCreatedRigidBody(_, entity) => activeEntities += entity.identifier
     }
   }
 

@@ -40,7 +40,7 @@ object ColliderSystem extends System with EventListener {
   private def storeComponent(entity: Entity): Unit = {
     (entity.getComponent[Transform], entity.getComponent[Collider]) match {
       case (Some(transform :: Nil), Some(collider :: Nil)) =>
-        collidables = collidables + (entity.id -> ColliderPosition(collider, transform))
+        collidables = collidables + (entity.identifier -> ColliderPosition(collider, transform))
       case _ => ;
     }
   }

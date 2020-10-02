@@ -56,7 +56,7 @@ class RenderSystem(renderer: Renderer) extends System with EventListener {
       entity.getComponent[Light]
     ) match {
       case (Some(transform :: Nil), Some(camera :: Nil), None, None) =>
-        cameras = cameras + (entity.id -> RenderCamera(camera, transform))
+        cameras = cameras + (entity.identifier -> RenderCamera(camera, transform))
       case (Some(transform :: Nil), None, Some(model :: Nil), None) =>
         models = RenderModel(model, transform) :: models
       case (Some(transform :: Nil), None, None, Some(light :: Nil)) =>

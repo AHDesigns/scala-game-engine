@@ -6,7 +6,7 @@ import identifier.{ID, Identifier}
 import scala.collection.mutable
 
 class Entity(val name: String = "") extends EventListener with Identifier {
-  override val id: ID = if (name.nonEmpty) ID(name) else ID()
+  override val identifier: ID = if (name.nonEmpty) ID(name) else ID()
   private val components: mutable.Set[ID] = mutable.Set.empty
   ECS.addEntity(this)
 
@@ -15,14 +15,14 @@ class Entity(val name: String = "") extends EventListener with Identifier {
   }
 
   def addComponent[A <: Component](component: A)(implicit componentId: ComponentId[A]): Entity = {
-    components += componentId.id
-    component.init(id)
+    components += componentId.identifier
+    component.init(identifier)
     ECS.addComponent(this, component)
     this
   }
 
   def removeComponent[A <: Component](implicit component: ComponentId[A]): Entity = {
-    components -= component.id
+    components -= component.identifier
     ECS.removeComponent(this, component)
     this
   }
@@ -33,20 +33,20 @@ class Entity(val name: String = "") extends EventListener with Identifier {
   }
 
   def hasComponent[A <: Component](implicit component: ComponentId[A]): Boolean =
-    components.contains(component.id)
+    components.contains(component.identifier)
 
   def hasComponents[A <: Component, B <: Component](implicit
       component: ComponentId[A],
       component2: ComponentId[B]
   ): Boolean =
-    List(component, component2).map(_.id).toSet.subsetOf(components)
+    List(component, component2).map(_.identifier).toSet.subsetOf(components)
 
   def hasComponents[A <: Component, B <: Component, C <: Component](implicit
       component: ComponentId[A],
       component2: ComponentId[B],
       component3: ComponentId[C]
   ): Boolean =
-    List(component, component2, component3).map(_.id).toSet.subsetOf(components)
+    List(component, component2, component3).map(_.identifier).toSet.subsetOf(components)
 
   def hasComponents[A <: Component, B <: Component, C <: Component, D <: Component](implicit
       component: ComponentId[A],
@@ -59,5 +59,5 @@ class Entity(val name: String = "") extends EventListener with Identifier {
       component2,
       component3,
       component4
-    ).map(_.id).toSet.subsetOf(components)
+    ).map(_.identifier).toSet.subsetOf(components)
 }

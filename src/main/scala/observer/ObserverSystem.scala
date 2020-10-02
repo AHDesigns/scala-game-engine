@@ -17,7 +17,7 @@ class ObserverSystem[Observable, ObservableId[_] <: Identifier] {
 
   def ![E <: Observable](event: E)(implicit e: ObservableId[E]): Unit = {
     for (
-      cbs <- listeners.get(e.id);
+      cbs <- listeners.get(e.identifier);
       (_, cb) <- cbs
     ) cb.asInstanceOf[E => Unit](event)
   }
@@ -32,8 +32,8 @@ class ObserverSystem[Observable, ObservableId[_] <: Identifier] {
           s"Listener is no longer subscribed to events. Attempted to listen to $e"
         )
       } else {
-        listeners += (e.id -> listeners
-          .getOrElse(e.id, Queue.empty)
+        listeners += (e.identifier -> listeners
+          .getOrElse(e.identifier, Queue.empty)
           .enqueue(listenerId, cb))
       }
       this

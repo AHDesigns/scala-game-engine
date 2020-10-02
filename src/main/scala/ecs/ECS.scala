@@ -5,11 +5,6 @@ import identifier.ID
 
 import scala.collection.mutable
 
-// TODO: change ECS to use unboxed Arrays not Maps
-// after some googling, it seems using hash lookups could be really slow, and it might be
-// best to swap to Arrays, using integer IDs for lookups
-//  https://www.lihaoyi.com/post/BenchmarkingScalaCollections.html
-
 /** Entity Component System Database
   *
   * All components actually live in here, grouped by ComponentId and then stored against their EntityID
@@ -23,20 +18,20 @@ object ECS extends EventListener {
   private val entities = mutable.HashMap.empty[ID, Entity]
 
   def addEntity(entity: Entity): Unit = {
-    entities += (entity.id -> entity)
+    entities += (entity.identifier -> entity)
   }
   def removeEntity(entity: Entity): Unit = {
-    entities -= entity.id
+    entities -= entity.identifier
   }
 
   def removeComponent[A <: Component](entity: Entity, component: ComponentId[A]): Unit = {
     // TODO: support removing single components from component list
-    ecs.get(component.id) match {
-      case Some(ls) => ls.remove(entity.id)
+    ecs.get(component.identifier) match {
+      case Some(ls) => ls.remove(entity.identifier)
       case _        => ;
     }
 
-    ComponentSystem ! Delete(entity.id, component)
+    ComponentSystem ! Delete(entity.identifier, component)
   }
 
   /** Add a component to the ECS
@@ -46,12 +41,12 @@ object ECS extends EventListener {
   def addComponent[A <: Component](entity: Entity, component: A)(implicit
       componentId: ComponentId[A]
   ): Unit = {
-    ecs.get(componentId.id) match {
+    ecs.get(componentId.identifier) match {
       case None =>
-        ecs.update(componentId.id, mutable.HashMap(entity.id -> List(component)))
+        ecs.update(componentId.identifier, mutable.HashMap(entity.identifier -> List(component)))
       case Some(value) =>
-        val newComps = component :: value.getOrElse(entity.id, Nil)
-        value.update(entity.id, newComps)
+        val newComps = component :: value.getOrElse(entity.identifier, Nil)
+        value.update(entity.identifier, newComps)
     }
 
     ComponentSystem ! component
@@ -69,14 +64,14 @@ object ECS extends EventListener {
   def getComponents[A <: Component](implicit
       componentId: ComponentId[A]
   ): Option[EntityComponents[A]] = {
-    ecs.get(componentId.id).asInstanceOf[Option[EntityComponents[A]]]
+    ecs.get(componentId.identifier).asInstanceOf[Option[EntityComponents[A]]]
   }
 
   def demandComponents[A <: Component](implicit
       componentId: ComponentId[A]
   ): EntityComponents[A] = {
     ecs
-      .getOrElse(componentId.id, throw new RuntimeException("could not get components!"))
+      .getOrElse(componentId.identifier, throw new RuntimeException("could not get components!"))
       .asInstanceOf[EntityComponents[A]]
   }
 
@@ -84,8 +79,8 @@ object ECS extends EventListener {
   def getEntityComponent[A <: Component](
       entity: Entity
   )(implicit componentId: ComponentId[A]): Option[List[A]] = {
-    ecs.get(componentId.id).asInstanceOf[Option[EntityComponents[A]]] match {
-      case Some(entityComponents) => entityComponents.get(entity.id)
+    ecs.get(componentId.identifier).asInstanceOf[Option[EntityComponents[A]]] match {
+      case Some(entityComponents) => entityComponents.get(entity.identifier)
       case None                   => None
     }
   }

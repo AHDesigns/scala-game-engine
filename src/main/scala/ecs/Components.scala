@@ -23,7 +23,7 @@ object ComponentId {
 
 class ComponentId[E] extends Identifier {
   def is(componentId: Identifier): Boolean = {
-    this.id == componentId.id
+    this.identifier == componentId.identifier
   }
 }
 

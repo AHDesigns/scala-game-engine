@@ -1,5 +1,8 @@
 package identifier
 
+import identifier.ID.IdValue
+
 trait Identifier {
-  val id: ID = ID()
+  val identifier: ID = ID()
+  val id: IdValue = identifier.id
 }
