@@ -9,10 +9,8 @@ case class RenderModel(model: Model, transform: Transform)
 case class RenderLight(light: Light, transform: Transform)
 case class RenderCamera(camera: Camera, transform: Transform)
 
-// This is a special system that doesn't extend the usual System trait
-object RenderSystem extends EventListener {
-  private var renderer: Renderer = _
-
+class RenderSystem(renderer: Renderer) extends System with EventListener {
+  setup()
   private var projectionMatrix = perspective(800, 400)
   private var activeCamera: ID = ID("camera")
   // private var viewMatrix = Maths.createViewMatrix(camera)
@@ -21,7 +19,8 @@ object RenderSystem extends EventListener {
   var lights = List.empty[RenderLight]
   var models = List.empty[RenderModel]
 
-  def update(time: Double): Unit = {
+  override def init(): Unit = {}
+  override def update(time: Float): Unit = {
     // TODO: make active camera rather than just doing this
     val camera = cameras.getOrElse(activeCamera, throw new RuntimeException("no active camera"))
     val light = lights.find(_.isInstanceOf[RenderLight]).get
@@ -29,26 +28,27 @@ object RenderSystem extends EventListener {
     models foreach { model => renderer.render(model, light, camera, projectionMatrix) }
   }
 
-  def init(renderer: Renderer): Unit = {
-    this.renderer = renderer
+  def setup(): Unit = {
     renderer.setup()
 
     events
       .on[WindowResize] { window => projectionMatrix = perspective(window.width, window.height) }
       .on[DebugWireframe] { _ => renderer.wireframe() }
       .on[GameEnd] { _ => events.unsubscribe() }
-      .on[ComponentCreatedTransform] {
-        case ComponentCreatedTransform(_, entity) => storeComponent(entity)
-      }
-      .on[ComponentCreatedModel] { case ComponentCreatedModel(_, entity) => storeComponent(entity) }
-      .on[ComponentCreatedCamera] {
-        case ComponentCreatedCamera(_, entity) => storeComponent(entity)
-      }
-      .on[ComponentCreatedLight] { case ComponentCreatedLight(_, entity) => storeComponent(entity) }
     //    .on[CameraMove] { camera => viewMatrix = camera.transform }
+
+    components
+      .on[Transform] { storeComponent(_) }
+      .on[Model] { storeComponent(_) }
+      .on[Camera] { storeComponent(_) }
+      .on[Light] { storeComponent(_) }
+//      .on[Delete](delIs(ComponentId.transform {}))
   }
 
-  private def storeComponent(entity: Entity): Unit = {
+  private def storeComponent(component: Component): Unit = {
+    val entity = ECS
+      .getEntity(component.entityId)
+      .getOrElse(throw new RuntimeException("entity does not exist"))
     (
       entity.getComponent[Transform],
       entity.getComponent[Camera],

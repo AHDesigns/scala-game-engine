@@ -25,10 +25,9 @@ trait BambooEngine extends EventListener {
       gameRunning = false
     })
     // Setup all systems
-    RenderSystem.init(new GLRenderer())
+    val renderer = new RenderSystem(new GLRenderer())
     systems foreach (_.init())
 
-    // this can probably be moved into it's own system
     gameSetup
 
     val secsPerUpdate = 1d / FPS
@@ -52,7 +51,7 @@ trait BambooEngine extends EventListener {
       }
 
       window.draw {
-        RenderSystem.update(elapsed)
+        renderer.update(elapsed.toFloat)
       }
       // sleep the thread based on the target FPS
       sync(loopStartTime.toLong)

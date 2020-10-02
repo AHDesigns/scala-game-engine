@@ -17,26 +17,25 @@ import scala.collection.mutable
   * componentId -> (entityId, components[])[]
   */
 object ECS extends EventListener {
-
-  //  private var lastId = 1
-//  /** A map of systems and components they care about */
-//  private var systems = Map.empty[ID, List[_ <: Component]]
-//
-//  def subscribe(): ComponentListener = {
-//    lastId += 1
-//    new ComponentListener(lastId)
-//  }
-//
-//  class ComponentListener(private val listenerId: IdValue) {
-//    def onCreated[C <: Component](cb: C => Unit)(implicit c: ComponentId[C]): ComponentListener = {
-//ljjjjjk
-//    }
-//  }
   // componentId -> (entityId, components[])
   private val ecs: mutable.HashMap[ID, mutable.HashMap[ID, List[_ <: Component]]] =
     mutable.HashMap.empty
+  private val entities = mutable.HashMap.empty[ID, Entity]
+
+  def addEntity(entity: Entity): Unit = {
+    entities += (entity.id -> entity)
+  }
+  def removeEntity(entity: Entity): Unit = {
+    entities -= entity.id
+  }
 
   def removeComponent[A <: Component](entity: Entity, component: ComponentId[A]): Unit = {
+    // TODO: support removing single components from component list
+    ecs.get(component.id) match {
+      case Some(ls) => ls.remove(entity.id)
+      case _        => ;
+    }
+
     ComponentSystem ! Delete(entity.id, component)
   }
 
@@ -54,23 +53,8 @@ object ECS extends EventListener {
         val newComps = component :: value.getOrElse(entity.id, Nil)
         value.update(entity.id, newComps)
     }
-    ComponentSystem ! component
-    emit(component, entity)
 
-    /** this only exists for pattern matching */
-    def emit(component: Component, entity: Entity): Unit = {
-      // TODO: find a way to use implicits to handle all these
-      component match {
-        case c: Transform      => EventSystem ! ComponentCreatedTransform(c, entity)
-        case c: Model          => EventSystem ! ComponentCreatedModel(c, entity)
-        case c: Camera         => EventSystem ! ComponentCreatedCamera(c, entity)
-        case c: Light          => EventSystem ! ComponentCreatedLight(c, entity)
-        case c: PlayerMovement => EventSystem ! ComponentCreatedPlayerMovement(c, entity)
-        case c: RigidBody      => EventSystem ! ComponentCreatedRigidBody(c, entity)
-        case c: Collider       => EventSystem ! ComponentCreatedCollider(c, entity)
-        case c: Delete         => ;
-      }
-    }
+    ComponentSystem ! component
   }
 
   // I thought I could share this type throughout the class but it doesn't seem to work in all places
@@ -104,5 +88,9 @@ object ECS extends EventListener {
       case Some(entityComponents) => entityComponents.get(entity.id)
       case None                   => None
     }
+  }
+
+  def getEntity(entityId: ID): Option[Entity] = {
+    entities.get(entityId)
   }
 }

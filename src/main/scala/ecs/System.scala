@@ -1,6 +1,6 @@
 package ecs
 
-trait System {
+trait System extends ComponentObserver {
   def init(): Unit
   def update(timeElapsed: Float): Unit
 }

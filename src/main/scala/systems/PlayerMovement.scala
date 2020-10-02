@@ -1,6 +1,6 @@
 package systems
 
-import ecs.{ComponentId, ComponentObserver, Delete, PlayerMovement, System, SystemMessage}
+import ecs.{ComponentId, Delete, PlayerMovement, System, SystemMessage}
 import identifier.ID
 import org.joml.Vector3f
 import systems.physics.{Impulse, RigidBodySystem}
@@ -16,7 +16,7 @@ final case class PlayerMoveTo(x: Float, y: Float, z: Float, local: Boolean = tru
 final case class PlayerTurnBy(x: Float, y: Float, z: Float) extends PlayerMovementSystemMessage
 final case class PlayerJump() extends PlayerMovementSystemMessage
 
-object PlayerMovementSystem extends System with ComponentObserver {
+object PlayerMovementSystem extends System {
   private val inverse = false
   private val speed = 0.1f
   private val rotSpeed = 0.00001f
@@ -34,10 +34,7 @@ object PlayerMovementSystem extends System with ComponentObserver {
   def init(): Unit = {
     components.on[PlayerMovement] { c => activeEntities += (c.entityId -> c) }
     components.on[Delete](delIs(ComponentId.playerMovement) { c =>
-      println("remove player movem")
-      println(activeEntities)
       activeEntities.remove(c.entityId)
-      println(activeEntities)
     })
   }
 

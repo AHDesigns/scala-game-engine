@@ -8,6 +8,11 @@ import scala.collection.mutable
 class Entity(val name: String = "") extends EventListener with Identifier {
   override val id: ID = if (name.nonEmpty) ID(name) else ID()
   private val components: mutable.Set[ID] = mutable.Set.empty
+  ECS.addEntity(this)
+
+  def deleteSelf(): Unit = {
+    ECS.removeEntity(this)
+  }
 
   def addComponent[A <: Component](component: A)(implicit componentId: ComponentId[A]): Entity = {
     components += componentId.id
