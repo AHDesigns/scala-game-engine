@@ -1,8 +1,8 @@
 package shaders
 
+import ecs.{Light, Transform}
 import org.joml.{Matrix4f, Vector3f}
 import org.lwjgl.opengl.GL20._
-import systems.render.RenderLight
 import utils.Control.GL
 
 trait Shader {
@@ -12,7 +12,8 @@ trait Shader {
       transformationMatrix: Matrix4f,
       projectionMatrix: Matrix4f,
       viewMatrix: Matrix4f,
-      light: RenderLight
+      light: Light,
+      lTransform: Transform
   ): Unit
 
   protected def loadVec3(location: Int, v: Vector3f): Unit = {

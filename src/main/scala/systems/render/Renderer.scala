@@ -1,5 +1,7 @@
 package systems.render
 
+import ecs.{Light, Model, Transform}
+import eventSystem.DebugWireframe
 import org.joml.Matrix4f
 
 trait Renderer {
@@ -9,12 +11,14 @@ trait Renderer {
 
   /** Render should be responsible for sending the actual draw calls to hardware */
   def render(
-      renderMeshShader: RenderModel,
-      light: RenderLight,
-      camera: RenderCamera,
+      camera: Transform,
+      light: Light,
+      lTransform: Transform,
+      model: Model,
+      mTransform: Transform,
       projectionMatrix: Matrix4f
   ): Unit
 
   /** Toggle wireframe rendering */
-  def wireframe(): Unit
+  def wireframe(e: DebugWireframe): Unit
 }

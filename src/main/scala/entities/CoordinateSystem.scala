@@ -1,6 +1,6 @@
 package entities
 
-import ecs.{Entity, Model, RigidBody, Transform}
+import ecs.{Entity, Model, Transform}
 import loaders.EntityLoader
 import org.joml.{Vector3f, Vector4f}
 import shaders.StaticShader
@@ -12,7 +12,6 @@ class CoordinateSystem(var max: Int, val loader: EntityLoader) {
 
   new Entity()
     .addComponent(Transform(new Vector3f(), scale = 0.5f))
-    .addComponent(RigidBody())
     .addComponent(
       Model(
         loader.loadModel("primitive/cube"),
@@ -21,7 +20,6 @@ class CoordinateSystem(var max: Int, val loader: EntityLoader) {
     )
   new Entity()
     .addComponent(Transform(new Vector3f(0, 100f, 0), scale = 0.5f))
-    .addComponent(RigidBody())
     .addComponent(
       Model(
         loader.loadModel("primitive/cube"),
@@ -59,6 +57,4 @@ class CoordinateSystem(var max: Int, val loader: EntityLoader) {
       )
     }
   }
-
-//  entities map (_.addComponent(RigidBody()))
 }

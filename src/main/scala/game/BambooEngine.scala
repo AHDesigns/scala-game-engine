@@ -5,7 +5,8 @@ import eventSystem._
 import input.Handler
 import loaders.EntityLoader
 import org.lwjgl.Version
-import systems.render.{GLRenderer, RenderSystem}
+import systems.RenderSystem
+import systems.render.GLRenderer
 import window.Window
 
 trait BambooEngine extends EventListener {
@@ -26,7 +27,7 @@ trait BambooEngine extends EventListener {
     })
     // Setup all systems
     val renderer = new RenderSystem(new GLRenderer())
-    systems foreach (_.init())
+    (renderer +: systems) foreach (_.init())
 
     gameSetup
 

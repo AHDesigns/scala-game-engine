@@ -1,16 +1,10 @@
 package input
 
-import ecs.colliders.Plane
-import ecs._
 import eventSystem._
 import input.Handler.movementKeys
-import loaders.EntityLoader
-import org.joml.{Vector3f, Vector4f}
 import org.lwjgl.glfw.Callbacks.glfwFreeCallbacks
 import org.lwjgl.glfw.GLFW._
-import shaders.StaticShader
-import systems.{PlayerJump, PlayerMoveBy, PlayerMovementSystem, PlayerTurnBy}
-import utils.Axis
+//import systems.{PlayerJump, PlayerMoveBy, PlayerMovementSystem, PlayerTurnBy}
 import utils.Control.GL
 import window.Window
 
@@ -38,8 +32,7 @@ class Handler(window: Window) extends EventListener {
           else if (keyAction == GLFW_RELEASE) {
             if (key == GLFW_KEY_ESCAPE) EventSystem ! WindowClose()
             if (key == GLFW_KEY_X) EventSystem ! DebugWireframe()
-            if (key == GLFW_KEY_B) makeBox()
-            if (key == GLFW_KEY_SPACE) PlayerMovementSystem ! PlayerJump()
+//            if (key == GLFW_KEY_SPACE) PlayerMovementSystem ! PlayerJump()
           }
         }
       )
@@ -60,7 +53,7 @@ class Handler(window: Window) extends EventListener {
 //          PlayerMovementSystem ! PlayerTurnBy((newX - oldX).toFloat, (newY - oldY).toFloat, 0)
           // TODO Handler should speak to a UI PlayerInputController rather than player movement directly
           // such a class would delegate the player's inputs, eg, UI or game character
-          PlayerMovementSystem ! PlayerTurnBy((newY - oldY).toFloat, (newX - oldX).toFloat, 0)
+//          PlayerMovementSystem ! PlayerTurnBy((newY - oldY).toFloat, (newX - oldX).toFloat, 0)
           lastMouse = (newX, newY)
         }
       )
@@ -75,22 +68,6 @@ class Handler(window: Window) extends EventListener {
     })
   }
 
-  private def makeBox(): Unit = {
-
-    val loader = new EntityLoader()
-    new Entity()
-      .addComponent(Transform(new Vector3f(), scale = 0.5f))
-      .addComponent(RigidBody())
-      .addComponent(PlayerMovement())
-      .addComponent(Collider(Plane(Axis.Y)))
-      .addComponent(
-        Model(
-          loader.loadModel("primitive/cube"),
-          new StaticShader(new Vector4f(1, 1, 1, 1f))
-        )
-      )
-  }
-
   private def move(key: Int, action: KeyPress): Unit = {
     action match {
       case KeyDown() | KeyUp() =>
@@ -100,7 +77,7 @@ class Handler(window: Window) extends EventListener {
         if (isPressed(GLFW_KEY_W)) y -= 1
         if (isPressed(GLFW_KEY_S)) y += 1
 //        EventSystem ! InputMove(x, y, z)
-        PlayerMovementSystem ! PlayerMoveBy(x, y, z)
+//        PlayerMovementSystem ! PlayerMoveBy(x, y, z)
       case _ => ;
     }
   }

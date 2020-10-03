@@ -1,10 +1,10 @@
 package shaders
 
+import ecs.{Light, Transform}
 import loaders.ShaderLoader
 import org.joml.Matrix4f
 import org.lwjgl.glfw.GLFW.glfwGetTime
 import org.lwjgl.opengl.GL20._
-import systems.render.RenderLight
 import utils.Control.{GL, GLU}
 import utils.JavaBufferUtils.getMatrixBuffer
 
@@ -18,7 +18,8 @@ class ColorShader(shaderName: String) extends Shader with ShaderLoader {
       transformationMatrix: Matrix4f,
       projectionMatrix: Matrix4f,
       viewMatrix: Matrix4f,
-      light: RenderLight
+      light: Light,
+      lTransform: Transform
   ): Unit = {
     val time = GL { glfwGetTime() }
     val greenValue = (Math.sin(time).toFloat / 2f) + 0.5f

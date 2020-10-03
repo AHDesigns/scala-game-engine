@@ -1,9 +1,9 @@
 package shaders
 
+import ecs.{Light, Transform}
 import loaders.ShaderLoader
 import org.joml.{Matrix4f, Vector4f}
 import org.lwjgl.opengl.GL20._
-import systems.render.RenderLight
 import utils.Control.{GL, GLU}
 import utils.JavaBufferUtils.getMatrixBuffer
 
@@ -17,7 +17,8 @@ class StaticShader(color: Vector4f) extends Shader with ShaderLoader {
       transformationMatrix: Matrix4f,
       projectionMatrix: Matrix4f,
       viewMatrix: Matrix4f,
-      renderLight: RenderLight
+      light: Light,
+      lTransform: Transform
   ): Unit = {
     // TODO: refactor the get and set into a single method
     val colorLocation = GLU { glGetUniformLocation(program, "aColor") }
@@ -32,7 +33,7 @@ class StaticShader(color: Vector4f) extends Shader with ShaderLoader {
     GL { glUniformMatrix4fv(matrix, false, getMatrixBuffer(transformationMatrix)) }
     GL { glUniformMatrix4fv(projectionMatrixLoc, false, getMatrixBuffer(projectionMatrix)) }
     GL { glUniformMatrix4fv(viewMatrixLoc, false, getMatrixBuffer(viewMatrix)) }
-    loadVec3(lightPosLoc, renderLight.transform.position)
-    loadVec3(lightColLoc, renderLight.light.color)
+    loadVec3(lightPosLoc, lTransform.position)
+    loadVec3(lightColLoc, light.color)
   }
 }

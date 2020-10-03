@@ -1,5 +1,7 @@
 package systems.render
 
+import ecs.{Light, Model, Transform}
+import eventSystem.{DebugWireframe, EventListener}
 import org.joml.Matrix4f
 import org.lwjgl.opengl.GL11._
 import org.lwjgl.opengl.GL20.{glDisableVertexAttribArray, glEnableVertexAttribArray}
@@ -8,32 +10,36 @@ import rendy.BasicMesh
 import utils.Control.GL
 import utils.Maths
 
-class GLRenderer extends Renderer {
+class GLRenderer extends Renderer with EventListener {
   private var isWireframe = false
 
   def setup(): Unit = {
     GL { glEnable(GL_DEPTH_TEST) }
     GL { glEnable(GL_CULL_FACE) }
     GL { glCullFace(GL_BACK) }
+    events.on[DebugWireframe] { wireframe }
   }
 
   def render(
-      renderMeshShader: RenderModel,
-      light: RenderLight,
-      camera: RenderCamera,
+      camera: Transform,
+      light: Light,
+      lTransform: Transform,
+      model: Model,
+      mTransform: Transform,
       projectionMatrix: Matrix4f
   ): Unit = {
-    val viewMatrix = Maths.createViewMatrix(camera.transform)
-    renderMeshShader.model.mesh match {
+    val viewMatrix = Maths.createViewMatrix(camera)
+    model.mesh match {
       case BasicMesh(vaoID, indices, attributes) =>
         // TODO: store this in entity to save calculating
-        val transformationMatrix = Maths.createTransformationMatrix(renderMeshShader.transform)
+        val transformationMatrix = Maths.createTransformationMatrix(mTransform)
 
-        renderMeshShader.model.shader.draw(
+        model.shader.draw(
           transformationMatrix,
           projectionMatrix,
           viewMatrix,
-          light
+          light,
+          lTransform
         )
 
         GL { glBindVertexArray(vaoID) }
@@ -48,7 +54,7 @@ class GLRenderer extends Renderer {
     }
   }
 
-  def wireframe(): Unit = {
+  def wireframe(x: DebugWireframe): Unit = {
     GL { glPolygonMode(GL_FRONT_AND_BACK, if (isWireframe) GL_FILL else GL_LINE) }
     isWireframe = !isWireframe
   }
