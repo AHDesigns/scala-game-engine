@@ -13,7 +13,8 @@ trait Shader {
       projectionMatrix: Matrix4f,
       viewMatrix: Matrix4f,
       light: Light,
-      lTransform: Transform
+      lTransform: Transform,
+      textureId: Option[Int]
   ): Unit
 
   protected def loadVec3(location: Int, v: Vector3f): Unit = {

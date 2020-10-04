@@ -2,10 +2,11 @@ package observer
 
 import identifier.ID.IdValue
 import identifier.{ID, Identifier}
+import logging.Logger
 
 import scala.collection.immutable.Queue
 
-class ObserverSystem[Observable, ObservableId[_] <: Identifier] {
+class ObserverSystem[Observable, ObservableId[_] <: Identifier] extends Logger {
   private var lastId = 1
   private var listeners: Map[ID, Queue[(IdValue, _ >: Observable => Unit)]] =
     Map.empty
@@ -28,7 +29,7 @@ class ObserverSystem[Observable, ObservableId[_] <: Identifier] {
 
     def on[E <: Observable](cb: E => Unit)(implicit e: ObservableId[E]): Observer = {
       if (!listening) {
-        println(
+        logWarn(
           s"Listener is no longer subscribed to events. Attempted to listen to $e"
         )
       } else {

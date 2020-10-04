@@ -1,6 +1,7 @@
 package window
 
 import eventSystem.{EventListener, EventSystem, GameEnd, WindowResize}
+import logging.Logger
 import org.lwjgl.glfw.GLFW._
 import org.lwjgl.glfw.GLFWErrorCallback
 import org.lwjgl.opengl.GL.createCapabilities
@@ -9,7 +10,7 @@ import org.lwjgl.system.MemoryUtil._
 import utils.Control.GL
 import utils.System.isMacOs
 
-class Window extends EventListener {
+class Window extends EventListener with Logger {
   // Create the window
   private val n = GLFW_FALSE
   private val y = GLFW_TRUE
@@ -19,7 +20,7 @@ class Window extends EventListener {
   GLFWErrorCallback.createPrint(System.err).set
 
   if (!glfwInit()) {
-    println("failed to initialise GLFW")
+    logErr("failed to initialise GLFW")
     System.exit(1)
   }
 
@@ -46,7 +47,7 @@ class Window extends EventListener {
   // does all the things
   createCapabilities
 
-  println(glGetString(GL_VERSION))
+  log(glGetString(GL_VERSION))
   GL {
     glfwSetFramebufferSizeCallback(
       id,

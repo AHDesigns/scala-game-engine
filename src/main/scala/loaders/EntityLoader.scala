@@ -12,7 +12,7 @@ import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 import scala.language.postfixOps
 
-class EntityLoader extends ObjLoader {
+class EntityLoader extends ObjLoader with TextureLoader {
   private var vbos = new ListBuffer[Int]()
   private var vaos = new ListBuffer[Int]()
   private val cache = mutable.Map.empty[String, Mesh]
@@ -21,7 +21,12 @@ class EntityLoader extends ObjLoader {
     cache.getOrElseUpdate(filePath, loadPrimitive(load(filePath)))
   }
 
-  def loadPrimitive(modelData: MeshData): BasicMesh = {
+  def loadTexturedModel(filePath: String, texturePath: String): Mesh = {
+    val textureId = loadTexture(texturePath)
+    cache.getOrElseUpdate(filePath, loadPrimitive(load(filePath), Some(textureId)))
+  }
+
+  def loadPrimitive(modelData: MeshData, textureId: Option[Int] = None): Mesh = {
     val vaoID = GL { glGenVertexArrays() }
     vaos += vaoID
     GL { glBindVertexArray(vaoID) }
@@ -31,7 +36,7 @@ class EntityLoader extends ObjLoader {
 
     GL { glBindVertexArray(0) }
 
-    BasicMesh(vaoID, modelData.indices.size, attributes)
+    BasicMesh(vaoID, modelData.indices.size, attributes, textureId)
   }
 
   private def storeAttrib(data: AttribData): Int = {

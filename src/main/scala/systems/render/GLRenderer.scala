@@ -4,6 +4,7 @@ import ecs.{Light, Model, Transform}
 import eventSystem.{DebugWireframe, EventListener}
 import org.joml.Matrix4f
 import org.lwjgl.opengl.GL11._
+import org.lwjgl.opengl.GL13.{GL_TEXTURE0, glActiveTexture}
 import org.lwjgl.opengl.GL20.{glDisableVertexAttribArray, glEnableVertexAttribArray}
 import org.lwjgl.opengl.GL30.glBindVertexArray
 import rendy.BasicMesh
@@ -17,6 +18,9 @@ class GLRenderer extends Renderer with EventListener {
     GL { glEnable(GL_DEPTH_TEST) }
     GL { glEnable(GL_CULL_FACE) }
     GL { glCullFace(GL_BACK) }
+
+    GL { glEnable(GL_BLEND) }
+    GL { glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA) }
     events.on[DebugWireframe] { wireframe }
   }
 
@@ -30,16 +34,23 @@ class GLRenderer extends Renderer with EventListener {
   ): Unit = {
     val viewMatrix = Maths.createViewMatrix(camera)
     model.mesh match {
-      case BasicMesh(vaoID, indices, attributes) =>
+      case BasicMesh(vaoID, indices, attributes, textureId) =>
         // TODO: store this in entity to save calculating
         val transformationMatrix = Maths.createTransformationMatrix(mTransform)
+
+        for { id <- textureId } {
+          println(s"id, $id")
+          GL { glActiveTexture(GL_TEXTURE0) }
+          GL { glBindTexture(GL_TEXTURE_2D, id) }
+        }
 
         model.shader.draw(
           transformationMatrix,
           projectionMatrix,
           viewMatrix,
           light,
-          lTransform
+          lTransform,
+          textureId
         )
 
         GL { glBindVertexArray(vaoID) }

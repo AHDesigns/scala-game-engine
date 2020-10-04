@@ -30,7 +30,12 @@ case class TexturedMeshJ(
 
 sealed trait Mesh
 
-sealed case class BasicMesh(vaoID: Int, indicesSize: Int, attributes: Seq[Int]) extends Mesh
+sealed case class BasicMesh(
+    vaoID: Int,
+    indicesSize: Int,
+    attributes: Seq[Int],
+    textureId: Option[Int]
+) extends Mesh
 
 sealed trait AttribData {
   val vertexData: List[Float]

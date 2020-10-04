@@ -2,13 +2,14 @@ package input
 
 import eventSystem._
 import input.Handler.movementKeys
+import logging.Logger
 import org.lwjgl.glfw.Callbacks.glfwFreeCallbacks
 import org.lwjgl.glfw.GLFW._
 //import systems.{PlayerJump, PlayerMoveBy, PlayerMovementSystem, PlayerTurnBy}
 import utils.Control.GL
 import window.Window
 
-class Handler(window: Window) extends EventListener {
+class Handler(window: Window) extends EventListener with Logger {
   val mouseSensitivity = 70 // 1 - 100 would be in-game option
   private var lastMouse: (Int, Int) = window.getMousePos match {
     case (x, y) => (x * mouseSensitivity, y * mouseSensitivity)
@@ -92,8 +93,8 @@ class Handler(window: Window) extends EventListener {
   private def isPressed(key: Int): Boolean =
     glfwGetKey(window.id, key) == GLFW_PRESS
 
-  private def log(key: Int, action: KeyPress): Unit = {
-    println("key press: " + key + " | action: " + action)
+  private def logKeyPress(key: Int, action: KeyPress): Unit = {
+    log("key press: " + key + " | action: " + action)
   }
 }
 

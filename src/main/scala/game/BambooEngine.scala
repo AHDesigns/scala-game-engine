@@ -4,19 +4,20 @@ import ecs._
 import eventSystem._
 import input.Handler
 import loaders.EntityLoader
+import logging.Logger
 import org.lwjgl.Version
 import systems.RenderSystem
 import systems.render.GLRenderer
 import window.Window
 
-trait BambooEngine extends EventListener {
+trait BambooEngine extends EventListener with Logger {
   val FPS: Int
   val loader = new EntityLoader()
 
   val systems: Seq[System]
 
   def gameLoop(gameSetup: => Unit): Unit = {
-    println("Using LWJGL " + Version.getVersion + "!")
+    log("Using LWJGL " + Version.getVersion + "!")
     var gameRunning = true
 
     val window = new Window()

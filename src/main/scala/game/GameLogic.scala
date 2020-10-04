@@ -1,9 +1,9 @@
 package game
 
 import ecs._
-import entities.CoordinateSystem
-import org.joml.{Vector3f, Vector4f}
-import shaders.StaticShader
+import entities.Primitives
+import org.joml.Vector3f
+import shaders.TextureShader
 //import systems.physics.ColliderSystem
 //import systems.{MoveSystem, PlayerMovementSystem}
 import utils.Maths.Rot
@@ -20,29 +20,36 @@ object GameLogic extends App with BambooEngine {
     new Entity("singletons")
       .addComponent(CameraActive(Some("player camera")))
 
+    val iso = Transform(new Vector3f(2, 2, 2), Rot(45, 45, 0))
+    val square = Transform(new Vector3f(0, 0, 2))
     new Entity("camera")
-      .addComponent(Transform(new Vector3f(2, 0, 2), Rot(0, 45, 0)))
+      .addComponent(square)
       .addComponent(Camera("player camera"))
       .addComponent(PlayerMovement(isCamera = true))
-
-    new Entity("Floor")
-      .addComponent(Transform(new Vector3f(0, -1, 0), Rot()))
 
     new Entity("Main light")
       .addComponent(Transform(position = new Vector3f(0, 0, 25)))
       .addComponent(Light(new Vector3f(1, 1, 1)))
     //    .addComponent(PlayerMovement(isCamera = true))
 
-    new Entity("Player")
-      .addComponent(Transform(scale = 1.5f))
+    new Entity()
+      .addComponent(Transform(new Vector3f(), rotation = Rot(0, 180), scale = 0.5f))
       .addComponent(
         Model(
-          loader.loadModel("primitive/cube"),
-          new StaticShader(new Vector4f(1, 1, 1, 1))
+          loader.loadPrimitive(Primitives.Quad, Some(loader.loadTexture("flumpy.jpg"))),
+          new TextureShader("")
         )
       )
-    //    .addComponent(PlayerMovement())
 
-    new CoordinateSystem(10, loader)
+//    new Entity()
+//      .addComponent(Transform(new Vector3f(), scale = 0.5f))
+//      .addComponent(
+//        Model(
+//          loader.loadTexturedModel("primitive/cube_smooth", "flumpy.jpg"),
+//          new TextureShader("")
+//        )
+//      )
+
+//    new CoordinateSystem(10, loader)
   }
 }

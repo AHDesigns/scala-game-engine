@@ -2,14 +2,15 @@ package shaders
 
 import ecs.{Light, Transform}
 import loaders.ShaderLoader
+import logging.Logger
 import org.joml.{Matrix4f, Vector4f}
 import org.lwjgl.opengl.GL20._
 import utils.Control.{GL, GLU}
 import utils.JavaBufferUtils.getMatrixBuffer
 
-class StaticShader(color: Vector4f) extends Shader with ShaderLoader {
+class StaticShader(color: Vector4f) extends Shader with ShaderLoader with Logger {
   val program: Int = load("basic") match {
-    case Left(err) => println(err); 0
+    case Left(err) => logErr(err); 0
     case Right(id) => id
   }
 
@@ -18,7 +19,8 @@ class StaticShader(color: Vector4f) extends Shader with ShaderLoader {
       projectionMatrix: Matrix4f,
       viewMatrix: Matrix4f,
       light: Light,
-      lTransform: Transform
+      lTransform: Transform,
+      textureId: Option[Int]
   ): Unit = {
     // TODO: refactor the get and set into a single method
     val colorLocation = GLU { glGetUniformLocation(program, "aColor") }

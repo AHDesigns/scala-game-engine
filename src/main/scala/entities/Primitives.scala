@@ -1,6 +1,6 @@
 package entities
 
-import rendy.{ColorData, MeshData, PositionsData}
+import rendy._
 
 object Primitives {
   val Triangle: MeshData = MeshData(
@@ -28,7 +28,15 @@ object Primitives {
         -0.5f, 0.5f, 0.0f // top left
       )
     ),
-    List(0, 1, 2, 0, 2, 3)
+    List(0, 1, 2, 0, 2, 3),
+    textures = Some(TextureData(List(0, 0, 0, 1, 1, 1, 1, 0))),
+    normalsData = Some(
+      NormalsData(
+        List(
+          0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1
+        )
+      )
+    )
   )
 
   val Cube: MeshData = MeshData(

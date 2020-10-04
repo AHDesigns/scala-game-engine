@@ -17,7 +17,7 @@ public class ObjJLoader {
         try {
             fr = new FileReader(new File("res/models/" + fileName + ".obj"));
         } catch (FileNotFoundException e) {
-            System.err.println("Couldn't load file! " + fileName);
+            System.err.print("Couldn't load file! " + fileName + "\n");
             e.printStackTrace();
         }
 

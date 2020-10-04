@@ -1,5 +1,7 @@
 package loaders
 
+import logging.Logger
+
 import scala.xml._
 
 /**
@@ -13,7 +15,7 @@ import scala.xml._
 /**
   * Load dae model format
   */
-trait DaeLoader {
+trait DaeLoader extends Logger {
   def load(file: String) = {
     val xml = XML.load(s"res/models/$file.dae")
 
@@ -68,7 +70,7 @@ trait DaeLoader {
         _offset.toInt
       } catch {
         case _: Throwable =>
-          println(
+          logErr(
             s"Malformed dae file! input / offset value '${_offset}'could not be parsed to Int"
           )
           System.exit(1)
