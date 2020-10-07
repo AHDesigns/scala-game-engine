@@ -2,6 +2,7 @@ package game
 
 import components._
 import entities.{Entity, Primitives}
+import loaders.SpriteLoader
 import org.joml.Vector3f
 import shaders.TextureShader
 import systems.System
@@ -37,14 +38,31 @@ object GameLogic extends App with BambooEngine {
       .addComponent(Transform(new Vector3f(1), rotation = Rot(0, 180), scale = 0.5f))
       .addComponent(
         Model(
-          loader.loadPrimitive(Primitives.Quad, Some(loader.loadTexture("flumpy.jpg"))),
+          loader.loadPrimitive(Primitives.Quad, Some(loader.loadTexture("flumpy.jpg").textureId)),
           new TextureShader("")
         )
       )
 
+    val spriteLoader = new SpriteLoader()
+    val spriteMap = Map(
+      "floor" -> (1, 1),
+      "door" -> (8, 3),
+      "thing" -> (22, 21),
+      "random" -> (22, 31),
+      "fail" -> (220, 31)
+    )
+    val spriteSheet = spriteLoader.loadSpriteSheet("monsters", "sprites.bmp", 16, spriteMap)
     new Entity()
-      .addComponent(Transform(new Vector3f(), rotation = Rot(0, 0)))
-      .addComponent(Sprite("1"))
+      .addComponent(Transform())
+      .addComponent(Sprite("door", spriteSheet))
+
+    new Entity()
+      .addComponent(Transform(new Vector3f(1, 0, 0)))
+      .addComponent(Sprite("thing", spriteSheet))
+
+    new Entity()
+      .addComponent(Transform(new Vector3f(0, 1, 0)))
+      .addComponent(Sprite("random", spriteSheet))
 
 //    new Entity()
 //      .addComponent(Transform(new Vector3f(), scale = 0.5f))

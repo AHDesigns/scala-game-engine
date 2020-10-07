@@ -80,7 +80,7 @@ class GLRenderer extends Renderer with EventListener {
         sprite.model.shader.draw2D(
           cameraPos,
           spriteTransform,
-          sprite.spriteOffset
+          sprite.spriteImage.spriteOffset
         )
 
         GL { glBindVertexArray(vaoID) }

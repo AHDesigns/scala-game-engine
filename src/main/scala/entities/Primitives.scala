@@ -29,7 +29,19 @@ object Primitives {
       )
     ),
     List(0, 1, 2, 0, 2, 3),
-    textures = Some(TextureData(List(0, 0, 0, 1, 1, 1, 1, 0))),
+//    textures = Some(TextureData(List(
+//      0, 0,
+//      0, 1,
+//      1, 1,
+//      1, 0
+//    ))),
+    textures = Some(
+      TextureData(
+        List(
+          0, 1, 1, 1, 1, 0, 0, 0
+        )
+      )
+    ),
     normalsData = Some(
       NormalsData(
         List(

@@ -6,10 +6,10 @@ import org.lwjgl.opengl.GL11._
 import org.lwjgl.stb.STBImage.{stbi_failure_reason, stbi_image_free, stbi_load}
 import org.lwjgl.system.MemoryStack
 
+case class Texture(textureId: Int, width: Int, height: Int)
 trait TextureLoader {
   // from https://ahbejarano.gitbook.io/lwjglgamedev/chapter7
-  def loadTexture(filePath: String): Int = {
-
+  def loadTexture(filePath: String): Texture = {
     val absoluteFilePath = "res/" + filePath
     var width = 0
     var height = 0
@@ -45,7 +45,7 @@ trait TextureLoader {
 
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, buf);
     stbi_image_free(buf)
-    textureId
+    Texture(textureId, width, height)
   }
 
 }

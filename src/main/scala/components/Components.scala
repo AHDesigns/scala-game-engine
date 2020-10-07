@@ -3,6 +3,7 @@ package components
 import entities.Primitives
 import game.GameLogic.loader
 import identifier.Identifier
+import loaders.{SpriteImage, SpriteSheet}
 import org.joml.Vector3f
 import rendy.Mesh
 import shaders.{Shader, SpriteShader}
@@ -47,21 +48,15 @@ case class Light(color: Vector3f) extends Component
 
 case class Model(mesh: Mesh, shader: Shader) extends Component
 
-import components.Sprite.defaultSpriteSheet
-class Sprite(id: String, spriteSheet: String = defaultSpriteSheet) extends Component {
-  val (spriteSheetId, spriteOffset) = loader.loadSprite(id, spriteSheet)
-  println(spriteSheetId, spriteOffset)
+case class Sprite(private val name: String, private val spriteSheet: SpriteSheet)
+    extends Component {
+  val spriteImage: SpriteImage = spriteSheet.getSprite(name)
   val model: Model = Model(
-    loader.loadPrimitive(
-      Primitives.Quad,
-      Some(spriteSheetId)
-    ),
+    loader.loadPrimitive(Primitives.Quad, Some(spriteSheet.textureId)),
     new SpriteShader("")
   )
 }
 
 object Sprite {
   val defaultSpriteSheet = "sprites.bmp"
-  def apply(id: String, spriteSheet: String = defaultSpriteSheet): Sprite =
-    new Sprite(id, spriteSheet)
 }
