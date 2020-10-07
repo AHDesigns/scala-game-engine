@@ -1,10 +1,11 @@
 package shaders
 
-import ecs.{Light, Transform}
+import components.{Light, Transform}
 import loaders.ShaderLoader
 import logging.Logger
 import org.joml.{Matrix4f, Vector4f}
 import org.lwjgl.opengl.GL20._
+import rendy.SpriteOffset
 import utils.Control.{GL, GLU}
 import utils.JavaBufferUtils.getMatrixBuffer
 
@@ -38,4 +39,10 @@ class StaticShader(color: Vector4f) extends Shader with ShaderLoader with Logger
     loadVec3(lightPosLoc, lTransform.position)
     loadVec3(lightColLoc, light.color)
   }
+
+  override def draw2D(
+      cameraPos: Matrix4f,
+      spriteTransform: Matrix4f,
+      spriteOffset: SpriteOffset
+  ): Unit = ???
 }

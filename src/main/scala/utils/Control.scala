@@ -1,6 +1,6 @@
 package utils
 
-import org.lwjgl.opengl.GL11.glGetError
+import org.lwjgl.opengl.GL11._
 
 import scala.annotation.tailrec
 import scala.language.reflectiveCalls
@@ -19,7 +19,16 @@ object Control {
     val res = fn
     val err = glGetError()
     if (err != 0) {
-      new RuntimeException(s"GL error $err").printStackTrace()
+      val errCode = err match {
+        case GL_INVALID_ENUM      => "INVALID_ENUM"
+        case GL_INVALID_VALUE     => "INVALID_VALUE"
+        case GL_INVALID_OPERATION => "INVALID_OPERATION"
+        case GL_STACK_OVERFLOW    => "STACK_OVERFLOW"
+        case GL_STACK_UNDERFLOW   => "STACK_UNDERFLOW"
+        case GL_OUT_OF_MEMORY     => "OUT_OF_MEMORY"
+        case _                    => "UNKNOWN"
+      }
+      new RuntimeException(s"GL error $err | $errCode").printStackTrace()
       java.lang.System.exit(1)
     }
     res

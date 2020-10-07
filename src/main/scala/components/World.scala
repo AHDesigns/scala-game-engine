@@ -1,8 +1,11 @@
-package ecs
+package components
+
+import entities.Entity
 
 import scala.collection.mutable.ArrayBuffer
 
-object EntityManager {
+// TODO can this be made a package object to prevent access?
+object World {
   // entityId, Entity
   private var entities = Map.empty[Int, Entity]
   // componentId, components

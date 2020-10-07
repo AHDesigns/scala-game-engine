@@ -1,6 +1,6 @@
 package systems
 
-import ecs.{Camera, CameraActive, Light, Model, System, Transform}
+import components._
 import eventSystem.{GameLoopStart, GameLoopTick}
 import org.joml.Matrix4f
 import systems.render.Renderer

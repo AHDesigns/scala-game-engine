@@ -1,4 +1,4 @@
-package ecs
+package components
 
 import identifier.Uuid
 
@@ -16,14 +16,14 @@ trait Component extends Uuid {
 
   def getSibling[A <: Component](implicit componentId: ComponentId[A]): Option[A] = {
     for {
-      entity <- entityManager.getEntity(entityId)
+      entity <- world.getEntity(entityId)
       sibling <- entity.getSibling[A](componentId.id)
     } yield sibling
   }
   // ------------------------------------------------
   //              PRIVATES                          -
   // ------------------------------------------------
-  private val entityManager = EntityManager
+  private val world = World
   private var _componentActiveInSystem: Boolean = true
   private var _entityId: Int = 0
 }

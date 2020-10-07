@@ -18,16 +18,6 @@ case class MeshData(
   val stride: Int = attributes.map(_.step).sum
 }
 
-case class TexturedMeshJ(
-    _vertices: Array[Float],
-    _indices: Array[Int],
-    normals: Array[Float],
-    textures: Array[Float]
-) {
-  val vertices: List[Float] = _vertices.toList
-  val indices: List[Int] = _indices.toList
-}
-
 sealed trait Mesh
 
 sealed case class BasicMesh(
@@ -36,6 +26,9 @@ sealed case class BasicMesh(
     attributes: Seq[Int],
     textureId: Option[Int]
 ) extends Mesh
+
+case class SpriteOffset(x1: Float, x2: Float, y1: Float, y2: Float)
+sealed case class SpriteMesh() {}
 
 sealed trait AttribData {
   val vertexData: List[Float]

@@ -1,5 +1,6 @@
-package ecs
+package systems
 
+import components.{Component, ComponentId, SingletonComponent, World}
 import eventSystem.{Event, EventId, EventListener}
 
 import scala.collection.immutable.Queue
@@ -45,7 +46,7 @@ trait System extends EventListener {
   // ------------------------------------------------
   //              PRIVATES                          -
   // ------------------------------------------------
-  private val ecs = EntityManager
+  private val ecs = World
 
   private var eventQ: Queue[Event] = Queue.empty[Event]
 

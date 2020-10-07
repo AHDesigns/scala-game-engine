@@ -1,6 +1,6 @@
 package entities
 
-import ecs.{Entity, Model, Transform}
+import components.{Model, Transform}
 import loaders.EntityLoader
 import org.joml.{Vector3f, Vector4f}
 import shaders.StaticShader

@@ -1,21 +1,22 @@
-package ecs
+package entities
 
+import components.{Component, ComponentId, World}
 import identifier.{ID, Identifier}
 
 class Entity(val name: String = "") extends Identifier {
   override val identifier: ID = if (name.nonEmpty) ID(name) else ID()
 
-  private val entityManager = EntityManager
+  private val world = World
   // componentType, (componentUuid, componentIndex)
   var componentMap = Map.empty[Int, Map[String, Int]]
-  entityManager.addEntity(id, this)
+  world.addEntity(id, this)
 
   def addComponent[A <: Component](
       component: A
   )(implicit componentId: ComponentId[A]): this.type = {
     component.entityId = id
     val componentType = componentId.id
-    val pos = entityManager.addComponent(component)
+    val pos = world.addComponent(component)
     val componentList = componentMap.getOrElse(componentType, Map.empty)
     val newComponent = component.uuid -> pos
     componentMap += (componentType -> (componentList + newComponent))
@@ -25,7 +26,7 @@ class Entity(val name: String = "") extends Identifier {
   def getSiblings[A <: Component](componentId: Int): Option[Seq[A]] = {
     for {
       componentMap <- componentMap.get(componentId)
-      sibling <- entityManager.getComponents[A](componentId, componentMap.values.toList)
+      sibling <- world.getComponents[A](componentId, componentMap.values.toList)
     } yield sibling
   }
 
@@ -33,7 +34,7 @@ class Entity(val name: String = "") extends Identifier {
     for {
       componentMap <- componentMap.get(componentId)
       componentArrayIdx = componentMap.values.head
-      sibling <- entityManager.getComponents[A](componentId, Seq(componentArrayIdx))
+      sibling <- world.getComponents[A](componentId, Seq(componentArrayIdx))
     } yield sibling.head
   }
 
@@ -63,7 +64,7 @@ class Entity(val name: String = "") extends Identifier {
             componentArrayIdx
         }
     }
-    for { idx <- componentArrayIdx } entityManager.removeComponent(componentType, idx)
+    for { idx <- componentArrayIdx } world.removeComponent(componentType, idx)
     this
   }
 }

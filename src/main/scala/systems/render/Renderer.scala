@@ -1,6 +1,6 @@
 package systems.render
 
-import ecs.{Light, Model, Transform}
+import components.{Light, Model, Sprite, Transform}
 import eventSystem.DebugWireframe
 import org.joml.Matrix4f
 
@@ -18,6 +18,8 @@ trait Renderer {
       mTransform: Transform,
       projectionMatrix: Matrix4f
   ): Unit
+
+  def render2D(cameraPos: Matrix4f, spriteTransform: Matrix4f, sprite: Sprite): Unit
 
   /** Toggle wireframe rendering */
   def wireframe(e: DebugWireframe): Unit

@@ -1,9 +1,11 @@
-package ecs
+package components
 
+import entities.Primitives
+import game.GameLogic.loader
 import identifier.Identifier
 import org.joml.Vector3f
 import rendy.Mesh
-import shaders.Shader
+import shaders.{Shader, SpriteShader}
 import utils.Maths.Rot
 
 // ------------------------------------------------
@@ -22,6 +24,7 @@ object ComponentId {
   implicit val camera: ComponentId[Camera] = new ComponentId
   implicit val playerMovement: ComponentId[PlayerMovement] = new ComponentId
   implicit val cameraActive: ComponentId[CameraActive] = new ComponentId
+  implicit val sprite: ComponentId[Sprite] = new ComponentId
 }
 
 // ------------------------------------------------
@@ -43,3 +46,22 @@ case class PlayerMovement(isCamera: Boolean = false) extends Component
 case class Light(color: Vector3f) extends Component
 
 case class Model(mesh: Mesh, shader: Shader) extends Component
+
+import components.Sprite.defaultSpriteSheet
+class Sprite(id: String, spriteSheet: String = defaultSpriteSheet) extends Component {
+  val (spriteSheetId, spriteOffset) = loader.loadSprite(id, spriteSheet)
+  println(spriteSheetId, spriteOffset)
+  val model: Model = Model(
+    loader.loadPrimitive(
+      Primitives.Quad,
+      Some(spriteSheetId)
+    ),
+    new SpriteShader("")
+  )
+}
+
+object Sprite {
+  val defaultSpriteSheet = "sprites.bmp"
+  def apply(id: String, spriteSheet: String = defaultSpriteSheet): Sprite =
+    new Sprite(id, spriteSheet)
+}

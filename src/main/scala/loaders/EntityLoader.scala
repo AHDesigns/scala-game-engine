@@ -16,6 +16,7 @@ class EntityLoader extends ObjLoader with TextureLoader {
   private var vbos = new ListBuffer[Int]()
   private var vaos = new ListBuffer[Int]()
   private val cache = mutable.Map.empty[String, Mesh]
+  private val textureCache = mutable.Map.empty[String, Int]
 
   def loadModel(filePath: String): Mesh = {
     cache.getOrElseUpdate(filePath, loadPrimitive(load(filePath)))
@@ -24,6 +25,12 @@ class EntityLoader extends ObjLoader with TextureLoader {
   def loadTexturedModel(filePath: String, texturePath: String): Mesh = {
     val textureId = loadTexture(texturePath)
     cache.getOrElseUpdate(filePath, loadPrimitive(load(filePath), Some(textureId)))
+  }
+
+  def loadSprite(spriteId: String, spriteSheet: String): (Int, SpriteOffset) = {
+    // do something to get uv coords of sprite sheet
+    val textureId = textureCache.getOrElseUpdate(spriteSheet, loadTexture(spriteSheet))
+    (textureId, SpriteOffset(0, 1, 0, 1))
   }
 
   def loadPrimitive(modelData: MeshData, textureId: Option[Int] = None): Mesh = {

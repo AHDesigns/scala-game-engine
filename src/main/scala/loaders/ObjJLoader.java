@@ -2,7 +2,6 @@ package loaders;
 
 import org.joml.Vector2f;
 import org.joml.Vector3f;
-import rendy.TexturedMeshJ;
 
 import java.io.BufferedReader;
 import java.io.File;

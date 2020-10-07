@@ -1,6 +1,6 @@
 package eventSystem
 
-import ecs._
+import entities.Entity
 import identifier.Identifier
 import org.joml.Matrix4f
 

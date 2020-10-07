@@ -1,6 +1,6 @@
 package utils
 
-import ecs.Transform
+import components.Transform
 import org.joml.{Matrix4f, Vector3f}
 
 object Maths {
