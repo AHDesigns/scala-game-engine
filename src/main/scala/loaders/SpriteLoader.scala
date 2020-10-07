@@ -14,9 +14,13 @@ class SpriteSheet(
 ) {
   private val xPix = spriteSize.toFloat / texture.width.toFloat
   private val yPix = spriteSize.toFloat / texture.height.toFloat
-
+  private val spriteCache = mutable.Map.empty[String, SpriteImage]
   val textureId: Int = texture.textureId
   def getSprite(name: String): SpriteImage = {
+    spriteCache.getOrElseUpdate(name, calculateSprite(name))
+  }
+
+  def calculateSprite(name: String): SpriteImage = {
     val (r, c) = spriteMap.getOrElse(
       name,
       throw new RuntimeException(s"sprite name $name not found for spriteSheetId $spriteSheetId")
