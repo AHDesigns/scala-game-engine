@@ -17,7 +17,9 @@ trait FileLoader {
       file: String
   )(lineProcessor: BufferedSource => T): Either[String, T] = {
     Try {
-      Control.using(Source.fromFile(file)) { lineProcessor }
+      Control.using(Source.fromFile(file)) { x =>
+        lineProcessor(x)
+      }
     } match {
       case Success(value) => Right(value)
       case Failure(exception) =>

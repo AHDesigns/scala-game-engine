@@ -5,17 +5,16 @@ import rendy.SpriteOffset
 
 import scala.collection.mutable
 
-case class SpriteImage(textureId: Int, spriteOffset: SpriteOffset)
+case class SpriteImage(texture: Texture, spriteOffset: SpriteOffset)
 class SpriteSheet(
     spriteSheetId: String,
-    spriteSize: Int,
+    val spriteSize: Int,
     spriteMap: SpriteMap,
-    texture: Texture
+    val texture: Texture
 ) {
   private val xPix = spriteSize.toFloat / texture.width.toFloat
   private val yPix = spriteSize.toFloat / texture.height.toFloat
   private val spriteCache = mutable.Map.empty[String, SpriteImage]
-  val textureId: Int = texture.textureId
   def getSprite(name: String): SpriteImage = {
     spriteCache.getOrElseUpdate(name, calculateSprite(name))
   }
@@ -29,7 +28,7 @@ class SpriteSheet(
     val x2 = r * xPix
     val y1 = (c - 1) * yPix
     val y2 = c * yPix
-    SpriteImage(texture.textureId, SpriteOffset(x1, x2, y1, y2))
+    SpriteImage(texture, SpriteOffset(x1, x2, y1, y2))
   }
 }
 

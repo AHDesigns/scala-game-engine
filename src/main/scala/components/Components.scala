@@ -1,12 +1,11 @@
 package components
 
-import entities.Primitives
 import game.GameLogic.loader
 import identifier.Identifier
-import loaders.{SpriteImage, SpriteSheet}
+import loaders.{FontLoader, SpriteImage, SpriteSheet}
 import org.joml.Vector3f
 import rendy.Mesh
-import shaders.{Shader, SpriteShader}
+import shaders.{ModelShader, SpriteShader}
 import utils.Maths.Rot
 
 // ------------------------------------------------
@@ -26,6 +25,7 @@ object ComponentId {
   implicit val playerMovement: ComponentId[PlayerMovement] = new ComponentId
   implicit val cameraActive: ComponentId[CameraActive] = new ComponentId
   implicit val sprite: ComponentId[Sprite] = new ComponentId
+  implicit val text: ComponentId[Text] = new ComponentId
 }
 
 // ------------------------------------------------
@@ -46,17 +46,22 @@ case class PlayerMovement(isCamera: Boolean = false) extends Component
 
 case class Light(color: Vector3f) extends Component
 
-case class Model(mesh: Mesh, shader: Shader) extends Component
+case class Model(mesh: Mesh, shader: ModelShader) extends Component
 
 case class Sprite(private val name: String, private val spriteSheet: SpriteSheet)
     extends Component {
   val spriteImage: SpriteImage = spriteSheet.getSprite(name)
-  val model: Model = Model(
-    loader.loadPrimitive(Primitives.Quad, Some(spriteSheet.textureId)),
-    new SpriteShader("")
-  )
+  val mesh: Mesh =
+    loader.createMeshSprite(spriteImage, Some(spriteSheet.spriteSize, spriteSheet.spriteSize))
+  val shader = new SpriteShader("")
 }
 
 object Sprite {
   val defaultSpriteSheet = "sprites.bmp"
+}
+
+case class Text(private val string: String)(implicit font: FontLoader) extends Component {
+//  val text: IndexedSeq[Glyph] = font.text(string)
+//  val mesh: Mesh = loader.createMeshSprite()
+//  val shader = new TextShader(50, 68)
 }

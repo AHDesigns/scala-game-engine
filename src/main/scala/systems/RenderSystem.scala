@@ -31,7 +31,7 @@ class RenderSystem(renderer: Renderer) extends System {
     } {
       processComponent[Model, Unit] { model =>
         for { mTransform <- model.getSibling[Transform] } {
-          renderer.render(cTransform, sun, sTransform, model, mTransform, projectionMatrix)
+          renderer.renderModel(cTransform, sun, sTransform, model, mTransform, projectionMatrix)
         }
       }
     }

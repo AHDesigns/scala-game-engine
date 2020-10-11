@@ -36,6 +36,7 @@ class Window extends EventListener with Logger {
   }
 
   val id: Long = glfwCreateWindow(1000, 600, "GamyMcGameFace", NULL, NULL)
+  log("window width: [1000] height: [600]")
   if (id == NULL) throw new RuntimeException("Failed to create the GLFW window")
 
   // Make the OpenGL context current
@@ -52,6 +53,7 @@ class Window extends EventListener with Logger {
     glfwSetFramebufferSizeCallback(
       id,
       (_, width, height) => {
+        log(s"window resize width: [$width] height: [$height]")
         EventSystem ! WindowResize(width, height)
         GL { glViewport(0, 0, width, height) }
       }

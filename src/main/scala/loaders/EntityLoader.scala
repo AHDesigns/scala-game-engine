@@ -27,6 +27,52 @@ class EntityLoader extends ObjLoader with TextureLoader {
     cache.getOrElseUpdate(filePath, loadPrimitive(load(filePath), Some(textureId)))
   }
 
+  def createMeshSprite(spriteImage: SpriteImage, size: Option[(Int, Int)]): Mesh =
+    spriteImage match {
+      case SpriteImage(Texture(id, tWidth, tHeight), SpriteOffset(x1, x2, y1, y2)) =>
+        val spriteMeshId = List(id.toFloat, x1, x2, y1, y2).mkString
+        val (width, height) = size.getOrElse(tWidth -> tHeight)
+        cache.getOrElseUpdate(
+          spriteMeshId,
+          loadPrimitive(
+            MeshData(
+              PositionsData(
+                List(
+                  width.toFloat,
+                  height.toFloat,
+                  0.0f, // top right
+                  width.toFloat,
+                  0f,
+                  0.0f, // bottom right
+                  0f,
+                  0f,
+                  0.0f, // bottom left
+                  0f,
+                  height.toFloat,
+                  0.0f // top left
+                )
+              ),
+              List(0, 1, 2, 0, 2, 3),
+              textures = Some(
+                TextureData(
+                  List(
+                    x2,
+                    y1, // top right
+                    x2,
+                    y2, // bottom right
+                    x1,
+                    y2, // bottom left
+                    x1,
+                    y1 // top left
+                  )
+                )
+              )
+            ),
+            Some(id)
+          )
+        )
+    }
+
   def loadPrimitive(modelData: MeshData, textureId: Option[Int] = None): Mesh = {
     val vaoID = GL { glGenVertexArrays() }
     vaos += vaoID

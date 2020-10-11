@@ -5,8 +5,8 @@ import input.Handler
 import loaders.EntityLoader
 import logging.Logger
 import org.lwjgl.Version
-import systems.SpriteSystem
-import systems.render.GLRenderer
+import systems.{RenderSystem, SpriteSystem, TextSystem}
+import systems.render.Renderer
 import window.Window
 
 trait BambooEngine extends EventListener with Logger {
@@ -21,14 +21,21 @@ trait BambooEngine extends EventListener with Logger {
 
     val window = new Window()
     val inputHandler = new Handler(window)
+    val renderer = new Renderer()
 
     events.on[WindowClose](_ => {
       gameRunning = false
     })
     // Setup all systems
-//    val renderer = new RenderSystem(new GLRenderer())
-    val renderer = new SpriteSystem(new GLRenderer())
-    (renderer +: systems) foreach (_.init())
+    val modelRenderer = new RenderSystem(renderer)
+    val spriteRenderer = new SpriteSystem(renderer)
+    val textRenderer = new TextSystem(renderer)
+
+    modelRenderer.init()
+    spriteRenderer.init()
+    textRenderer.init()
+
+    systems foreach (_.init())
 
     gameSetup
 
@@ -53,8 +60,9 @@ trait BambooEngine extends EventListener with Logger {
       }
 
       window.draw {
-//        renderer.update(elapsed.toFloat)
-        renderer.update(elapsed.toFloat)
+//        modelRenderer.update(elapsed.toFloat)
+        spriteRenderer.update(elapsed.toFloat)
+//        textRenderer.update(elapsed.toFloat)
       }
       // sleep the thread based on the target FPS
       sync(loopStartTime.toLong)

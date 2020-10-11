@@ -50,7 +50,8 @@ void main()
 {
     vec4 worldPos = spriteMatrix * vec4(aPos, 1.0);
     gl_Position = cameraMatrix * worldPos;
-    textureCoord = getSpriteLocation(texCoord);
+//    textureCoord = getSpriteLocation(texCoord);
+    textureCoord = texCoord;
 }
 
     #---
