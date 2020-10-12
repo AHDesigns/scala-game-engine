@@ -1,6 +1,6 @@
 package identifier
 
-class ID(val id: ID.IdValue) {
+case class ID(id: ID.IdValue) {
 
   /** compare two ID's by their value, not reference */
   def ==(entity: ID): Boolean = id == entity.id

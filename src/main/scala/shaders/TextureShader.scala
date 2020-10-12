@@ -2,13 +2,13 @@ package shaders
 
 import components.{Light, Transform}
 import logging.Logger
-import org.joml.{Matrix4f, Vector4f}
+import org.joml.Matrix4f
 import org.lwjgl.opengl.GL20._
 import utils.Control.{GL, GLU}
 import utils.JavaBufferUtils.getMatrixBuffer
 
-class StaticShader(color: Vector4f) extends ModelShader with Logger {
-  val program: Int = load("basic") match {
+class TextureShader(shaderName: String) extends ModelShader with Logger {
+  val program: Int = load("texture") match {
     case Left(err) => logErr(err); 0
     case Right(id) => id
   }
@@ -21,16 +21,15 @@ class StaticShader(color: Vector4f) extends ModelShader with Logger {
       lTransform: Transform,
       textureId: Option[Int]
   ): Unit = {
-    // TODO: refactor the get and set into a single method
-    val colorLocation = GLU { glGetUniformLocation(program, "aColor") }
     val matrix = GLU { glGetUniformLocation(program, "transformationMatrix") }
     val projectionMatrixLoc = GLU { glGetUniformLocation(program, "projectionMatrix") }
     val viewMatrixLoc = GLU { glGetUniformLocation(program, "viewMatrix") }
     val lightColLoc = GLU { glGetUniformLocation(program, "lightCol") }
     val lightPosLoc = GLU { glGetUniformLocation(program, "lightPos") }
+    val textureLoc = GLU { glGetUniformLocation(program, "textureSampler") }
 
     GL { glUseProgram(program) }
-    GL { glUniform4f(colorLocation, color.x, color.y, color.z, color.w) }
+    GL { glUniform1i(textureLoc, 0) }
     GL { glUniformMatrix4fv(matrix, false, getMatrixBuffer(transformationMatrix)) }
     GL { glUniformMatrix4fv(projectionMatrixLoc, false, getMatrixBuffer(projectionMatrix)) }
     GL { glUniformMatrix4fv(viewMatrixLoc, false, getMatrixBuffer(viewMatrix)) }

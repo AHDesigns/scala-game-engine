@@ -8,15 +8,15 @@ class EventSystemSpec extends AnyFlatSpec with should.Matchers {
     var count = 1
     val listener = EventSystem.subscribe()
 
-    listener.on[SimpleEvent](_ => { count += 1 })
+    listener.on[EmptyEvent](_ => { count += 1 })
 
     count should be(1)
 
-    EventSystem ! SimpleEvent()
+    EventSystem ! EmptyEvent()
 
     count should be(2)
 
-    EventSystem ! SimpleEvent()
+    EventSystem ! EmptyEvent()
 
     count should be(3)
 
@@ -27,10 +27,10 @@ class EventSystemSpec extends AnyFlatSpec with should.Matchers {
     var count = 0
     val listener = EventSystem.subscribe()
 
-    listener.on[SimpleEvent](_ => { count += 1 })
+    listener.on[EmptyEvent](_ => { count += 1 })
     listener.unsubscribe()
 
-    EventSystem ! SimpleEvent()
+    EventSystem ! EmptyEvent()
 
     count should be(0)
 
@@ -60,14 +60,14 @@ class EventSystemSpec extends AnyFlatSpec with should.Matchers {
     var count2 = 0
     val listener = EventSystem.subscribe()
 
-    listener.on[SimpleEvent](_ => {
+    listener.on[EmptyEvent](_ => {
       count = 3
     })
-    listener.on[SimpleEvent](_ => {
+    listener.on[EmptyEvent](_ => {
       count2 = 8
     })
 
-    EventSystem ! SimpleEvent()
+    EventSystem ! EmptyEvent()
 
     count should be(3)
     count2 should be(8)
@@ -79,10 +79,10 @@ class EventSystemSpec extends AnyFlatSpec with should.Matchers {
     var count = 0
     val listener = EventSystem.subscribe()
 
-    listener.on[SimpleEvent](_ => { count = 5 })
-    listener.on[SimpleEvent](_ => { count *= 3 })
+    listener.on[EmptyEvent](_ => { count = 5 })
+    listener.on[EmptyEvent](_ => { count *= 3 })
 
-    EventSystem ! SimpleEvent()
+    EventSystem ! EmptyEvent()
 
     count should be(15)
 
@@ -93,8 +93,8 @@ class EventSystemSpec extends AnyFlatSpec with should.Matchers {
     val count = 0
     EventSystem
       .subscribe()
-      .on[SimpleEvent](_ => {})
-      .on[SimpleEvent](_ => {})
+      .on[EmptyEvent](_ => {})
+      .on[EmptyEvent](_ => {})
       .unsubscribe()
 
     count should be(0)
@@ -104,9 +104,9 @@ class EventSystemSpec extends AnyFlatSpec with should.Matchers {
     object Foo extends EventListener
     var count = 0
 
-    Foo.events.on[SimpleEvent](_ => { count = 3 })
+    Foo.events.on[EmptyEvent](_ => { count = 3 })
 
-    EventSystem ! SimpleEvent()
+    EventSystem ! EmptyEvent()
 
     count should be(3)
 

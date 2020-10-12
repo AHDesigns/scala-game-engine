@@ -1,5 +1,6 @@
 package loaders
 
+import logging.Logger
 import org.joml.{Vector2f, Vector3f}
 import rendy._
 
@@ -19,7 +20,7 @@ import scala.collection.mutable
 /**
   * Load OBJ from res/models
   */
-trait ObjLoader extends FileLoader {
+trait ObjLoader extends FileLoader with Logger {
   protected def load(file: String): MeshData = {
     ObjJLoader.load(file) match {
       case TexturedMeshJ(vertices, indices, normals, textures) =>
@@ -47,7 +48,7 @@ trait ObjLoader extends FileLoader {
     readFileByLines(s"res/models/$file.obj") { source =>
       {
         source.getLines().foreach { line =>
-          println(s"processing line $line")
+          log(s"processing line $line")
           line.split(" ") match {
             case Array("v", x, y, z) =>
               vertices += new Vector3f(F(x), F(y), F(z))
@@ -90,11 +91,11 @@ trait ObjLoader extends FileLoader {
           vertexPointer += 1
           verticesArray(vertexPointer) = vertex.z
         }
-        println("about to loop")
+        log("about to loop")
         for (i <- indices.indices) {
           indicesArray(i) = indices(i)
         }
-        println("looped")
+        log("looped")
 
         //        ComplexModel(
         //          verticesArray.toList,
@@ -117,7 +118,7 @@ trait ObjLoader extends FileLoader {
       normals: mutable.ArrayBuffer[Vector3f],
       textArray: mutable.ArrayBuffer[Float],
       normalsArray: mutable.ArrayBuffer[Float]
-  ) {
+  ): Unit = {
     val vertexData = vertex.split("/")
     val currentVertexPointer = vertexData(0).toInt - 1
     indices += (currentVertexPointer)

@@ -2,12 +2,14 @@ package input
 
 import eventSystem._
 import input.Handler.movementKeys
+import logging.Logger
 import org.lwjgl.glfw.Callbacks.glfwFreeCallbacks
 import org.lwjgl.glfw.GLFW._
+//import systems.{PlayerJump, PlayerMoveBy, PlayerMovementSystem, PlayerTurnBy}
 import utils.Control.GL
 import window.Window
 
-class Handler(window: Window) extends EventListener {
+class Handler(window: Window) extends EventListener with Logger {
   val mouseSensitivity = 70 // 1 - 100 would be in-game option
   private var lastMouse: (Int, Int) = window.getMousePos match {
     case (x, y) => (x * mouseSensitivity, y * mouseSensitivity)
@@ -31,6 +33,7 @@ class Handler(window: Window) extends EventListener {
           else if (keyAction == GLFW_RELEASE) {
             if (key == GLFW_KEY_ESCAPE) EventSystem ! WindowClose()
             if (key == GLFW_KEY_X) EventSystem ! DebugWireframe()
+//            if (key == GLFW_KEY_SPACE) PlayerMovementSystem ! PlayerJump()
           }
         }
       )
@@ -45,7 +48,13 @@ class Handler(window: Window) extends EventListener {
           // round to Int as these come in as really precise doubles, but the decimal value never changes (Macbook pro)
           val newX = x.toInt * mouseSensitivity
           val newY = y.toInt * mouseSensitivity
-          EventSystem ! MouseMove(newX - oldX, newY - oldY)
+          // x is right left
+          // y is up down
+//          EventSystem ! MouseMove(newX - oldX, newY - oldY)
+//          PlayerMovementSystem ! PlayerTurnBy((newX - oldX).toFloat, (newY - oldY).toFloat, 0)
+          // TODO Handler should speak to a UI PlayerInputController rather than player movement directly
+          // such a class would delegate the player's inputs, eg, UI or game character
+//          PlayerMovementSystem ! PlayerTurnBy((newY - oldY).toFloat, (newX - oldX).toFloat, 0)
           lastMouse = (newX, newY)
         }
       )
@@ -68,7 +77,8 @@ class Handler(window: Window) extends EventListener {
         if (isPressed(GLFW_KEY_D)) x += 1
         if (isPressed(GLFW_KEY_W)) y -= 1
         if (isPressed(GLFW_KEY_S)) y += 1
-        EventSystem ! InputMove(x, y, z)
+//        EventSystem ! InputMove(x, y, z)
+//        PlayerMovementSystem ! PlayerMoveBy(x, y, z)
       case _ => ;
     }
   }
@@ -83,8 +93,8 @@ class Handler(window: Window) extends EventListener {
   private def isPressed(key: Int): Boolean =
     glfwGetKey(window.id, key) == GLFW_PRESS
 
-  private def log(key: Int, action: KeyPress): Unit = {
-    println("key press: " + key + " | action: " + action)
+  private def logKeyPress(key: Int, action: KeyPress): Unit = {
+    log("key press: " + key + " | action: " + action)
   }
 }
 

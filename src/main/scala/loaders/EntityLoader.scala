@@ -12,16 +12,68 @@ import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 import scala.language.postfixOps
 
-class EntityLoader extends ObjLoader {
+class EntityLoader extends ObjLoader with TextureLoader {
   private var vbos = new ListBuffer[Int]()
   private var vaos = new ListBuffer[Int]()
   private val cache = mutable.Map.empty[String, Mesh]
+  private val textureCache = mutable.Map.empty[String, Int]
 
   def loadModel(filePath: String): Mesh = {
     cache.getOrElseUpdate(filePath, loadPrimitive(load(filePath)))
   }
 
-  def loadPrimitive(modelData: MeshData): BasicMesh = {
+  def loadTexturedModel(filePath: String, texturePath: String): Mesh = {
+    val textureId = textureCache.getOrElseUpdate(texturePath, loadTexture(texturePath).textureId)
+    cache.getOrElseUpdate(filePath, loadPrimitive(load(filePath), Some(textureId)))
+  }
+
+  def createMeshSprite(spriteImage: SpriteImage): Mesh =
+    spriteImage match {
+      case SpriteImage(Texture(id, tWidth, tHeight), SpriteOffset(x1, x2, y1, y2), size) =>
+        val spriteMeshId = List(id.toFloat, x1, x2, y1, y2).mkString
+        val (width, height) = size.getOrElse(tWidth.toFloat -> tHeight.toFloat)
+        cache.getOrElseUpdate(
+          spriteMeshId,
+          loadPrimitive(
+            MeshData(
+              PositionsData(
+                List(
+                  width,
+                  height,
+                  0.0f, // top right
+                  width,
+                  0f,
+                  0.0f, // bottom right
+                  0f,
+                  0f,
+                  0.0f, // bottom left
+                  0f,
+                  height,
+                  0.0f // top left
+                )
+              ),
+              List(0, 1, 2, 0, 2, 3),
+              textures = Some(
+                TextureData(
+                  List(
+                    x2,
+                    y1, // top right
+                    x2,
+                    y2, // bottom right
+                    x1,
+                    y2, // bottom left
+                    x1,
+                    y1 // top left
+                  )
+                )
+              )
+            ),
+            Some(id)
+          )
+        )
+    }
+
+  def loadPrimitive(modelData: MeshData, textureId: Option[Int] = None): Mesh = {
     val vaoID = GL { glGenVertexArrays() }
     vaos += vaoID
     GL { glBindVertexArray(vaoID) }
@@ -31,7 +83,7 @@ class EntityLoader extends ObjLoader {
 
     GL { glBindVertexArray(0) }
 
-    BasicMesh(vaoID, modelData.indices.size, attributes)
+    BasicMesh(vaoID, modelData.indices.size, attributes, textureId)
   }
 
   private def storeAttrib(data: AttribData): Int = {

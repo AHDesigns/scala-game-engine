@@ -1,45 +1,70 @@
 package entities
 
-import behaviours.Behaviour
-import eventSystem.{EntityCreated, EventListener, EventSystem, GameLoopTick}
-import identifier.ID
-import rendy.Mesh
-import shaders.Shader
+import components.{Component, ComponentId, World}
+import identifier.{ID, Identifier}
 
-import scala.collection.mutable
+class Entity(val name: String = "") extends Identifier {
+  override val identifier: ID = if (name.nonEmpty) ID(name) else ID()
 
-case class Entity(
-    transform: Transform = Transform(),
-    mesh: Option[Mesh] = None,
-    shader: Option[Shader] = None,
-    behaviours: List[Behaviour] = List.empty,
-    name: String = ""
-) extends EventListener {
-  val id: ID = if (name.nonEmpty) ID(name) else ID()
-  Entity.entities.addOne(id, this)
+  private val world = World
+  // componentType, (componentUuid, componentIndex)
+  var componentMap = Map.empty[Int, Map[String, Int]]
+  world.addEntity(id, this)
 
-  this.behaviours foreach (b => {
-    b.bind(this)
-    b.init()
-  })
-
-  this.events.on[GameLoopTick] { _ =>
-    this.behaviours filter (_.hasUpdate) foreach (_.update())
+  def addComponent[A <: Component](
+      component: A
+  )(implicit componentId: ComponentId[A]): this.type = {
+    component.entityId = id
+    val componentType = componentId.id
+    val pos = world.addComponent(component)
+    val componentList = componentMap.getOrElse(componentType, Map.empty)
+    val newComponent = component.uuid -> pos
+    componentMap += (componentType -> (componentList + newComponent))
+    this
   }
 
-  EventSystem ! EntityCreated(this)
-
-  def destroy(): Unit = {
-    Entity.entities.remove(id)
-    this.events.unsubscribe()
+  def getSiblings[A <: Component](componentId: Int): Option[Seq[A]] = {
+    for {
+      componentMap <- componentMap.get(componentId)
+      sibling <- world.getComponents[A](componentId, componentMap.values.toList)
+    } yield sibling
   }
 
-  /** Get a behaviour if it exists on this entity */
-  def getBehaviour(behaviour: Behaviour): Option[Behaviour] =
-    behaviours.find(_.getClass == behaviour.getClass)
-}
+  def getSibling[A <: Component](componentId: Int): Option[A] = {
+    for {
+      componentMap <- componentMap.get(componentId)
+      componentArrayIdx = componentMap.values.head
+      sibling <- world.getComponents[A](componentId, Seq(componentArrayIdx))
+    } yield sibling.head
+  }
 
-object Entity {
-  lazy val empty = new Entity()
-  val entities = mutable.HashMap.empty[ID, Entity]
+  def demandSiblings[A <: Component](componentId: Int): Seq[A] =
+    getSiblings[A](componentId).getOrElse(
+      throw new RuntimeException(s"could not get component $componentId")
+    )
+
+  def demandSibling[A <: Component](componentId: Int): A = demandSiblings[A](componentId).head
+
+  def removeComponent[A <: Component](
+      componentUuid: Option[String] = None
+  )(implicit componentId: ComponentId[A]): this.type = {
+    val componentType = componentId.id
+    val componentArrayIdx = componentMap.get(componentType) match {
+      case None => None
+      case Some(components) =>
+        componentUuid match {
+          case Some(uuid) =>
+            val componentArrayIdx = components.get(uuid)
+            val componentList = componentMap.getOrElse(componentType, Map.empty)
+            componentMap += (componentType -> (componentList - uuid))
+            componentArrayIdx
+          case None =>
+            val componentArrayIdx = components.headOption.map(_._2)
+            componentMap -= componentType
+            componentArrayIdx
+        }
+    }
+    for { idx <- componentArrayIdx } world.removeComponent(componentType, idx)
+    this
+  }
 }

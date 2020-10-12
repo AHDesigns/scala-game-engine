@@ -1,15 +1,17 @@
 package utils
 
-object System {
+import logging.Logger
+
+object System extends Logger {
   private lazy val osName = {
     val name = java.lang.System.getProperty("os.name").toLowerCase()
-    println(s"osName: $name")
+    log(s"osName: $name")
     name
   }
 
   lazy val isMacOs: Boolean = {
     val isMac = osName.startsWith("mac os x")
-    println(s"mac?: $isMac")
+    log(s"mac?: $isMac")
     isMac
   }
 }

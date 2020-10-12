@@ -1,25 +1,26 @@
 package shaders
 
-import behaviours.Light
-import entities.Entity
-import loaders.ShaderLoader
+import components.{Light, Transform}
+import logging.Logger
 import org.joml.Matrix4f
 import org.lwjgl.glfw.GLFW.glfwGetTime
 import org.lwjgl.opengl.GL20._
 import utils.Control.{GL, GLU}
 import utils.JavaBufferUtils.getMatrixBuffer
 
-class ColorShader(shaderName: String) extends Shader with ShaderLoader {
+class ColorShader(shaderName: String) extends ModelShader with Logger {
   val program: Int = load(shaderName) match {
-    case Left(err) => println(err); 0
+    case Left(err) => logErr(err); 0
     case Right(id) => id
   }
 
-  def draw[A <: Entity with Light](
+  def draw(
       transformationMatrix: Matrix4f,
       projectionMatrix: Matrix4f,
       viewMatrix: Matrix4f,
-      light: A
+      light: Light,
+      lTransform: Transform,
+      textureId: Option[Int]
   ): Unit = {
     val time = GL { glfwGetTime() }
     val greenValue = (Math.sin(time).toFloat / 2f) + 0.5f

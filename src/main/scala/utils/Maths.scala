@@ -1,12 +1,12 @@
 package utils
 
-import entities.{Entity, Transform}
+import components.Transform
 import org.joml.{Matrix4f, Vector3f}
 
 object Maths {
-  def createViewMatrix(entity: Entity): Matrix4f =
-    entity match {
-      case Entity(Transform(position, rotation, _), _, _, _, _) =>
+  def createViewMatrix(camera: Transform): Matrix4f =
+    camera match {
+      case Transform(position, rotation, _) =>
         new Matrix4f()
           .rotateX(rotation.x)
           .rotateY(-rotation.y)
@@ -14,9 +14,9 @@ object Maths {
           .translate(new Vector3f(position).negate())
     }
 
-  def createTransformationMatrix(entity: Entity): Matrix4f =
-    entity match {
-      case Entity(Transform(position, rotation, scale), _, _, _, _) =>
+  def createTransformationMatrix(modelTransform: Transform): Matrix4f =
+    modelTransform match {
+      case Transform(position, rotation, scale) =>
         new Matrix4f()
           .translation(position)
           .rotateX(rotation.x)
@@ -44,8 +44,4 @@ object Maths {
 
     def +(rotation: Rot): Rot = Rot(x, y, z) += rotation
   }
-
-  val Right = new Vector3f(1f, 0f, 0f)
-  val Forward = new Vector3f(0f, 0f, 1f)
-  val Up = new Vector3f(0f, 1f, 0f)
 }

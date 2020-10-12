@@ -1,5 +1,9 @@
 package eventSystem
 
+import observer.ObserverSystem
+
+object EventSystem extends ObserverSystem[Event, EventId]
+
 trait EventListener {
-  val events: EventSystem.EventListener = EventSystem.subscribe()
+  val events: EventSystem.Observer = EventSystem.subscribe()
 }

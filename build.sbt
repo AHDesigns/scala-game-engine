@@ -11,5 +11,7 @@ lazy val hello = (project in file("."))
   .settings(
     name := "GamyMcGameFace",
     fork in run := true,
-    javaOptions in run ++= Seq("-XstartOnFirstThread", "-Djava.library.path=lib")
+    javaOptions in run ++= Seq("-XstartOnFirstThread", "-Djava.library.path=lib"),
+    scalacOptions += "-Xfatal-warnings",
+    scalacOptions += "-deprecation"
   )
