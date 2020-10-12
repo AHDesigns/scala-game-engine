@@ -5,7 +5,11 @@ import rendy.SpriteOffset
 
 import scala.collection.mutable
 
-case class SpriteImage(texture: Texture, spriteOffset: SpriteOffset)
+case class SpriteImage(
+    texture: Texture,
+    spriteOffset: SpriteOffset,
+    size: Option[(Float, Float)] = None
+)
 class SpriteSheet(
     spriteSheetId: String,
     val spriteSize: Int,
@@ -28,7 +32,11 @@ class SpriteSheet(
     val x2 = r * xPix
     val y1 = (c - 1) * yPix
     val y2 = c * yPix
-    SpriteImage(texture, SpriteOffset(x1, x2, y1, y2))
+    SpriteImage(
+      texture,
+      SpriteOffset(x1, x2, y1, y2),
+      Some(spriteSize.toFloat -> spriteSize.toFloat)
+    )
   }
 }
 

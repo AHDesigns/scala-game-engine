@@ -1,14 +1,19 @@
 package systems
 
 import components.{Camera, CameraActive, Text, Transform}
+import eventSystem.WindowResize
 import org.joml.Matrix4f
 import systems.render.Renderer
 import utils.Maths
 
 class TextSystem(renderer: Renderer) extends System {
-  private var projectionMatrix = perspective(800, 400)
+  private val scale = 1f
+  private var orthoMatrix = ortho(2544, 1494, scale)
   override def init(): Unit = {
     renderer.setup()
+    events.on[WindowResize] {
+      case WindowResize(width, height) => orthoMatrix = ortho(width, height, scale)
+    }
   }
 
   override def update(timeDelta: Float): Unit = {
@@ -19,21 +24,28 @@ class TextSystem(renderer: Renderer) extends System {
     } yield transform
 
     for { cTransform <- camera } {
-      val cMatrix = perspective(800, 400).mul(Maths.createViewMatrix(cTransform))
+      val cMatrix = orthoMatrix.translate(cTransform.position, new Matrix4f())
       processComponent[Text, Unit] { sprite =>
         for { sTransform <- sprite.getSibling[Transform] } {
           val spriteMatrix = Maths.createTransformationMatrix(sTransform)
-//          renderer.renderText(cMatrix, spriteMatrix, sprite)
+          cMatrix.mul(spriteMatrix, spriteMatrix)
+          renderer.renderText(spriteMatrix, sprite)
         }
       }
     }
   }
 
-  private def perspective(w: Int, h: Int) =
-    new Matrix4f().setPerspective(
-      Math.toRadians(70).toFloat,
-      w.toFloat / h.toFloat,
-      0.01f,
-      1000f
-    )
+  private def ortho(
+      width: Int,
+      height: Int,
+      scaling: Float = 1f,
+      camera: Matrix4f = new Matrix4f().identity()
+  ) =
+    camera
+      .setOrtho2D(
+        0,
+        width.toFloat / scaling,
+        0,
+        height.toFloat / scaling
+      )
 }

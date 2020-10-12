@@ -1,14 +1,19 @@
 package systems
 
 import components.{Camera, CameraActive, Sprite, Transform}
+import eventSystem.WindowResize
 import org.joml.Matrix4f
 import systems.render.Renderer
 import utils.Maths
 
 class SpriteSystem(renderer: Renderer) extends System {
+  private val scale = 2f
   private var orthoMatrix = ortho(2544, 1494, 2f)
   override def init(): Unit = {
     renderer.setup()
+    events.on[WindowResize] {
+      case WindowResize(width, height) => orthoMatrix = ortho(width, height, scale)
+    }
   }
 
   override def update(timeDelta: Float): Unit = {
@@ -23,7 +28,8 @@ class SpriteSystem(renderer: Renderer) extends System {
       processComponent[Sprite, Unit] { sprite =>
         for { sTransform <- sprite.getSibling[Transform] } {
           val spriteMatrix = Maths.createTransformationMatrix(sTransform)
-          renderer.renderSprite(cMatrix, spriteMatrix, sprite)
+          cMatrix.mul(spriteMatrix, spriteMatrix)
+          renderer.renderSprite(spriteMatrix, sprite)
         }
       }
     }
@@ -48,11 +54,4 @@ class SpriteSystem(renderer: Renderer) extends System {
         0,
         height.toFloat / scaling
       )
-  private def perspective(w: Int, h: Int) =
-    new Matrix4f().setPerspective(
-      Math.toRadians(70).toFloat,
-      w.toFloat / h.toFloat,
-      0.01f,
-      1000f
-    )
 }

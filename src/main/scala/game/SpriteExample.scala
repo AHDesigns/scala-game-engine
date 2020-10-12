@@ -9,9 +9,7 @@ import systems.{CamaraSystem, System}
 //import systems.{MoveSystem, PlayerMovementSystem}
 import utils.Maths.Rot
 
-object GameLogic extends App with BambooEngine {
-  override val FPS: Int = 60
-
+object SpriteExample extends App with BambooEngine {
   override val systems: Seq[System] = List(
     CamaraSystem
 //    PlayerMovementSystem,
@@ -45,22 +43,44 @@ object GameLogic extends App with BambooEngine {
 //      )
 
     val spriteLoader = new SpriteLoader()
-    val spriteMap = Map(
-      "floor" -> (1, 1),
-      "door" -> (8, 3),
-      "thing" -> (22, 21),
-      "random" -> (22, 31),
-      "fail" -> (220, 31)
-    )
+//    val spriteMap = Map(
+//      "floor" -> (1, 1),
+//      "door" -> (8, 3),
+//      "thing" -> (22, 21),
+//      "random" -> (22, 31)
+//    )
+    val spriteMap = (for {
+      column <- 1 to 4
+      rows = 32
+      row <- 1 to rows
+    } yield {
+      val index = ((column - 1) * rows) + row
+      index.toString -> (row, column)
+    }).toMap
+//    println(spriteMap.keys.toList.map(_.toInt).sorted)
     val spriteSheet = spriteLoader.loadSpriteSheet("monsters", "sprites.bmp", 16, spriteMap)
 
-    new Entity()
-      .addComponent(Transform(new Vector3f(10, 10, 0)))
-      .addComponent(Sprite("door", spriteSheet))
-//
+    // 116 rows
+    // 64 cols
+    val maxId = 32 * 4
+    println("starting map creation")
+    for {
+      x <- 0 until (3824 / 2) by 16
+      y <- 0 until (2054 / 2) by 16
+    } {
+      val id = {
+        val random = (Math.random() * maxId).toInt
+        if (random == 0) 1 else random
+      }
+      new Entity()
+        .addComponent(Transform(new Vector3f(x.toFloat, y.toFloat, 0)))
+        .addComponent(Sprite(id.toString, spriteSheet))
+    }
+    println("finished map")
+    //
 //    new Entity()
-//      .addComponent(Transform(new Vector3f(1, 0, 0)))
-//      .addComponent(Sprite("thing", spriteSheet))
+//      .addComponent(Transform(new Vector3f(0, 16, 0)))
+//      .addComponent(Sprite("2", spriteSheet))
 //
 //    new Entity()
 //      .addComponent(Transform(new Vector3f(0, 1, 0)))

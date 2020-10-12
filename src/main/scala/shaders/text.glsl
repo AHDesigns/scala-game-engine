@@ -4,8 +4,7 @@ layout (location = 3) in vec2 texCoord;
 
 out vec2 textureCoord;
 
-uniform mat4 textPosition;
-uniform mat4 cameraMatrix;
+uniform mat4 projModelMatrix;
 uniform vec4 glyphOffset;
 uniform vec2 glyphSize;
 
@@ -47,40 +46,42 @@ vec2 getSpriteLocation(vec2 uvCoord)
     return spriteCoords;
 }
 
-vec2 resiseSprite(vec3 pos, vec2 size)
+vec2 resiseSprite(vec2 uvCoord, vec2 size)
 {
-//    float xPixels = 1 / (3824 / 2);
-//    float yPixels = 1 / (2054 / 2);
-    float xPixels = 1 / 1;
-    return vec2 (pos.x * 0.01 * size.x, pos.y * 0.01 * size.y);
-//    return vec2 (pos.x * xPixels * size.x, pos.y * yPixels * size.y);
+    vec2 spriteCoords;
+    if (uvCoord.x == 0 && uvCoord.y == 0) {
+        spriteCoords = vec2(0, size.y);
+    } else if (uvCoord.x == 0 && uvCoord.y == 1 ) {
+        spriteCoords = size;
+    } else if (uvCoord.x == 1 && uvCoord.y == 0 ) {
+        spriteCoords = vec2(0, 0);
+    } else {
+        spriteCoords = vec2(size.x,0);
+    }
+
+    return spriteCoords;
 }
 
 vec2 resiseSpritehack(vec2 uvCoord, vec2 size)
 {
     vec2 spriteCoords;
     if (uvCoord.x == 0 && uvCoord.y == 0) {
-//        spriteCoords = vec2(size.y, 0);
-        spriteCoords = vec2(0, size.y);
+        spriteCoords = vec2(0, 10);
     } else if (uvCoord.x == 0 && uvCoord.y == 1 ) {
-        spriteCoords = size;
-//        spriteCoords = vec2(1,1);
+        spriteCoords = vec2(10,10);
     } else if (uvCoord.x == 1 && uvCoord.y == 0 ) {
         spriteCoords = vec2(0, 0);
     } else {
-//        spriteCoords = vec2(0, size.y);
-        spriteCoords = vec2(size.x,0);
+        spriteCoords = vec2(10,0);
     }
 
-    return spriteCoords * 1 / (1000/2);
-//    return spriteCoords * 0.001;
+    return spriteCoords;
 }
 
 void main()
 {
     vec2 newPos = resiseSpritehack(texCoord, glyphSize);
-    vec4 worldPos = textPosition * vec4(newPos, aPos.z, 1.0);
-    gl_Position = cameraMatrix * worldPos;
+    gl_Position = projModelMatrix * vec4(newPos, aPos.z, 1.0);
     textureCoord = getSpriteLocation(texCoord);
 }
 

@@ -1,8 +1,8 @@
 package components
 
-import game.GameLogic.loader
+import game.SpriteExample.loader
 import identifier.Identifier
-import loaders.{FontLoader, SpriteImage, SpriteSheet}
+import loaders.{FontLoader, Glyph, SpriteImage, SpriteSheet}
 import org.joml.Vector3f
 import rendy.Mesh
 import shaders.{ModelShader, SpriteShader}
@@ -51,8 +51,7 @@ case class Model(mesh: Mesh, shader: ModelShader) extends Component
 case class Sprite(private val name: String, private val spriteSheet: SpriteSheet)
     extends Component {
   val spriteImage: SpriteImage = spriteSheet.getSprite(name)
-  val mesh: Mesh =
-    loader.createMeshSprite(spriteImage, Some(spriteSheet.spriteSize, spriteSheet.spriteSize))
+  val mesh: Mesh = loader.createMeshSprite(spriteImage)
   val shader = new SpriteShader("")
 }
 
@@ -60,8 +59,8 @@ object Sprite {
   val defaultSpriteSheet = "sprites.bmp"
 }
 
-case class Text(private val string: String)(implicit font: FontLoader) extends Component {
-//  val text: IndexedSeq[Glyph] = font.text(string)
-//  val mesh: Mesh = loader.createMeshSprite()
-//  val shader = new TextShader(50, 68)
+case class Text(private val string: String)(implicit val font: FontLoader) extends Component {
+  val text: IndexedSeq[(Glyph, Mesh)] =
+    font.glyphs(string).map(glyph => (glyph, loader.createMeshSprite(glyph.spriteImage)))
+  val shader = new SpriteShader("")
 }

@@ -1,8 +1,8 @@
 package systems.render
 
-import components.{Light, Model, Sprite, Transform}
+import components._
 import eventSystem.{DebugWireframe, EventListener}
-import org.joml.Matrix4f
+import org.joml.{Matrix4f, Vector3f}
 import org.lwjgl.opengl.GL11._
 import org.lwjgl.opengl.GL13.{glActiveTexture, GL_TEXTURE0}
 import org.lwjgl.opengl.GL20.{glDisableVertexAttribArray, glEnableVertexAttribArray}
@@ -19,8 +19,8 @@ class Renderer extends EventListener {
 //    GL { glEnable(GL_CULL_FACE) }
 //    GL { glCullFace(GL_BACK) }
 
-//    GL { glEnable(GL_BLEND) }
-//    GL { glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA) }
+    GL { glEnable(GL_BLEND) }
+    GL { glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA) }
     events.on[DebugWireframe] { wireframe }
   }
 
@@ -73,7 +73,7 @@ class Renderer extends EventListener {
     isWireframe = !isWireframe
   }
 
-  def renderSprite(cameraPos: Matrix4f, spriteTransform: Matrix4f, sprite: Sprite): Unit = {
+  def renderSprite(spriteMatrix: Matrix4f, sprite: Sprite): Unit = {
     sprite.mesh match {
       case BasicMesh(vaoID, indices, attributes, textureId) =>
         for { id <- textureId } {
@@ -81,11 +81,7 @@ class Renderer extends EventListener {
           GL { glBindTexture(GL_TEXTURE_2D, id) }
         }
 
-        sprite.shader.draw(
-          cameraPos,
-          spriteTransform,
-          sprite.spriteImage.spriteOffset
-        )
+        sprite.shader.draw(spriteMatrix)
 
         GL { glBindVertexArray(vaoID) }
 
@@ -99,37 +95,37 @@ class Renderer extends EventListener {
     }
   }
 
-//  def renderText(cameraPos: Matrix4f, textTransform: Matrix4f, text: Text): Unit = {
-//    text.mesh match {
-//      case BasicMesh(vaoID, indices, attributes, textureId) =>
-//        for { id <- textureId } {
-//          GL { glActiveTexture(GL_TEXTURE0) }
-//          GL { glBindTexture(GL_TEXTURE_2D, id) }
-//        }
-//
-//        GL { glBindVertexArray(vaoID) }
-//
-//        for (index <- attributes) GL { glEnableVertexAttribArray(index) }
-//
-////        textTransform.translate(new Vector3f(advance, 0, 0), new Matrix4f()),
-//        var advance = 0f
-//        for { glyph <- text.text } {
-//          text.model.shader.drawText(
-//            cameraPos.translate(new Vector3f(advance, 0, 0), new Matrix4f()),
-//            glyph
-//          )
-//
-////          advance += glyph.xAdvance
-//          advance += (glyph.xAdvance * (1f / 64f))
-////          advance += (glyph.xAdvance * (1f / 100f))
-////          advance += (glyph.xAdvance * (1f / 24f))
-//
-//          GL { glDrawElements(GL_TRIANGLES, indices, GL_UNSIGNED_INT, 0) }
-//        }
-//
-//        for (index <- attributes) GL { glDisableVertexAttribArray(index) }
-//
-//        GL { glBindVertexArray(0) }
-//    }
-//  }
+  def renderText(textTransform: Matrix4f, text: Text): Unit = {
+    var advance = 0f
+    var lastChar = ' '
+
+    text.text.foreach {
+      case (glyph, BasicMesh(vaoID, indices, attributes, textureId)) =>
+        for { id <- textureId } {
+          GL { glActiveTexture(GL_TEXTURE0) }
+          GL { glBindTexture(GL_TEXTURE_2D, id) }
+        }
+
+        GL { glBindVertexArray(vaoID) }
+
+        for (index <- attributes) GL { glEnableVertexAttribArray(index) }
+
+        val kerning = text.font.getKerning(lastChar, glyph.char)
+        text.shader.draw(
+          textTransform.translate(
+            new Vector3f(advance + kerning, 0, 0),
+            new Matrix4f()
+          )
+        )
+
+        advance += glyph.xAdvance
+        lastChar = glyph.char
+
+        GL { glDrawElements(GL_TRIANGLES, indices, GL_UNSIGNED_INT, 0) }
+
+        for (index <- attributes) GL { glDisableVertexAttribArray(index) }
+
+        GL { glBindVertexArray(0) }
+    }
+  }
 }

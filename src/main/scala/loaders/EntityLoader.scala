@@ -27,28 +27,28 @@ class EntityLoader extends ObjLoader with TextureLoader {
     cache.getOrElseUpdate(filePath, loadPrimitive(load(filePath), Some(textureId)))
   }
 
-  def createMeshSprite(spriteImage: SpriteImage, size: Option[(Int, Int)]): Mesh =
+  def createMeshSprite(spriteImage: SpriteImage): Mesh =
     spriteImage match {
-      case SpriteImage(Texture(id, tWidth, tHeight), SpriteOffset(x1, x2, y1, y2)) =>
+      case SpriteImage(Texture(id, tWidth, tHeight), SpriteOffset(x1, x2, y1, y2), size) =>
         val spriteMeshId = List(id.toFloat, x1, x2, y1, y2).mkString
-        val (width, height) = size.getOrElse(tWidth -> tHeight)
+        val (width, height) = size.getOrElse(tWidth.toFloat -> tHeight.toFloat)
         cache.getOrElseUpdate(
           spriteMeshId,
           loadPrimitive(
             MeshData(
               PositionsData(
                 List(
-                  width.toFloat,
-                  height.toFloat,
+                  width,
+                  height,
                   0.0f, // top right
-                  width.toFloat,
+                  width,
                   0f,
                   0.0f, // bottom right
                   0f,
                   0f,
                   0.0f, // bottom left
                   0f,
-                  height.toFloat,
+                  height,
                   0.0f // top left
                 )
               ),

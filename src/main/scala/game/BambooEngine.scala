@@ -10,7 +10,7 @@ import systems.render.Renderer
 import window.Window
 
 trait BambooEngine extends EventListener with Logger {
-  val FPS: Int
+  private val FPS = 600
   val loader = new EntityLoader()
 
   val systems: Seq[_root_.systems.System]
@@ -46,23 +46,25 @@ trait BambooEngine extends EventListener with Logger {
     while (gameRunning) {
       val loopStartTime = getTime
       val elapsed = loopStartTime - previous
+      println("FPS: ", (1d / elapsed).floor.toInt)
       previous = loopStartTime
       steps += elapsed
 
       while (steps >= secsPerUpdate) {
-        // Update all systems
-        systems foreach (_.update(elapsed.toFloat))
-        // Broadcast game loop event, not sure if I need this
-        EventSystem ! GameLoopTick(elapsed.toFloat)
-        // Get any inputs from the user ready for the next frame.
-        inputHandler.poll()
         steps -= secsPerUpdate
       }
+
+      // Update all systems
+      systems foreach (_.update(elapsed.toFloat))
+      // Broadcast game loop event, not sure if I need this
+      EventSystem ! GameLoopTick(elapsed.toFloat)
+      // Get any inputs from the user ready for the next frame.
+      inputHandler.poll()
 
       window.draw {
 //        modelRenderer.update(elapsed.toFloat)
         spriteRenderer.update(elapsed.toFloat)
-//        textRenderer.update(elapsed.toFloat)
+        textRenderer.update(elapsed.toFloat)
       }
       // sleep the thread based on the target FPS
       sync(loopStartTime.toLong)

@@ -55,10 +55,7 @@ object World {
   def getComponentList[A <: Component](implicit componentId: ComponentId[A]): ArrayBuffer[A] = {
     val componentType = componentId.id
     components
-      .getOrElse(
-        componentType,
-        throw new RuntimeException(s"no components of type $componentType")
-      )
+      .getOrElse(componentType, new ArrayBuffer[A].empty)
       .asInstanceOf[ArrayBuffer[A]]
   }
 

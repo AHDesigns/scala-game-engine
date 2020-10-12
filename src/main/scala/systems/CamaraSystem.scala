@@ -1,6 +1,7 @@
 package systems
 
 import components.{Camera, CameraActive, Transform}
+import utils.Directions
 
 object CamaraSystem extends System {
   override def init(): Unit = {}
@@ -13,7 +14,7 @@ object CamaraSystem extends System {
       }
       transform <- camera.getSibling[Transform]
     } {
-//      transform.position.add(Directions.Right.toVec)
+      transform.position.add(Directions.Right.toVec)
     }
   }
 }

@@ -18,7 +18,7 @@ trait Shader extends ShaderLoader {
     GL { loader(location) }
   }
 
-  protected def uniformTexture(slot: Int = 0, uniformName: String = "textureSampler"): Unit =
+  protected def uniformTexture(slot: Int, uniformName: String = "textureSampler"): Unit =
     uniform(uniformName) {
       GL { glUniform1i(_, slot) }
     }

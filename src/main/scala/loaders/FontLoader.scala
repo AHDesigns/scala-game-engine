@@ -1,19 +1,21 @@
 package loaders
 
 import logging.Logger
+import rendy.SpriteOffset
 
 import scala.util.{Failure, Success, Try}
 import scala.util.matching.Regex
 
 case class Glyph(
-    char: Int,
-    uvStart: (Float, Float),
-    uvEnd: (Float, Float),
-    size: (Float, Float),
+    spriteImage: SpriteImage,
     xOffset: Int,
     yOffset: Int,
-    xAdvance: Int
+    xAdvance: Int,
+    char: Char
 )
+
+case class CharInfo(char: Char, glyph: Glyph)
+case class Kerning(first: Char, second: Char, amount: Int)
 
 class FontLoader(fontPath: String, fontInfoPath: String)
     extends FileLoader
@@ -21,7 +23,11 @@ class FontLoader(fontPath: String, fontInfoPath: String)
     with Logger {
   val fontTexture: Texture = loadTexture(fontPath)
 
-  def text(text: String): IndexedSeq[Glyph] = text map { getChar }
+  def glyphs(text: String): IndexedSeq[Glyph] = text map { getChar }
+
+  def getKerning(first: Char, second: Char): Int = {
+    kernings.getOrElse(first -> second, 0)
+  }
 
   private def getChar(c: Char): Glyph = {
     chars.get(c) match {
@@ -49,6 +55,43 @@ class FontLoader(fontPath: String, fontInfoPath: String)
     }
   }
 
+  private val kernings: Map[(Char, Char), Int] = {
+    readFileByLines("res/" + fontInfoPath) { source =>
+      (for {
+        line <- source.getLines()
+        kerning <- getKerning(line)
+      } yield kerning).toMap
+    } match {
+      case Left(err)    => throw new RuntimeException(s"failed $err")
+      case Right(value) => value
+    }
+  }
+
+  private def getKerning(line: String): Option[((Char, Char), Int)] = {
+    val kerningRegex: Regex =
+      """#first=(\d+) #second=(\d+) #amount=([-?\d]+)""".r
+    if (!line.startsWith("#kerning ")) {
+      None
+    } else {
+      Try {
+        (for (patternMatch <- kerningRegex.findAllMatchIn(line))
+          yield {
+            implicit val pat: Regex.Match = patternMatch
+            g(1).toInt.toChar -> g(2).toInt.toChar -> g(3).toInt
+          }).toList.headOption
+      } match {
+        case Failure(exception) =>
+          logWarn(exception.toString)
+          None
+        case Success(None) =>
+          logWarn(s"Could not parse line: [$line] to Kerning")
+          None
+        case Success(value) => value
+        case _              => throw new RuntimeException("inexhaustive match")
+      }
+    }
+  }
+
   private def processLine(line: String): Option[(Char, Glyph)] = {
     val glyphRegex: Regex =
       """#charId=(\d+) #uvStart=\(([\d.]+), ([\d.]+)\) #uvEnd=\(([\d.]+), ([\d.]+)\) #size=\(([\d.]+), ([\d.]+)\) #xOffset=([-?\d.]+) #yOffset=([-?\d.]+) #xAdvance=([-?\d.]+)""".r
@@ -57,15 +100,25 @@ class FontLoader(fontPath: String, fontInfoPath: String)
     } else {
       Try {
         (for (patternMatch <- glyphRegex.findAllMatchIn(line))
-          yield patternMatch.group(1).toInt.toChar -> Glyph(
-            char = patternMatch.group(1).toInt,
-            uvStart = (patternMatch.group(2).toFloat, patternMatch.group(3).toFloat),
-            uvEnd = (patternMatch.group(4).toFloat, patternMatch.group(5).toFloat),
-            size = (patternMatch.group(6).toFloat, patternMatch.group(7).toFloat),
-            xOffset = patternMatch.group(8).toInt,
-            yOffset = patternMatch.group(9).toInt,
-            xAdvance = patternMatch.group(10).toInt
-          )).toList.headOption
+          yield {
+            implicit val pat: Regex.Match = patternMatch
+            g(1).toInt.toChar -> Glyph(
+              SpriteImage(
+                fontTexture,
+                SpriteOffset(
+                  x1 = g(2).toFloat,
+                  x2 = g(4).toFloat,
+                  y1 = g(3).toFloat,
+                  y2 = g(5).toFloat
+                ),
+                size = Some(g(6).toFloat -> g(7).toFloat)
+              ),
+              xOffset = g(8).toInt,
+              yOffset = g(9).toInt,
+              xAdvance = g(10).toInt,
+              char = g(1).toInt.toChar
+            )
+          }).toList.headOption
       } match {
         case Failure(exception) =>
           logWarn(exception.toString)
@@ -78,4 +131,6 @@ class FontLoader(fontPath: String, fontInfoPath: String)
       }
     }
   }
+
+  private def g(i: Int)(implicit patternMatch: Regex.Match) = patternMatch.group(i)
 }
