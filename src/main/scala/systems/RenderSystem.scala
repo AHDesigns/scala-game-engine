@@ -23,7 +23,7 @@ class RenderSystem(renderer: Renderer) extends System {
 
     val sun = processComponent[Light, Option[(Light, Transform)]] { light =>
       for { transform <- light.getSibling[Transform] } yield (light, transform)
-    }.head
+    }.headOption.flatten
 
     for {
       cTransform <- camera

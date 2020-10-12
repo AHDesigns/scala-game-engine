@@ -62,7 +62,7 @@ trait BambooEngine extends EventListener with Logger {
       inputHandler.poll()
 
       window.draw {
-//        modelRenderer.update(elapsed.toFloat)
+        modelRenderer.update(elapsed.toFloat)
         spriteRenderer.update(elapsed.toFloat)
         textRenderer.update(elapsed.toFloat)
       }

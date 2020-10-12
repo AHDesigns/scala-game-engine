@@ -18,14 +18,6 @@ class CoordinateSystem(var max: Int, val loader: EntityLoader) {
         new StaticShader(new Vector4f(1, 1, 1, 1f))
       )
     )
-  new Entity()
-    .addComponent(Transform(new Vector3f(0, 100f, 0), scale = 0.5f))
-    .addComponent(
-      Model(
-        loader.loadModel("primitive/cube"),
-        new StaticShader(new Vector4f(1, 1, 1, 1f))
-      )
-    )
 
   val entities = -max to max flatMap { idx =>
     {

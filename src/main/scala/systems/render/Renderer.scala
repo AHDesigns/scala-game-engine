@@ -15,12 +15,6 @@ class Renderer extends EventListener {
   private var isWireframe = false
 
   def setup(): Unit = {
-//    GL { glEnable(GL_DEPTH_TEST) }
-//    GL { glEnable(GL_CULL_FACE) }
-//    GL { glCullFace(GL_BACK) }
-
-    GL { glEnable(GL_BLEND) }
-    GL { glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA) }
     events.on[DebugWireframe] { wireframe }
   }
 
@@ -36,6 +30,10 @@ class Renderer extends EventListener {
       mTransform: Transform,
       projectionMatrix: Matrix4f
   ): Unit = {
+    GL { glEnable(GL_DEPTH_TEST) }
+    GL { glEnable(GL_CULL_FACE) }
+    GL { glCullFace(GL_BACK) }
+
     val viewMatrix = Maths.createViewMatrix(camera)
     model.mesh match {
       case BasicMesh(vaoID, indices, attributes, textureId) =>
@@ -96,6 +94,8 @@ class Renderer extends EventListener {
   }
 
   def renderText(textTransform: Matrix4f, text: Text): Unit = {
+    GL { glEnable(GL_BLEND) }
+    GL { glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA) }
     var advance = 0f
     var lastChar = ' '
 
