@@ -98,6 +98,7 @@ class BatchRenderer extends ShaderLoader with Logger with TextureLoader {
 
   GL { glBindBuffer(GL_ARRAY_BUFFER, vboID) }
   def draw(): Unit = {
+    // best practices https://www.khronos.org/opengl/wiki/Vertex_Specification_Best_Practices
     // buffer data
     val idx = (Random.nextFloat() * quadCount).round * 9
     data.vertices(idx) += 0.1f
