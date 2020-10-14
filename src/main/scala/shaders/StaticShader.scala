@@ -8,7 +8,7 @@ import utils.Control.{GL, GLU}
 import utils.JavaBufferUtils.getMatrixBuffer
 
 class StaticShader(color: Vector4f) extends ModelShader with Logger {
-  val program: Int = load("basic") match {
+  val program: Int = load("static") match {
     case Left(err) => logErr(err); 0
     case Right(id) => id
   }

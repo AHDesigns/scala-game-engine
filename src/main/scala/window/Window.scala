@@ -41,8 +41,8 @@ class Window extends EventListener with Logger {
 
   // Make the OpenGL context current
   glfwMakeContextCurrent(id)
-  // Enable v-sync
-  glfwSwapInterval(1)
+  // Enable v-sync (TURN off for perf test)
+//  glfwSwapInterval(1)
   // Make the window visible
   glfwShowWindow(id)
   // does all the things

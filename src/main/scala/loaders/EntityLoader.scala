@@ -95,15 +95,11 @@ class EntityLoader extends ObjLoader with TextureLoader {
       case _: ColorData     => 2
       case _: TextureData   => 3
     }
-    bindVertex(data, attribId)
+    GL { glBufferData(GL_ARRAY_BUFFER, createBuffer(data.vertexData.toArray), GL_STATIC_DRAW) }
+    GL { glVertexAttribPointer(attribId, data.step, GL_FLOAT, false, 0, 0) }
 
     GL { glBindBuffer(GL_ARRAY_BUFFER, 0) }
     attribId
-  }
-
-  private def bindVertex(data: AttribData, index: Int): Unit = {
-    GL { glBufferData(GL_ARRAY_BUFFER, createBuffer(data.vertexData), GL_STATIC_DRAW) }
-    GL { glVertexAttribPointer(index, data.step, GL_FLOAT, false, 0, 0) }
   }
 
   /**
@@ -115,7 +111,7 @@ class EntityLoader extends ObjLoader with TextureLoader {
     */
   private def storeEAO(indices: List[Int]): Unit = {
     GL { glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, createVBO()) }
-    GL { glBufferData(GL_ELEMENT_ARRAY_BUFFER, createBuffer(indices), GL_STATIC_DRAW) }
+    GL { glBufferData(GL_ELEMENT_ARRAY_BUFFER, createBuffer(indices.toArray), GL_STATIC_DRAW) }
     // no need to unbind for EAO
   }
 

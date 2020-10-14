@@ -6,14 +6,14 @@ import org.joml.Matrix4f
 import org.lwjgl.BufferUtils
 
 object JavaBufferUtils {
-  def createBuffer(data: List[Float]): FloatBuffer = {
-    val buffer = BufferUtils.createFloatBuffer(data.length).put(data.toArray)
+  def createBuffer(data: Array[Float]): FloatBuffer = {
+    val buffer = BufferUtils.createFloatBuffer(data.length).put(data)
     buffer.flip()
     buffer
   }
 
-  def createBuffer(data: List[Int]): IntBuffer = {
-    val buffer = BufferUtils.createIntBuffer(data.length).put(data.toArray)
+  def createBuffer(data: Array[Int]): IntBuffer = {
+    val buffer = BufferUtils.createIntBuffer(data.length).put(data)
     buffer.flip()
     buffer
   }

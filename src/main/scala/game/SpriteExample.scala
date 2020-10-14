@@ -57,7 +57,6 @@ object SpriteExample extends App with BambooEngine {
       val index = ((column - 1) * rows) + row
       index.toString -> (row, column)
     }).toMap
-//    println(spriteMap.keys.toList.map(_.toInt).sorted)
     val spriteSheet = spriteLoader.loadSpriteSheet("monsters", "sprites.bmp", 16, spriteMap)
 
     // 116 rows
